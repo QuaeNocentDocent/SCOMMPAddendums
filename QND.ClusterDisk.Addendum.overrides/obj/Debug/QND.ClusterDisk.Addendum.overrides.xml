@@ -3,7 +3,7 @@
   <Manifest>
     <Identity>
       <ID>QND.ClusterDisk.Addendum.overrides</ID>
-      <Version>1.0.0.3</Version>
+      <Version>1.0.0.6</Version>
     </Identity>
     <Name>QND.ClusterDisk.Addendum.overrides</Name>
     <References>
@@ -14,7 +14,7 @@
       </Reference>
       <Reference Alias="QCA">
         <ID>QND.ClusterDisk.Addendum</ID>
-        <Version>1.0.0.66</Version>
+        <Version>1.0.0.69</Version>
         <PublicKeyToken>920d8ca3e48c0337</PublicKeyToken>
       </Reference>
     </References>
@@ -22,6 +22,12 @@
   <Monitoring>
     <Overrides>
       <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.AvgDiskSecPerTransfer.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" Rule="QCA!QND.ClusterDisk.AvgDiskSecPerTransfer.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.DiskReadsPerSec.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" Rule="QCA!QND.ClusterDisk.DiskReadsPerSec.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.DiskWritesPerSec.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" Rule="QCA!QND.ClusterDisk.DiskWritesPerSec.Collection" Property="Enabled">
         <Value>true</Value>
       </RulePropertyOverride>
     </Overrides>

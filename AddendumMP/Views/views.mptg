@@ -4,7 +4,7 @@
       <CustomViewConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
         <ViewFolder>QND.ClusterDisk.Clusterdisk.folder</ViewFolder>
         <ViewType>SC!Microsoft.SystemCenter.PerformanceViewType</ViewType>
-        <ViewConfiguration>&lt;Criteria&gt;&lt;Object&gt;Cluster Disk&lt;/Object&gt;&lt;Instance /&gt;&lt;Counter&gt;Cluster Disk - Average Seconds Per Transfer&lt;/Counter&gt;&lt;/Criteria&gt;</ViewConfiguration>
+        <ViewConfiguration>&lt;Criteria&gt;&lt;Object&gt;Cluster Disk&lt;/Object&gt;&lt;Instance /&gt;&lt;Counter&gt;Avg. Disk sec/Transfer&lt;/Counter&gt;&lt;/Criteria&gt;</ViewConfiguration>
         <Visible>true</Visible>
         <Accessibility>Internal</Accessibility>
         <Id>QND.ClusterDisk.Clusterdisk.Average.Seconds.Per.Transfer.View</Id>
@@ -18,10 +18,10 @@
       <CustomViewConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
         <ViewFolder>QND.ClusterDisk.Clusterdisk.folder</ViewFolder>
         <ViewType>SC!Microsoft.SystemCenter.PerformanceViewType</ViewType>
-        <ViewConfiguration>&lt;Criteria&gt;&lt;Object&gt;Cluster Disk&lt;/Object&gt;&lt;Instance /&gt;&lt;Counter&gt;Cluster Disk - Reads per Second&lt;/Counter&gt;&lt;/Criteria&gt;</ViewConfiguration>
+        <ViewConfiguration>&lt;Criteria&gt;&lt;Object&gt;Cluster Disk&lt;/Object&gt;&lt;Instance /&gt;&lt;Counter&gt;Disk Reads/sec&lt;/Counter&gt;&lt;/Criteria&gt;</ViewConfiguration>
         <Visible>true</Visible>
         <Accessibility>Internal</Accessibility>
-        <Id>QND.ClusterDisk.Clusterdisk.Readsper.Second.View</Id>
+        <Id>QND.ClusterDisk.Clusterdisk.Reads.per.Second.View</Id>
         <DisplayName>Cluster Disk - Reads per Second</DisplayName>
         <Description>Description for the new view</Description>
         <Target>ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk</Target>
@@ -32,7 +32,7 @@
       <CustomViewConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
         <ViewFolder>QND.ClusterDisk.Clusterdisk.folder</ViewFolder>
         <ViewType>SC!Microsoft.SystemCenter.PerformanceViewType</ViewType>
-        <ViewConfiguration>&lt;Criteria&gt;&lt;Object&gt;Cluster Disk&lt;/Object&gt;&lt;Instance /&gt;&lt;Counter&gt;Cluster Disk - Writes per Second&lt;/Counter&gt;&lt;/Criteria&gt;</ViewConfiguration>
+        <ViewConfiguration>&lt;Criteria&gt;&lt;Object&gt;Cluster Disk&lt;/Object&gt;&lt;Instance /&gt;&lt;Counter&gt;Disk Writes/sec&lt;/Counter&gt;&lt;/Criteria&gt;</ViewConfiguration>
         <Visible>true</Visible>
         <Accessibility>Internal</Accessibility>
         <Id>QND.ClusterDisk.Clusterdisk.Writes.per.Second.View</Id>
