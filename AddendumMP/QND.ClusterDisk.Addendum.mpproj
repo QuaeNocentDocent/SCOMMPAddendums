@@ -59,9 +59,15 @@
       <PackageToBundle>False</PackageToBundle>
     </ManagementPackReference>
     <ManagementPackReference Include="Microsoft.Windows.Server.ClusterSharedVolumeMonitoring">
-      <HintPath>C:\Local\Dev\OpsMgr\MPLib2012\Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.mp</HintPath>
+      <HintPath>C:\local\dev\opsmgr\mplib2012\Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.mp</HintPath>
       <Alias>ClusterDisk</Alias>
-      <MinVersion>6.0.6989.0</MinVersion>
+      <MinVersion>6.0.7061.0</MinVersion>
+      <PackageToBundle>False</PackageToBundle>
+    </ManagementPackReference>
+    <ManagementPackReference Include="Microsoft.Windows.Server.Library">
+      <HintPath>C:\local\dev\opsmgr\mplib2012\Microsoft.Windows.Server.Library.mp</HintPath>
+      <Alias>MWSL</Alias>
+      <MinVersion>6.0.7061.0</MinVersion>
       <PackageToBundle>False</PackageToBundle>
     </ManagementPackReference>
     <ManagementPackReference Include="System.Health.Library">
@@ -89,38 +95,30 @@
     </Compile>
     <Compile Include="CSVMonitors.mptg.mpx">
       <SubType>Code</SubType>
-      <DependentUpon>CSVMonitors.mpsd</DependentUpon>
     </Compile>
     <Compile Include="CSVPerfRules.mptg.mpx">
       <SubType>Code</SubType>
-      <DependentUpon>CSVPerfRules.mpsd</DependentUpon>
     </Compile>
     <Compile Include="Disk.mpx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Folders\Folders.mpx">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MPIdentity.mpx">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="Tests\ClusterDiskEx.mpx">
+    <Compile Include="Views\views.mptg.mpx">
       <SubType>Code</SubType>
-    </None>
-    <None Include="Tests\SignaturesCollection.mptg.mpx">
-      <SubType>Code</SubType>
-      <DependentUpon>Tests\SignaturesCollection.mptg</DependentUpon>
-    </None>
+      <DependentUpon>Views\views.mptg</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Monitors" />
+    <Folder Include="Folders" />
+    <Folder Include="Views" />
+    <Folder Include="Rules" />
     <Folder Include="Scripts" />
-    <Folder Include="Tests" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Tests\SignaturesCollection.mptg">
-      <SubType>Content</SubType>
-      <Generator>FragmentGenerator</Generator>
-    </None>
-    <None Include="Tests\Test1.wsf">
-      <SubType>Content</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Scripts\VolumeMapping.ps1" />
@@ -136,13 +134,17 @@
     <Content Include="CSVOptPerfRules.templatesnippet">
       <SubType>Content</SubType>
     </Content>
-    <None Include="CSVPerfRules.csv">
-      <SubType>Content</SubType>
-    </None>
     <Content Include="CSVPerfMonitor.templatesnippet">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="CSVPerfRules.csv">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="CSVPerfRules.mpsd">
+      <SubType>Content</SubType>
+      <Generator>FragmentGenerator</Generator>
+    </Content>
+    <Content Include="Views\views.mptg">
       <SubType>Content</SubType>
       <Generator>FragmentGenerator</Generator>
     </Content>

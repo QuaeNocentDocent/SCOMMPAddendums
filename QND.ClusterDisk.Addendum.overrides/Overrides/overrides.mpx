@@ -1,0 +1,9 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<Monitoring>
+		<Overrides>
+			<RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.AvgDiskSecPerTransfer.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" Rule="QCA!QND.ClusterDisk.AvgDiskSecPerTransfer.Collection" Property="Enabled">
+				<Value>true</Value>
+			</RulePropertyOverride>
+		</Overrides>
+	</Monitoring>
+</ManagementPackFragment>
