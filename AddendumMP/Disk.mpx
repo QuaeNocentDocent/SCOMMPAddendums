@@ -1,7 +1,7 @@
 ﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Monitoring>
     <Rules>
-      <Rule ID="QND.ClusterDisk.AvgDiskSecPerTransfer.Collection" Enabled="true" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk">
+      <Rule ID="QND.ClusterDisk.AvgDiskSecPerTransfer.Collection" Enabled="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk">
         <Category>PerformanceCollection</Category>
         <DataSources>
           <DataSource ID="PerformanceDS" TypeID="Perf!System.Performance.OptimizedDataProvider">
@@ -21,7 +21,7 @@
           <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
         </WriteActions>
       </Rule>
-      <Rule ID="QND.ClusterDisk.DiskReadsPerSec.Collection" Enabled="true" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk">
+      <Rule ID="QND.ClusterDisk.DiskReadsPerSec.Collection" Enabled="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk">
         <Category>PerformanceCollection</Category>
         <DataSources>
           <DataSource ID="PerformanceDS" TypeID="Perf!System.Performance.OptimizedDataProvider">
@@ -41,7 +41,7 @@
           <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
         </WriteActions>
       </Rule>
-      <Rule ID="QND.ClusterDisk.DiskWritesPerSec.Collection" Enabled="true" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk">
+      <Rule ID="QND.ClusterDisk.DiskWritesPerSec.Collection" Enabled="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk">
         <Category>PerformanceCollection</Category>
         <DataSources>
           <DataSource ID="PerformanceDS" TypeID="Perf!System.Performance.OptimizedDataProvider">
@@ -103,7 +103,7 @@
       </Rule>
     </Rules>
     <Monitors>
-      <UnitMonitor ID="QND.ClusterDisk.AvgDiskSecPerTransfer" Accessibility="Public" Enabled="true" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" 
+      <UnitMonitor ID="QND.ClusterDisk.AvgDiskSecPerTransfer" Accessibility="Public" Enabled="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" 
                    ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
         <Category>PerformanceHealth</Category>
         <AlertSettings AlertMessage="QND.ClusterDisk.AvgDiskSecPerTransfer.AlertMessage">

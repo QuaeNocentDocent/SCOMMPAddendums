@@ -72,7 +72,7 @@
 </TypeDefinitions>
   <Monitoring>
     <Discoveries>
-      <Discovery ID="QND.ClusterSharedVolume.Ext.Discovery" Enabled="true" Remotable="true" Priority="Normal" ConfirmDelivery="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume">
+      <Discovery ID="QND.ClusterSharedVolume.Ext.Discovery" Enabled="false" Remotable="true" Priority="Normal" ConfirmDelivery="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume">
         <Category>Discovery</Category>
         <DiscoveryTypes>
           <DiscoveryClass TypeID="QND.ClusterSharedVolume.Ext" />
@@ -86,7 +86,7 @@
       </Discovery>
     </Discoveries>
     <Monitors>
-      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.ReadLatency.Monitor" Accessibility="Public" Enabled="true" Target="QND.ClusterSharedVolume.Ext"
+      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.ReadLatency.Monitor" Accessibility="Public" Enabled="false" Target="QND.ClusterSharedVolume.Ext"
        ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
         <Category>PerformanceHealth</Category>
         <AlertSettings AlertMessage="QND.ClusterSharedVolume.Ext.ReadLatency.AlertMessage">
@@ -111,7 +111,7 @@
           <NumSamples>15</NumSamples>
         </Configuration>
       </UnitMonitor>
-      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.WriteLatency.Monitor" Accessibility="Public" Enabled="true" Target="QND.ClusterSharedVolume.Ext"
+      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.WriteLatency.Monitor" Accessibility="Public" Enabled="false" Target="QND.ClusterSharedVolume.Ext"
   ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
         <Category>PerformanceHealth</Category>
         <AlertSettings AlertMessage="QND.ClusterSharedVolume.Ext.WriteLatency.AlertMessage">
@@ -136,7 +136,7 @@
           <NumSamples>15</NumSamples>
         </Configuration>
       </UnitMonitor>
-      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.RedirReadLatency.Monitor" Accessibility="Public" Enabled="true" Target="QND.ClusterSharedVolume.Ext"
+      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.RedirReadLatency.Monitor" Accessibility="Public" Enabled="false" Target="QND.ClusterSharedVolume.Ext"
         ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
         <Category>PerformanceHealth</Category>
         <AlertSettings AlertMessage="QND.ClusterSharedVolume.Ext.RedirReadLatency.AlertMessage">
@@ -161,7 +161,7 @@
           <NumSamples>15</NumSamples>
         </Configuration>
       </UnitMonitor>      
-      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.RedirWriteLatency.Monitor" Accessibility="Public" Enabled="true" Target="QND.ClusterSharedVolume.Ext"
+      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.RedirWriteLatency.Monitor" Accessibility="Public" Enabled="false" Target="QND.ClusterSharedVolume.Ext"
   ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
         <Category>PerformanceHealth</Category>
         <AlertSettings AlertMessage="QND.ClusterSharedVolume.Ext.RedirWriteLatency.AlertMessage">
