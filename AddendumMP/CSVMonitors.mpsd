@@ -1,0 +1,56 @@
+<TemplateGroup DefaultType="CSVPerfMonitor">
+  <Instances>
+    <Instance ID="Instance6536d6b3e1794058ba84e3ebe5d32a9f" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.SnippetTemplate" Version="1.0.0.0">
+      <SnippetTemplateConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Substitutions>
+          <Substitution Name="Rule Id">ReadLatency</Substitution>
+          <Substitution Name="Perf Counter Name">Read Latency</Substitution>
+          <Substitution Name="Perf Object Name">Cluster CSV File System</Substitution>
+          <Substitution Name="Perf Instance Name">$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</Substitution>
+          <Substitution Name="Collection Frequency">60</Substitution>
+          <Substitution Name="Threshold">0.1</Substitution>
+          <Substitution Name="Num Samples">15</Substitution>
+        </Substitutions>
+      </SnippetTemplateConfiguration>
+    </Instance>
+    <Instance ID="Instance40e9217575844c90b8e61ca838ec5852" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.SnippetTemplate" Version="1.0.0.0">
+      <SnippetTemplateConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Substitutions>
+          <Substitution Name="Rule Id">WriteLatency</Substitution>
+          <Substitution Name="Perf Counter Name">Write Latency</Substitution>
+          <Substitution Name="Perf Object Name">Cluster CSV File System</Substitution>
+          <Substitution Name="Perf Instance Name">$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</Substitution>
+          <Substitution Name="Collection Frequency">60</Substitution>
+          <Substitution Name="Threshold">0.1</Substitution>
+          <Substitution Name="Num Samples">15</Substitution>
+        </Substitutions>
+      </SnippetTemplateConfiguration>
+    </Instance>
+    <Instance ID="Instance6c979c6777304b9e838b38972e18d2cd" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.SnippetTemplate" Version="1.0.0.0">
+      <SnippetTemplateConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Substitutions>
+          <Substitution Name="Rule Id">Redir.ReadLatency</Substitution>
+          <Substitution Name="Perf Counter Name">Redirected Read Latency</Substitution>
+          <Substitution Name="Perf Object Name">Cluster CSV File System</Substitution>
+          <Substitution Name="Perf Instance Name">$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</Substitution>
+          <Substitution Name="Collection Frequency">60</Substitution>
+          <Substitution Name="Threshold">0.1</Substitution>
+          <Substitution Name="Num Samples">15</Substitution>
+        </Substitutions>
+      </SnippetTemplateConfiguration>
+    </Instance>
+    <Instance ID="Instance6e3871b54d3b487a82966f87e849580d" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.SnippetTemplate" Version="1.0.0.0">
+      <SnippetTemplateConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Substitutions>
+          <Substitution Name="Rule Id">Redir.WriteLatency</Substitution>
+          <Substitution Name="Perf Counter Name">Redirected Write Latency</Substitution>
+          <Substitution Name="Perf Object Name">Cluster CSV File System</Substitution>
+          <Substitution Name="Perf Instance Name">$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</Substitution>
+          <Substitution Name="Collection Frequency">60</Substitution>
+          <Substitution Name="Threshold">0.1</Substitution>
+          <Substitution Name="Num Samples">15</Substitution>
+        </Substitutions>
+      </SnippetTemplateConfiguration>
+    </Instance>
+  </Instances>
+</TemplateGroup>

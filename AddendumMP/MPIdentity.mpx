@@ -1,0 +1,84 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="QND.ClusterDisk.Addendum">
+          <Name>QND Cluster Disk Addendum</Name>
+          <Description>Adds missing monitors and perf counters for cluster disks and clsuter shared volumes.</Description>
+        </DisplayString>
+      </DisplayStrings>
+      <KnowledgeArticles>
+        <KnowledgeArticle ElementID="QND.ClusterDisk.Addendum">
+
+            <MamlContent>
+              <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+                <title>Summary</title>
+                <para>This Management Pack integrates the standard cluster disks and cluster shared volumes monitors and rules</para>
+                <para>The MP adds the following monitors:</para>
+                <list>
+                  <listItem>
+                    <para>Cluster Disk - Latency (sec/transfer)</para>
+                  </listItem>
+                  <listItem>
+                    <para>CSV - Read Latency</para>
+                  </listItem>
+                  <listItem>
+                    <para>CSV - Write Latency</para>
+                  </listItem>
+                  <listItem>
+                    <para>CSV - Redirected Read Latency</para>
+                  </listItem>
+                  <listItem>
+                    <para>CSV - Redirected Write Latency</para>
+                  </listItem>
+                </list>
+                <para>Additionally the management pack collects the following performance counters using an optimized collection:</para>
+                <list>
+                  <listItem>
+                    <para>Cluster Disk - Average seconds per transfer</para>
+                  </listItem>
+                  <listItem>
+                    <para>Cluster Disk - Reads per second</para>
+                  </listItem>
+                  <listItem>
+                    <para>Cluster Disk - Writes per second</para>
+                  </listItem>
+                  <listItem>
+                    <para>Cluster Disk - Free MB</para>
+                  </listItem>
+                  <listItem>
+                    <para>Cluster Disk - % free space</para>
+                  </listItem>                  
+                  <listItem>
+                    <para>CSV - Read Latency</para>
+                  </listItem>
+                  <listItem>
+                    <para>CSV - Reads per second</para>
+                  </listItem>                  
+                  <listItem>
+                    <para>CSV - Write Latency</para>
+                  </listItem>
+                  <listItem>
+                    <para>CSV - Writes per second</para>
+                  </listItem>
+                  <listItem>
+                    <para>CSV - Redirected Read Latency</para>
+                  </listItem>
+                  <listItem>
+                    <para>CSV - Redirected Reads per second</para>
+                  </listItem>
+                  <listItem>
+                    <para>CSV - Redirected Write Latency</para>
+                  </listItem>
+                  <listItem>
+                    <para>CSV - Redirected Writes per second</para>
+                  </listItem>
+                </list>
+              </section>
+            </MamlContent>
+          </KnowledgeArticle>          
+
+      </KnowledgeArticles>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

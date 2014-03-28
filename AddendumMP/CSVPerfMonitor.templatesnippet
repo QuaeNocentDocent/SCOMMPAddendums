@@ -1,0 +1,50 @@
+﻿<ManagementPackFragment SchemaVersion="2.0">
+  <Monitoring>
+    <Monitors>
+      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.#text('Rule Id')#" Accessibility="Public" Enabled="true" Target="QND.ClusterSharedVolume.Ext"
+             ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
+        <Category>PerformanceHealth</Category>
+        <AlertSettings AlertMessage="QND.ClusterSharedVolume.Ext.#text('Rule Id')#.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Warning</AlertSeverity>
+          <AlertParameters></AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="OverThreshold" MonitorTypeStateID="ConditionTrue" HealthState="Warning" />
+          <OperationalState ID="UnderThreshold" MonitorTypeStateID="ConditionFalse" HealthState="Success" />
+        </OperationalStates>
+        <Configuration>
+          <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+          <CounterName><![CDATA[#text('Perf Counter Name')#]]></CounterName>
+          <ObjectName>#text('Perf Object Name')#</ObjectName>
+          <InstanceName>#text('Perf Instance Name')#</InstanceName>
+          <Frequency>#choice('Collection Frequency', list("60","120","300","900"))#</Frequency>
+          <Threshold>#text('Threshold')#</Threshold>
+          <Direction>greater</Direction>
+          <NumSamples>#text('Num Samples')#</NumSamples>
+        </Configuration>
+      </UnitMonitor>
+    </Monitors>
+  </Monitoring>
+  <Presentation>
+    <StringResources>
+      <String ID="QND.ClusterSharedVolume.Ext.#text('Rule Id')#.AlertMessage" />
+    </StringResources>
+  </Presentation>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.#text('Rule Id')#">
+          <Name>#text('Perf Counter Name')#</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.#text('Rule Id')#.AlertMessage">
+          <Name>CSV Performance - #text('Perf Counter Name')# over threshold</Name>
+          <Description>CSV performance degraded</Description>
+        </DisplayString>        
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>
+

@@ -1,0 +1,320 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+        <ClassType ID="QND.ClusterSharedVolume.Ext" Abstract="false" Accessibility="Public" Base="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume" Hosted="true">          
+          <Property ID="VolumeId" Type="string"/>
+        </ClassType>
+      </ClassTypes>      
+    </EntityTypes>
+    <ModuleTypes>
+    <DataSourceModuleType ID="QND.ClusterSharedVolume.Ext.Discovery.DS" Accessibility="Internal" Batching="false">
+      <Configuration>
+        <xsd:element name="TraceLevel" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        <xsd:element name="ScriptTimeout" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        <xsd:element name="IntervalSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+      </Configuration>
+      <OverrideableParameters>
+        <OverrideableParameter ID="TraceLevel" Selector="$Config/TraceLevel$" ParameterType="int" />
+        <OverrideableParameter ID="ScriptTimeout" Selector="$Config/ScriptTimeout$" ParameterType="int" />
+        <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+        <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+      </OverrideableParameters>
+      <ModuleImplementation>
+        <Composite>
+          <MemberModules>
+            <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedPowerShell.DiscoveryProvider">
+              <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+              <SyncTime>$Config/SyncTime$</SyncTime>
+              <ScriptName>OBPolicyDiscovery.ps1</ScriptName>
+              <ScriptBody>
+                $IncludeFileContent/Scripts/VolumeMapping.ps1$
+              </ScriptBody>
+              <Parameters>
+                <Parameter>
+                  <Name>traceLevel</Name>
+                  <Value>$Config/TraceLevel$</Value>
+                </Parameter>
+                <Parameter>
+                  <Name>computerName</Name>
+                  <Value>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Value>
+                </Parameter>
+                <Parameter>
+                  <Name>ClusterSharedVolumeName</Name>
+                  <Value>$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume"]/ClusterSharedVolumeName$</Value>
+                </Parameter>
+                <Parameter>
+                  <Name>FriendlyVolumeName</Name>
+                  <Value>$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume"]/FriendlyVolumeName$</Value>
+                </Parameter>                
+                <Parameter>
+                  <Name>sourceID</Name>
+                  <Value>$MPElement$</Value>
+                </Parameter>
+                <Parameter>
+                  <Name>ManagedEntityId</Name>
+                  <Value>$Target/Id$</Value>
+                </Parameter>
+              </Parameters>
+              <TimeoutSeconds>$Config/ScriptTimeout$</TimeoutSeconds>
+              <StrictErrorHandling>false</StrictErrorHandling>
+            </DataSource>
+          </MemberModules>
+          <Composition>
+            <Node ID="DS" />
+          </Composition>
+        </Composite>
+      </ModuleImplementation>
+      <OutputType>System!System.Discovery.Data</OutputType>
+    </DataSourceModuleType>
+</ModuleTypes>  
+</TypeDefinitions>
+  <Monitoring>
+    <Discoveries>
+      <Discovery ID="QND.ClusterSharedVolume.Ext.Discovery" Enabled="true" Remotable="true" Priority="Normal" ConfirmDelivery="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="QND.ClusterSharedVolume.Ext" />
+        </DiscoveryTypes>
+      <DataSource ID="DS" TypeID="QND.ClusterSharedVolume.Ext.Discovery.DS">
+        <TraceLevel>1</TraceLevel>
+        <ScriptTimeout>120</ScriptTimeout>
+        <IntervalSeconds>86400</IntervalSeconds>
+        <SyncTime />
+      </DataSource>
+      </Discovery>
+    </Discoveries>
+    <Monitors>
+      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.ReadLatency.Monitor" Accessibility="Public" Enabled="true" Target="QND.ClusterSharedVolume.Ext"
+       ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
+        <Category>PerformanceHealth</Category>
+        <AlertSettings AlertMessage="QND.ClusterSharedVolume.Ext.ReadLatency.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Warning</AlertSeverity>
+          <AlertParameters></AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="OverThreshold" MonitorTypeStateID="ConditionTrue" HealthState="Warning" />
+          <OperationalState ID="UnderThreshold" MonitorTypeStateID="ConditionFalse" HealthState="Success" />
+        </OperationalStates>
+        <Configuration>
+          <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+          <CounterName>Read Latency</CounterName>
+          <ObjectName>Cluster CSV File System</ObjectName>
+          <InstanceName>$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</InstanceName>
+          <Frequency>60</Frequency>
+          <Threshold>0.1</Threshold>
+          <Direction>greater</Direction>
+          <NumSamples>15</NumSamples>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.WriteLatency.Monitor" Accessibility="Public" Enabled="true" Target="QND.ClusterSharedVolume.Ext"
+  ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
+        <Category>PerformanceHealth</Category>
+        <AlertSettings AlertMessage="QND.ClusterSharedVolume.Ext.WriteLatency.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Warning</AlertSeverity>
+          <AlertParameters></AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="OverThreshold" MonitorTypeStateID="ConditionTrue" HealthState="Warning" />
+          <OperationalState ID="UnderThreshold" MonitorTypeStateID="ConditionFalse" HealthState="Success" />
+        </OperationalStates>
+        <Configuration>
+          <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+          <CounterName>Write Latency</CounterName>
+          <ObjectName>Cluster CSV File System</ObjectName>
+          <InstanceName>$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</InstanceName>
+          <Frequency>60</Frequency>
+          <Threshold>0.1</Threshold>
+          <Direction>greater</Direction>
+          <NumSamples>15</NumSamples>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.RedirReadLatency.Monitor" Accessibility="Public" Enabled="true" Target="QND.ClusterSharedVolume.Ext"
+        ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
+        <Category>PerformanceHealth</Category>
+        <AlertSettings AlertMessage="QND.ClusterSharedVolume.Ext.RedirReadLatency.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Warning</AlertSeverity>
+          <AlertParameters></AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="OverThreshold" MonitorTypeStateID="ConditionTrue" HealthState="Warning" />
+          <OperationalState ID="UnderThreshold" MonitorTypeStateID="ConditionFalse" HealthState="Success" />
+        </OperationalStates>
+        <Configuration>
+          <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+          <CounterName>Redirected Read Latency</CounterName>
+          <ObjectName>Cluster CSV File System</ObjectName>
+          <InstanceName>$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</InstanceName>
+          <Frequency>60</Frequency>
+          <Threshold>0.1</Threshold>
+          <Direction>greater</Direction>
+          <NumSamples>15</NumSamples>
+        </Configuration>
+      </UnitMonitor>      
+      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.RedirWriteLatency.Monitor" Accessibility="Public" Enabled="true" Target="QND.ClusterSharedVolume.Ext"
+  ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
+        <Category>PerformanceHealth</Category>
+        <AlertSettings AlertMessage="QND.ClusterSharedVolume.Ext.RedirWriteLatency.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Warning</AlertSeverity>
+          <AlertParameters></AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="OverThreshold" MonitorTypeStateID="ConditionTrue" HealthState="Warning" />
+          <OperationalState ID="UnderThreshold" MonitorTypeStateID="ConditionFalse" HealthState="Success" />
+        </OperationalStates>
+        <Configuration>
+          <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+          <CounterName>Redirected Write Latency</CounterName>
+          <ObjectName>Cluster CSV File System</ObjectName>
+          <InstanceName>$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</InstanceName>
+          <Frequency>60</Frequency>
+          <Threshold>0.1</Threshold>
+          <Direction>greater</Direction>
+          <NumSamples>15</NumSamples>
+        </Configuration>
+      </UnitMonitor>      
+    </Monitors>
+  </Monitoring>
+  <Presentation>
+    <StringResources>
+      <StringResource ID="QND.ClusterSharedVolume.Ext.ReadLatency.AlertMessage"/>
+      <StringResource ID="QND.ClusterSharedVolume.Ext.WriteLatency.AlertMessage"/>
+      <StringResource ID="QND.ClusterSharedVolume.Ext.RedirReadLatency.AlertMessage"/>
+      <StringResource ID="QND.ClusterSharedVolume.Ext.RedirWriteLatency.AlertMessage"/>
+    </StringResources>
+  </Presentation>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext">
+          <Name>Cluster Shared Volume Extended</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext" SubElementID="VolumeId">
+          <Name>Volume Name</Name>
+        </DisplayString>
+
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.ReadLatency.Monitor">
+          <Name>Read Latency</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.ReadLatency.AlertMessage">
+          <Name>CSV Performance - Read Latency over threshold</Name>
+          <Description>CSV performance degraded</Description>
+        </DisplayString>
+
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.WriteLatency.Monitor">
+          <Name>Write Latency</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.WriteLatency.AlertMessage">
+          <Name>CSV Performance - Write Latency over threshold</Name>
+          <Description>CSV performance degraded</Description>
+        </DisplayString>
+
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.RedirReadLatency.Monitor">
+          <Name>Redirected Read Latency</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.RedirReadLatency.AlertMessage">
+          <Name>CSV Performance - Redirected Read Latency over threshold</Name>
+          <Description>CSV performance degraded</Description>
+        </DisplayString>
+        
+        
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.RedirWriteLatency.Monitor">
+          <Name>Redirected Write Latency</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.RedirWriteLatency.AlertMessage">
+          <Name>CSV Performance - Redirected Write Latency over threshold</Name>
+          <Description>CSV performance degraded</Description>
+        </DisplayString>      
+      </DisplayStrings>
+      <KnowledgeArticles>
+        <KnowledgeArticle ElementID="QND.ClusterSharedVolume.Ext.ReadLatency.Monitor">
+          <MamlContent>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Summary</title>
+              <para>This monitor checks for Read Latency. By default it raises an alert if the response time is over 100msec for more than 15 minutes.</para>
+              <para>High Read Latency effects the performance of all the virtual machines using the CSV</para>            
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Causes</title>
+              <para>High Read Latency can be caused by a spike in the usage of the CSV such as a rogue VM or by hardware related problems. It can be related to wrong antivirus configuration, too</para>
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Solution</title>
+              <para>Check using the reads/sec and writes/sec counters if there's a usage spike, if not check the storage subsystem. Check if the antivirus systems is set to exclude virtual machines disks.</para>
+            </section>
+          </MamlContent>
+        </KnowledgeArticle>
+        <KnowledgeArticle ElementID="QND.ClusterSharedVolume.Ext.WriteLatency.Monitor">
+          <MamlContent>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Summary</title>
+              <para>This monitor checks for Write Latency. By default it raises an alert if the response time is over 100msec for more than 15 minutes.</para>
+              <para>High Write Latency effects the performance of all the virtual machines using the CSV</para>
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Causes</title>
+              <para>High Write Latency can be caused by a spike in the usage of the CSV such as a rogue VM or by hardware related problems. It can be related to wrong antivirus configuration, too</para>
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Solution</title>
+              <para>Check using the reads/sec and writes/sec counters if there's a usage spike, if not check the storage subsystem. Check if the antivirus systems is set to exclude virtual machines disks.</para>
+            </section>
+          </MamlContent>
+        </KnowledgeArticle>
+        <KnowledgeArticle ElementID="QND.ClusterSharedVolume.Ext.RedirWriteLatency.Monitor">
+          <MamlContent>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Summary</title>
+              <para>This monitor checks for Redirected Write Latency. By default it raises an alert if the response time is over 100msec for more than 15 minutes.</para>
+              <para>High Redirected Write Latency effects the performance of all the virtual machines using the CSV</para>
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Causes</title>
+              <para>High Redirected Write Latency can be caused by a spike in the usage of the CSV such as a rogue VM or by hardware related problems. It can be related to wrong antivirus configuration, too</para>
+              <para>Redirected I/O should be a rare and transitory state. During redirected I/O all the I/O for the CSV is managed by a single node and the network is used to transfer I/O from other nodes. So higher repsonse times should be expected.</para>
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Solution</title>
+              <para>Check using the redirected reads/sec and redirected writes/sec counters if there's a usage spike, if not check the storage subsystem. Check if the antivirus systems is set to exclude virtual machines disks.</para>
+              <para>Check for enough bandwith for network used for redirected I/O. Check the causes of redirected I/O and if possibile minimize them.</para>
+            </section>
+          </MamlContent>
+        </KnowledgeArticle>
+        <KnowledgeArticle ElementID="QND.ClusterSharedVolume.Ext.RedirReadLatency.Monitor">
+          <MamlContent>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Summary</title>
+              <para>This monitor checks for Redirected Read Latency. By default it raises an alert if the response time is over 100msec for more than 15 minutes.</para>
+              <para>High Redirected Read Latency effects the performance of all the virtual machines using the CSV</para>
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Causes</title>
+              <para>High Redirected Read Latency can be caused by a spike in the usage of the CSV such as a rogue VM or by hardware related problems. It can be related to wrong antivirus configuration, too</para>
+              <para>Redirected I/O should be a rare and transitory state. During redirected I/O all the I/O for the CSV is managed by a single node and the network is used to transfer I/O from other nodes. So higher repsonse times should be expected.</para>
+            </section>
+            <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+              <title>Solution</title>
+              <para>Check using the redirected reads/sec and redirected writes/sec counters if there's a usage spike, if not check the storage subsystem. Check if the antivirus systems is set to exclude virtual machines disks.</para>
+              <para>Check for enough bandwith for network used for redirected I/O. Check the causes of redirected I/O and if possibile minimize them.</para>
+            </section>
+          </MamlContent>
+        </KnowledgeArticle>        
+      </KnowledgeArticles>
+
+      
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

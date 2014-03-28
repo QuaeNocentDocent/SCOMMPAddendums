@@ -1,0 +1,35 @@
+﻿<ManagementPackFragment SchemaVersion="2.0">
+  <Monitoring>
+    <Rules>
+      <Rule ID="QND.ClusterSharedVolume.Ext.#text('Rule Id')#" Enabled="true" Target="QND.ClusterSharedVolume.Ext" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="DS" TypeID="#alias('System.Performance.Library')#!System.Performance.OptimizedDataProvider">
+            <ComputerName>$Target/Host/Property[Type="#alias('Microsoft.Windows.Library')#!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+            <CounterName><![CDATA[#text('Perf Counter Name')#]]></CounterName>
+            <ObjectName>#text('Perf Object Name')#</ObjectName>
+            <InstanceName>#text('Perf Instance Name')#</InstanceName>
+            <AllInstances>false</AllInstances>
+            <Frequency>#choice('Collection Frequency', list("60","120","300","900"))#</Frequency>
+            <Tolerance>#text('Tolerance')#</Tolerance>
+            <ToleranceType>#choice('Tolerance Type', list("Absolute","Percentage"))#</ToleranceType>
+            <MaximumSampleSeparation>#choice('Sample Separation', list("3","6","12"))#</MaximumSampleSeparation>
+          </DataSource>
+        </DataSources>
+        <WriteActions>
+          <WriteAction ID="WriteToDB" TypeID="#alias('Microsoft.SystemCenter.Library')#!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="WriteToDW" TypeID="#alias('Microsoft.SystemCenter.DataWarehouse.Library')#!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
+    </Rules>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.#text('Rule Id')#">
+          <Name>Collection rule for performance counter #text('Perf Counter Name')#.</Name>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

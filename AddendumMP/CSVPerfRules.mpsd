@@ -1,0 +1,116 @@
+<TemplateGroup DefaultType="CSVOptPerfRules">
+  <Instances>
+    <Instance ID="Instance7a606bbe661242e1b7d5858f25f75ab0" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.SnippetTemplate" Version="1.0.0.0">
+      <SnippetTemplateConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Substitutions>
+          <Substitution Name="Rule Id">ReadsSec.Collection</Substitution>
+          <Substitution Name="Perf Counter Name">Reads/sec</Substitution>
+          <Substitution Name="Perf Object Name">Cluster CSV File System</Substitution>
+          <Substitution Name="Perf Instance Name">$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</Substitution>
+          <Substitution Name="Collection Frequency">300</Substitution>
+          <Substitution Name="Tolerance">5</Substitution>
+          <Substitution Name="Tolerance Type">Percentage</Substitution>
+          <Substitution Name="Sample Separation">12</Substitution>
+        </Substitutions>
+      </SnippetTemplateConfiguration>
+    </Instance>
+    <Instance ID="Instance6fac404fd37d4a648b1da5aa167ee98a" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.SnippetTemplate" Version="1.0.0.0">
+      <SnippetTemplateConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Substitutions>
+          <Substitution Name="Rule Id">ReadLatency.Collection</Substitution>
+          <Substitution Name="Perf Counter Name">Read Latency</Substitution>
+          <Substitution Name="Perf Object Name">Cluster CSV File System</Substitution>
+          <Substitution Name="Perf Instance Name">$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</Substitution>
+          <Substitution Name="Collection Frequency">300</Substitution>
+          <Substitution Name="Tolerance">0.005</Substitution>
+          <Substitution Name="Tolerance Type">Absolute</Substitution>
+          <Substitution Name="Sample Separation">12</Substitution>
+        </Substitutions>
+      </SnippetTemplateConfiguration>
+    </Instance>
+    <Instance ID="Instance12bfac882b4d4447bc436b0d883648b0" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.SnippetTemplate" Version="1.0.0.0">
+      <SnippetTemplateConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Substitutions>
+          <Substitution Name="Rule Id">WriteSec.Collection</Substitution>
+          <Substitution Name="Perf Counter Name">Writes/sec</Substitution>
+          <Substitution Name="Perf Object Name">Cluster CSV File System</Substitution>
+          <Substitution Name="Perf Instance Name">$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</Substitution>
+          <Substitution Name="Collection Frequency">300</Substitution>
+          <Substitution Name="Tolerance">5</Substitution>
+          <Substitution Name="Tolerance Type">Percentage</Substitution>
+          <Substitution Name="Sample Separation">12</Substitution>
+        </Substitutions>
+      </SnippetTemplateConfiguration>
+    </Instance>
+    <Instance ID="Instance29f2d6ce64c14b89bbb1c07b12eaebc1" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.SnippetTemplate" Version="1.0.0.0">
+      <SnippetTemplateConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Substitutions>
+          <Substitution Name="Rule Id">WriteLatency.Collection</Substitution>
+          <Substitution Name="Perf Counter Name">Write Latency</Substitution>
+          <Substitution Name="Perf Object Name">Cluster CSV File System</Substitution>
+          <Substitution Name="Perf Instance Name">$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</Substitution>
+          <Substitution Name="Collection Frequency">300</Substitution>
+          <Substitution Name="Tolerance">0.005</Substitution>
+          <Substitution Name="Tolerance Type">Absolute</Substitution>
+          <Substitution Name="Sample Separation">12</Substitution>
+        </Substitutions>
+      </SnippetTemplateConfiguration>
+    </Instance>
+    <Instance ID="Instance6892eed0af7e4146adac9ac9a19c337d" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.SnippetTemplate" Version="1.0.0.0">
+      <SnippetTemplateConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Substitutions>
+          <Substitution Name="Rule Id">Redir.ReadLatency.Collection</Substitution>
+          <Substitution Name="Perf Counter Name">Redirected Read Latency</Substitution>
+          <Substitution Name="Perf Object Name">Cluster CSV File System</Substitution>
+          <Substitution Name="Perf Instance Name">$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</Substitution>
+          <Substitution Name="Collection Frequency">300</Substitution>
+          <Substitution Name="Tolerance">0.005</Substitution>
+          <Substitution Name="Tolerance Type">Absolute</Substitution>
+          <Substitution Name="Sample Separation">12</Substitution>
+        </Substitutions>
+      </SnippetTemplateConfiguration>
+    </Instance>
+    <Instance ID="Instance66995eda39464aba9116411f1e841342" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.SnippetTemplate" Version="1.0.0.0">
+      <SnippetTemplateConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Substitutions>
+          <Substitution Name="Rule Id">Redir.WriteSec.Collection</Substitution>
+          <Substitution Name="Perf Counter Name">Redirected Writes/sec</Substitution>
+          <Substitution Name="Perf Object Name">Cluster CSV File System</Substitution>
+          <Substitution Name="Perf Instance Name">$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</Substitution>
+          <Substitution Name="Collection Frequency">300</Substitution>
+          <Substitution Name="Tolerance">5</Substitution>
+          <Substitution Name="Tolerance Type">Percentage</Substitution>
+          <Substitution Name="Sample Separation">12</Substitution>
+        </Substitutions>
+      </SnippetTemplateConfiguration>
+    </Instance>
+    <Instance ID="Instancef504ed47e737460c9eae45539f5d2b0a" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.SnippetTemplate" Version="1.0.0.0">
+      <SnippetTemplateConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Substitutions>
+          <Substitution Name="Rule Id">Redir.WriteLatency.Collection</Substitution>
+          <Substitution Name="Perf Counter Name">Redirected Write Latency</Substitution>
+          <Substitution Name="Perf Object Name">Cluster CSV File System</Substitution>
+          <Substitution Name="Perf Instance Name">$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</Substitution>
+          <Substitution Name="Collection Frequency">300</Substitution>
+          <Substitution Name="Tolerance">0.005</Substitution>
+          <Substitution Name="Tolerance Type">Absolute</Substitution>
+          <Substitution Name="Sample Separation">12</Substitution>
+        </Substitutions>
+      </SnippetTemplateConfiguration>
+    </Instance>
+    <Instance ID="Instanceba2982e2cd42417dba9effa65d92bdc7" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.SnippetTemplate" Version="1.0.0.0">
+      <SnippetTemplateConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Substitutions>
+          <Substitution Name="Rule Id">Redir.ReadSec.Collection</Substitution>
+          <Substitution Name="Perf Counter Name">Redirected Reads/sec</Substitution>
+          <Substitution Name="Perf Object Name">Cluster CSV File System</Substitution>
+          <Substitution Name="Perf Instance Name">$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</Substitution>
+          <Substitution Name="Collection Frequency">300</Substitution>
+          <Substitution Name="Tolerance">5</Substitution>
+          <Substitution Name="Tolerance Type">Percentage</Substitution>
+          <Substitution Name="Sample Separation">12</Substitution>
+        </Substitutions>
+      </SnippetTemplateConfiguration>
+    </Instance>
+  </Instances>
+</TemplateGroup>

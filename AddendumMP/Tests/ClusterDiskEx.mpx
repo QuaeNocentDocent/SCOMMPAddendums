@@ -1,0 +1,431 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+        
+        <!-- In this section, modify the attributes based on your needs. Ensure the
+             Base attribute matches the application you are modeling.
+             More information can be found in the Management Pack Development Kit: 
+             http://msdn.microsoft.com/en-us/library/ee533867.aspx -->
+        <ClassType ID="Progel.ClusterDisk.ClusterDiskEx" Base="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Accessibility="Internal" Abstract="false" Hosted="true" Singleton="false">
+          <Property ID="VSNetworkName" Required="true" Type="string"/>
+
+        </ClassType>
+      
+      </ClassTypes>
+    </EntityTypes>
+    <ModuleTypes>
+      <DataSourceModuleType ID="Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk.Discovery.ScriptDataSource" Accessibility="Internal" Batching="false">
+        <Configuration>
+          <xsd:element name="IntervalSeconds" type="xsd:int" />
+          <xsd:element name="SyncTime" type="xsd:string" />
+          <xsd:element name="TraceLevel" type="xsd:int" />
+          <xsd:element name="MPElementID" type="xsd:string"  />
+          <xsd:element name="TargetID" type="xsd:string" />
+          <xsd:element name="TargetComputer" type="xsd:string"  />
+          <xsd:element name="ClusterName" type="xsd:string" />
+          <xsd:element name="TimeoutSeconds" type="xsd:int" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+          <OverrideableParameter ID="TraceLevel" Selector="$Config/TraceLevel$" ParameterType="int" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.DiscoveryProvider">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+                <ScriptName>Progel.ClusterDisk.Discovery.vbs</ScriptName>
+                <Arguments>$Config/TraceLevel$ "$Config/MPElementID$" "$Config/TargetID$" "$Config/TargetComputer$" "$Config/ClusterName$"</Arguments>
+                <ScriptBody>
+                  <![CDATA[
+
+'*************************************************************************
+' Script Name - 
+' Author	  -  - Progel srl
+' Version	  - 1.1 24.09.2007
+'
+' Purpose     - 
+'               
+' Assumptions - 
+'				
+'               
+' Parameters  - TraceLevel
+'             - 
+' If discovery the following parameters must be added 
+'				SourceId ($MPElement$ )
+'				ManagedEntityId ($Target/Id$)
+'
+' Output properties
+'
+' Status
+'
+' Version History
+'	  1.0 16.08.2007 FG First Release
+'
+' (c) Copyright 2009, Progel srl, All Rights Reserved
+' Proprietary and confidential to Progel srl              
+'
+'*************************************************************************
+Option Explicit
+SetLocale ("en-us")
+
+Const SCRIPT_VERSION = "1.2"
+Const SCRIPT_ARGS = 5
+'----------------------------------------------
+'Debugging info
+' ************** WARNING remove the extra space after the $ symbol, leaving in place this section can broke cookdown!
+' MPElement: $_MPElement$ 
+' MPElement/Name: $_MPElement/Name$
+'
+' System.Entity: $_MPElement[Name="System!System.Entity"]$
+' DisplayName: $_MPElement[Name="System!System.Entity"]/DisplayName$
+'
+' Target Id: $_Target/Id$
+' Target DisplayName: $_Target/Property[Type="System!System.Entity"]/DisplayName$
+'----------------------------------------------
+'
+
+'Trace Level Costants
+Const TRACE_NONE 	= 0
+COnst TRACE_ERROR 	= 1
+COnst TRACE_WARNING = 2
+Const TRACE_INFO 	= 3
+Const TRACE_VERBOSE = 4
+
+'Event Type Constants
+Const EVENT_TYPE_SUCCESS      = 0
+Const EVENT_TYPE_ERROR        = 1
+Const EVENT_TYPE_WARNING      = 2
+Const EVENT_TYPE_INFORMATION  = 4
+Const EVENT_TYPE_AUDITSUCCESS = 8
+Const EVENT_TYPE_AUDITFAILURE = 16
+
+' Standard Event IDs
+Const FAILURE_EVENT_ID = 4000		'errore generico nello script
+Const SUCCESS_EVENT_ID = 701
+Const START_EVENT_ID = 702
+Const STOP_EVENT_ID = 703
+
+' TypedPropertyBag
+const AlertDataType = 0
+const EventDataType	= 2
+const PerformanceDataType = 2
+const StateDataType       = 3
+
+'WMI constants
+Const WMI_MSCLUSTER_NAMESPACE = "root\MSCluster"
+Const WMI_CIMV2_NAMESPACE = "root\cimv2"
+Const WMI_MSCLUSTER_CLUSTER_RESOURCE = "MSCluster_Resource"
+Const WMI_CLUSTER_RESOURCE_TO_DISK_ASSOCIATOR_CLASS = "MSCluster_ResourceToDisk"
+Const WMI_CLUSTER_DISKPARTITION_TO_DISK_ASSOCIATOR_CLASS = "MSCluster_DiskToDiskPartition"
+
+Const WMI_MSCLUSTER_CLUSTER_CLASS = "MSCluster_Cluster"
+Const WMI_NAME_PROPERTY_NAME = "Name"
+Const WMI_PATH_PROPERTY_NAME = "Path"
+Const WMI_FILESYSTEM_PROPERTY_NAME = "FileSystem"
+Const WMI_TOTALSIZE_PROPERTY_NAME = "TotalSize"
+Const WMI_FREESPACE_PROPERTY_NAME = "FreeSpace"
+Const WMI_VOLUMELABEL_PROPERTY_NAME = "VolumeLabel"
+
+'State property bag constants
+Const STATE_DATA_TYPE = 3
+Const STATE_PROPERTY_NAME = "State"
+Const STATE_NTFS_NAME = "NTFSIsDirty"
+Const STATE_GOOD = "GOOD"
+Const STATE_BAD = "BAD"
+
+'Globals
+Dim g_API, g_oXML
+Dim g_StdErr
+Dim g_RegistryStatePath 'Used to store script related state in registry
+Dim P_TraceLevel
+
+On Error Resume Next
+
+Dim dtStart, oArgs
+Dim strSourceID 'As String  '= oArgs(4). strSourceId is the GUID of the discovery object that runs the script (MPElement).
+Dim strManagedEntityId 'As String  '= oArgs(5) - strManagedEntityId is the GUID of the computer class that is targeted by the script (Target/Id).
+Dim strTargetComputer 'As String  '= oArgs(6)
+Dim strClusterName 'As String '= oArgs(7)
+
+  	dtStart = Now
+
+	Globals
+
+	Set oArgs = WScript.Arguments
+	if oArgs.Count <> SCRIPT_ARGS Then
+		Call LogEvent(FAILURE_EVENT_ID,EVENT_TYPE_ERROR,"called without proper arguments and was not executed.", TRACE_ERROR)
+		Wscript.Quit -1
+	End If
+	P_TraceLevel = CInt(oArgs(0))
+	LogParams
+        strSourceID = Replace(oArgs(1), Chr(34), "")
+        strManagedEntityId = Replace(oArgs(2), Chr(34), "")
+        strTargetComputer = Replace(oArgs(3), Chr(34), "")
+        strClusterName = Replace(oArgs(4), Chr(34), "")
+
+    Dim oDiscoveryData, blnSuccess
+
+	set oDiscoveryData = g_API.CreateDiscoveryData(0, strSourceID, strManagedEntityId)
+        'Discover instances
+        blnSuccess = DiscoverClusterDisks(strTargetComputer, strClusterName, oDiscoveryData)
+
+        If blnSuccess AND Err.Number = 0 Then
+            Call g_API.Return(oDiscoveryData)
+        	Call LogEvent(STOP_EVENT_ID,EVENT_TYPE_SUCCESS, "has completed successfully in " & DateDiff("s", dtStart, Now) & " seconds.", TRACE_INFO)
+        else
+            Call ThrowKeepDiscoveryInfo(strSourceID, strManagedEntityId)
+            Call LogEvent(FAILURE_EVENT_ID, EVENT_TYPE_ERROR, "-- Cluster Disks Discovery Script -- An error occurred while running the script.", TRACE_ERROR)
+        End If
+
+	ClearGlobals
+
+
+
+Private Function DiscoverClusterDisks(ByRef strTargetComputer, ByRef strClusterName, ByRef objDiscoveryData) 'As Boolean
+    
+    Dim objMSClusterSWbemServices 'As SWbemServices
+   ' Dim objClusterResources 'As SWbemObject
+   ' Dim objClusterResource 'As SWbemObject
+    Dim objClusterDisk 'As SWbemObject
+    Dim objClusterDiskPartition 'As SWbemObject
+    Dim blnSuccess 'As Boolean
+
+    Dim objClusterGroups, objGroup, strNetName, objResources, objResource, strDCName
+       
+    'Connect to WMI NS \\.\root\MSCluster
+    If ConnectToWbemNS(".", WMI_MSCLUSTER_NAMESPACE, objMSClusterSWbemServices) Then
+        On Error Resume Next
+        Set objClusterGroups = objMSClusterSWbemServices.ExecQuery("select * from MSCluster_ResourceGroup") 'cannot use GroupType>=100 since it's only supported from Win 2008 R2 and up
+        'Loop every group to check for a netork name resources
+        For each objGroup in objClusterGroups
+            Set objResources = objGroup.Associators_("MSCluster_ResourceGroupToResource", "", "", "", False, False, "", "", 0)
+            strNetName = ""
+            for each objResource in objresources
+                If objresource.Type = "Network Name" Then
+                    strNetName = objResource.PrivateProperties.DnsName
+                    if Instr(strNetName, ".") = 0 Then
+                        strDCName = objResource.PrivateProperties.CreatingDC
+                        'WScript.Echo "strDCName " & strDCName
+                        if Instr(strDCName, ".") > 0 Then
+                            strNetName = strNetName & "." & Mid(strDCName, InStr(strDCName, ".")+1)
+                        end if
+                        If Err.Number <> 0 Then Err.Clear   'ignore propery not found errors
+                    end if
+                end if
+            Next
+            'instead of using a dictionary just run through the resources twice
+            if strNetName <> "" Then
+                WScript.Echo strNetName
+                for each objResource in objresources
+                    if objresource.ResourceClass=1 and objResource.Type = "Physical Disk" then
+                        For Each objClusterDisk In objResource.Associators_(WMI_CLUSTER_RESOURCE_TO_DISK_ASSOCIATOR_CLASS, "", "", "", False, False, "", "", 0)
+                        'Get the associated resource
+                            For Each objClusterDiskPartition In objClusterDisk.Associators_(WMI_CLUSTER_DISKPARTITION_TO_DISK_ASSOCIATOR_CLASS, "", "", "", False, False, "", "", 0)
+                             WScript.Echo objClusterDisk.Name & " " & objClusterDiskPartition.VolumeLabel
+                            blnSuccess = CreateDiscoveryData(objClusterDisk, objClusterDiskPartition, objResource, _
+                                                         strTargetComputer, strClusterName, objDiscoveryData, strNetName)
+                            Next 'objClusterDiskPartition
+                        Next 'objClusterDisk
+                    end if
+                next
+            end if
+        Next
+    End if
+    If Err.Number <> 0 Then
+        DispcverCLusterDisks = false
+    else
+        DiscoverClusterDisks = True
+    end if
+End Function
+
+Private Function CreateDiscoveryData(ByRef objClusterDisk, ByRef objClusterDiskPartition, ByRef objClusterResource, _
+                                     ByRef strTargetComputer, ByRef strClusterName, ByRef objDiscoveryData, strNetname) 'As Boolean
+
+    Dim objCSVInstance 'As MOMClassInstance
+
+    'Create the cluster shared volume instance hosted on the targeted cluster virtual server
+    Set objCSVInstance = objDiscoveryData.CreateClassInstance("$MPElement[Name='Progel.ClusterDisk.ClusterDiskEx']$")
+    'PrincipalName (host, key)
+    Call objCSVInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", strTargetComputer)
+    'ClusterSharedVolumeName (key)
+    Call objCSVInstance.AddProperty("$MPElement[Name='ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk']/ClusterResourceName$", objClusterResource.Properties_(WMI_NAME_PROPERTY_NAME))
+    'FriendlyVolumeName
+    Call objCSVInstance.AddProperty("$MPElement[Name='Progel.ClusterDisk.ClusterDiskEx']/VSNetworkName$", strNetName)
+    Call objDiscoveryData.AddInstance(objCSVInstance)
+    CreateDiscoveryData = True
+    
+End Function
+
+
+'******************************************************************************
+'   FUNCTION:       ConnectToWbemNs
+'   DESCRIPTION:    Connects to a WMI namespace
+'   PARAMETERS:     IN String strServerName: name of the computer. If empty the local computer will be used.
+'                   IN String strNameSpace: WMI namespace
+'                   OUT Object objSWbemServices: WbemScripting.SWbemServices object connected to the given
+'                                                namespace on the given server
+'   RETURNS:        Boolean: True if successful
+'******************************************************************************
+Private Function ConnectToWbemNS(ByRef strServerName, ByRef strNameSpace, ByRef objSWbemServices) 'As Boolean
+
+                Dim objSWbemLocator 'as WbemScripting.SWbemLocator
+
+                'Create a new WMI Locator object
+                Set objSWbemLocator = CreateObject("WbemScripting.SWbemLocator")
+
+                'Connect to WMI namespace on strServerName computer and create WMI Services object
+                Set objSWbemServices = objSWbemLocator.ConnectServer(strServerName, strNameSpace)
+
+                'Connect to WMI namespace on strServerName computer with alternative credentials and create WMI Services object
+                'Set objSWbemServices = objSWbemLocator.ConnectServer(strServerName, strNameSpace, strUserName, strPassWd)
+
+                'If object is initialised function will be successful
+                If objSWbemServices Is Nothing Then ConnectToWbemNS = False Else ConnectToWbemNS = True
+
+End Function
+
+
+
+
+'**********************************************
+'**** HELPER FUNCTIONS SCOM sempre necessarie
+'**********************************************
+
+Sub Globals
+	P_TraceLevel = TRACE_VERBOSE
+    Set g_API = CreateObject("MOM.ScriptAPI")
+    Set g_oXML = CreateObject("MSXML.DOMDocument")  
+    Set g_StdErr = WScript.StdErr
+	' only if needed g_RegistryStatePath = "HKLM\" & g_API.GetScriptStateKeyPath(WScript.ScriptName)
+end Sub
+
+Sub LogParams
+	DIm scmdLine, I, oArgs
+	sCmdLine = ""
+	Set oArgs = WScript.Arguments
+	for I=0 to oArgs.Count -1
+	 sCmdLine = sCmdLine & " " & oArgs(I)
+	next
+	LogEvent START_EVENT_ID,EVENT_TYPE_INFORMATION,"Starting script. " & sCmdLine, TRACE_INFO
+End Sub
+
+Sub LogEvent(eventID, eventType, msg, level)
+	If level <= P_TraceLevel Then
+        If level = TRACE_ERROR Then
+            g_StdErr.WriteLine "Logging event. " & WScript.ScriptName & " EventID: " & eventID & " eventType: " & eventType & " Version:" & SCRIPT_VERSION & " --> " & msg
+        else
+		    WScript.Echo "Logging event. " & WScript.ScriptName & " EventID: " & eventID & " eventType: " & eventType & " Version:" & SCRIPT_VERSION & " --> " & msg
+        end if
+		Call g_API.LogScriptEvent(WScript.ScriptName,eventID,eventType, msg & vbCrLf & "Version: " & SCRIPT_VERSION)
+	end if
+End Sub
+
+Sub ClearGlobals
+    Set g_API = Nothing
+    Set g_oXML = Nothing
+End Sub
+
+Function GetXMLDate(dDate)
+    Dim oNode
+          
+    Set oNode = g_oXML.CreateNode(1,"startTime","")
+    oNode.DataType = "datetime.tz"
+    oNode.nodeTypedValue =dDate
+    GetXMLDate = oNode.Text
+    Set oNode = Nothing
+End Function
+'strValueName = "HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation\ActiveTimeBias"
+'minTimeOffset = shell.regread(strValueName)
+'toffset = datediff("h",DateAdd("n", minTimeOffset, now()),now())
+
+Function FormatErr(oErr)
+	FormatErr =  "0x" & Hex(oErr.Number) & "(" & oErr.Number & ") - " & oErr.Description
+end function
+
+Function ThrowEmptyDiscovery(SourceId, ManagedEntityId)
+Dim oDiscoveryData
+	set oDiscoveryData = g_API.CreateDiscoveryData(0, SourceId, ManagedEntityId)
+	LogEvent FAILURE_EVENT_ID, EVENT_TYPE_WARNING, "Exiting with empty discovery data", TRACE_INFO
+	Call g_API.Return(oDiscoveryData)
+End Function
+
+Function ThrowKeepDiscoveryInfo(SourceId, ManagedEntityId)
+Dim oDiscoveryData
+	Set oDiscoveryData = g_API.CreateDiscoveryData(0,SourceId,ManagedEntityId)
+	'Instead of Snapshot discovery, submit Incremental discovery data
+	oDiscoveryData.IsSnapshot = false
+	LogEvent FAILURE_EVENT_ID, EVENT_TYPE_WARNING, "Exiting with null non snapshot discovery data", TRACE_INFO
+    Call g_API.Return (oDiscoveryData)
+End Function
+
+ Function GetTempFileName(sFile)
+      Dim tfolder, tfile, fso
+      Const TemporaryFolder = 2
+      Set fso = CreateObject("Scripting.FileSystemObject")
+      Set tfolder = fso.GetSpecialFolder(TemporaryFolder)
+      If sFile = "" Then 
+        sFile = fso.GetTempName    
+      end if
+      GetTempFileName = tfolder.Path & "\" & sFile
+      Set fso = Nothing
+End Function
+]]>
+                </ScriptBody>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </DataSource>
+            </MemberModules>
+            <Composition>
+              <Node ID="DS" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.Discovery.Data</OutputType>
+      </DataSourceModuleType>
+    </ModuleTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Discoveries>
+      <Discovery ID="Progel.ClusterDisk.Discovery" Enabled="true" Target="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.Cluster" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="Progel.ClusterDisk.ClusterDiskEx">
+          </DiscoveryClass>
+        </DiscoveryTypes>
+        <DataSource ID="DataSource" TypeID="Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk.Discovery.ScriptDataSource">
+          <IntervalSeconds>86400</IntervalSeconds>
+          <SyncTime/>
+          <TraceLevel>4</TraceLevel>
+          <MPElementID>$MPElement$</MPElementID>
+          <TargetID>$Target/Id$</TargetID>
+          <TargetComputer>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</TargetComputer>
+          <ClusterName>$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.Cluster"]/ClusterName$</ClusterName>
+          <TimeoutSeconds>300</TimeoutSeconds>
+        </DataSource>
+      </Discovery>
+    </Discoveries>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        
+        <!-- This is the string users of the Operations Console and Web Console will see. 
+             Descriptions are also helpful when the user is doing a search in the Console. -->
+        <DisplayString ElementID="Progel.ClusterDisk.ClusterDiskEx">
+          <Name>Cluster Disk Extended Class</Name>
+          <Description></Description>
+        </DisplayString>
+
+        <DisplayString ElementID="Progel.ClusterDisk.ClusterDiskEx" SubElementID="VSNetworkName">
+          <Name>Virtual Server Network Name</Name>
+          <Description></Description>
+        </DisplayString>
+
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

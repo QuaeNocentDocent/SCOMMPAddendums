@@ -1,0 +1,281 @@
+﻿<job id="main">
+	
+	<script language="VBScript">
+Option Explicit
+Const SCRIPT_VERSION = "1.02"
+Const LOG_SUCCESS_EVENT_PARAMETER_NAME = "LogSuccessEvent"
+Const MP_ELEMENT_PARAMETER_NAME = "MP Element"
+Const MANAGED_ENTITY_ID_PARAMETER_NAME = "Managed Entity"
+Const TARGET_COMPUTER_PARAMETER_NAME = "Target Computer"
+Const CLUSTER_NAME_PARAMETER_NAME = "Cluster Name"
+
+'WMI constants
+Const WMI_MSCLUSTER_NAMESPACE = "root\MSCluster"
+Const WMI_CIMV2_NAMESPACE = "root\cimv2"
+Const WMI_MSCLUSTER_CLUSTER_RESOURCE = "MSCluster_Resource"
+Const WMI_CLUSTER_RESOURCE_TO_DISK_ASSOCIATOR_CLASS = "MSCluster_ResourceToDisk"
+Const WMI_CLUSTER_DISKPARTITION_TO_DISK_ASSOCIATOR_CLASS = "MSCluster_DiskToDiskPartition"
+
+Const WMI_MSCLUSTER_CLUSTER_CLASS = "MSCluster_Cluster"
+Const WMI_NAME_PROPERTY_NAME = "Name"
+Const WMI_PATH_PROPERTY_NAME = "Path"
+Const WMI_FILESYSTEM_PROPERTY_NAME = "FileSystem"
+Const WMI_TOTALSIZE_PROPERTY_NAME = "TotalSize"
+Const WMI_FREESPACE_PROPERTY_NAME = "FreeSpace"
+Const WMI_VOLUMELABEL_PROPERTY_NAME = "VolumeLabel"
+
+'State property bag constants
+Const STATE_DATA_TYPE = 3
+Const STATE_PROPERTY_NAME = "State"
+Const STATE_NTFS_NAME = "NTFSIsDirty"
+Const STATE_GOOD = "GOOD"
+Const STATE_BAD = "BAD"
+
+'Performance property bag constants
+Const INSTANCE_NAME = "ClusterDiskName"
+Const PERFORMANCE_DATA_TYPE = 2
+Const PERFORMANCE_OBJECT_NAME = "PerfObject"
+Const PERFORMANCE_COUNTER_NAME = "PerfCounter"
+Const PERFORMANCE_INSTANCE_NAME = "PerfInstance"
+Const PERFORMANCE_VALUE_NAME = "PerfValue"
+Const PERF_OBJECT_CSV = "Cluster Disk"
+Const PERF_COUNTER_TOTAL_SIZE_MB = "Total size / MB"
+Const PERF_COUNTER_FREE_SPACE_MB = "Free space / MB"
+Const PERF_COUNTER_FREE_SPACE_PERCENT = "Free space / Percent"
+
+'Event constants
+Const EVENT_TYPE_SUCCESS = 0
+Const EVENT_TYPE_ERROR = 1
+Const EVENT_TYPE_WARNING = 2
+Const EVENT_TYPE_INFORMATION = 4
+
+Const EVENT_ID_SUCCESS = 1000           'Use IDs in the range 1 - 1000
+Const EVENT_ID_SCRIPTERROR = 999        'Then you can use eventcreate.exe to test the MP
+
+'Scripting.FileSystemObject constants
+Const FOR_READING = 1 'Open a file for reading only. You can't write to this file.
+Const FOR_WRITING = 2 'Open a file for writing.
+Const FOR_APPENDING = 8 'Open a file and write to the end of the file.
+
+'Global vars
+Dim mblnLogSuccessEvent 'As Boolean
+Dim mstrIdentifier 'As String
+
+Call Main
+
+'*********************************************************************************************
+'   PROCEDURE:      Main
+'   DESCRIPTION:    Reads the script parameters and creates the cluster disk monitoring data.
+'   PARAMETERS:     void
+'*********************************************************************************************
+Private Sub Main()
+
+        ' Targeted at Microsoft.Windows.Cluster.VirtualServer (based on Microsoft.Windows.Server.Computer)
+        Dim objFSO 'As Scripting.FileSystemObject
+    
+    
+        Dim strTargetComputer 'As String  '= oArgs(6)
+        Dim strClusterName 'As String '= oArgs(7)
+        Dim objMomScriptAPI 'As MOM.ScriptAPI
+        Dim objDiscoveryData 'As DiscoveryData
+        Dim blnSuccess 'As Boolean
+    
+        Call SetLocale("en-us")
+        
+        Set objMomScriptAPI = CreateObject("MOM.ScriptAPI")
+        If Not GetScriptParameters(strTargetComputer, strClusterName) Then
+                ' If the script is called without the required arguments,
+                ' create an information event and then quit.
+                Call objMomScriptAPI.LogScriptEvent(WScript.ScriptName, EVENT_ID_SCRIPTERROR, EVENT_TYPE_WARNING, "-- Cluster Disks Monitoring Script -- The script was called with fewer than four arguments or the arguments could not be parsed.")
+                WScript.Quit -1
+        End If
+
+        Set objFSO = CreateObject("Scripting.FileSystemObject")
+    
+        'On Error Resume Next
+
+        'Monitor instances
+        blnSuccess = MonitorClusterDisks(strTargetComputer, strClusterName, objMomScriptAPI)
+
+        If blnSuccess Then
+                If mblnLogSuccessEvent Then Call objMomScriptAPI.LogScriptEvent(WScript.ScriptName, EVENT_ID_SUCCESS, EVENT_TYPE_INFORMATION, "-- Cluster Disks Monitoring Script -- Script executed successfully.")
+        Else
+                Call objMomScriptAPI.LogScriptEvent(WScript.ScriptName, EVENT_ID_SCRIPTERROR, EVENT_TYPE_WARNING, "-- Cluster Disks Monitoring Script -- An error occurred while running script")
+        End If
+ 
+    'Return the typed property bags
+    If blnSuccess Then Call objMomScriptAPI.ReturnItems
+
+End Sub
+
+'****************************************************************************************************************
+'   FUNCTION:       MonitorClusterDisks
+'   DESCRIPTION:    Creates monitoring data for all instances of the class 'Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk' using WMI.
+'   PARAMETERS:     IN String strTargetComputer: principal name of the targeted 'Microsoft.Windows.Cluster.VirtualServer' instance.
+'                   IN String strClusterName: the cluster containing the cluster shared volume
+'   RETURNS:        Boolean: True if successful
+'****************************************************************************************************************
+Private Function MonitorClusterDisks(ByRef strTargetComputer, ByRef strClusterName, ByRef objMomScriptAPI) 'As Boolean
+    
+    Dim objMSClusterSWbemServices 'As SWbemServices
+    Dim objClusterResources 'As SWbemObject
+    Dim objClusterResource 'As SWbemObject
+    Dim objClusterDisk 'As SWbemObject
+    Dim objClusterDiskPartition 'As SWbemObject
+    Dim blnSuccess 'As Boolean
+
+       
+    'Connect to WMI NS \\.\root\MSCluster
+    If ConnectToWbemNS(".", WMI_MSCLUSTER_NAMESPACE, objMSClusterSWbemServices) Then
+        On Error Resume Next
+        Set objClusterGroups = objMSClusterSWbemServices.ExecQuery("select * from MSCluster_ClusterGroup") 'cannot use GroupType>=100 since it's only supported from Win 2008 R2 and up
+        'Loop every group to check for a netork name resources
+        For each objGroup in objClusterGroups
+            Set objResources = objGroup.Associators_("MSCluster_ClusterGroupToResource", "", "", "", False, False, "", "", 0)
+            strNetName = ""
+            for each objResource in objresources
+                If objresource.Type = "Network Name" Then
+                    strNetName = objResource.PrivateProperties.DnsName
+                end if
+            Next
+            'instead of using a dictionary just run through the resources twice
+            if strNetName <> "" Then
+                WScript.Echo strNetName
+                for each objResource in objresources
+                    if objresource.ResourceClass=1 and objresource.CoreResource = FALSE and objResource.Type = "Physical Disk" then
+                        For Each objClusterDisk In objClusterResource.Associators_(WMI_CLUSTER_RESOURCE_TO_DISK_ASSOCIATOR_CLASS, "", "", "", False, False, "", "", 0)
+                        'Get the associated resource
+                            For Each objClusterDiskPartition In objClusterDisk.Associators_(WMI_CLUSTER_DISKPARTITION_TO_DISK_ASSOCIATOR_CLASS, "", "", "", False, False, "", "", 0)
+                            WScript.Echo objClusterDisk.Name & " " & objClusterDiskPartition.VolumeLabel
+                        'blnSuccess = CreateDiscoveryData(objClusterDisk, objClusterDiskPartition, objClusterResource, _
+                         '                                strTargetComputer, strClusterName, objDiscoveryData, strNetName)
+                            Next 'objClusterDiskPartition
+                        Next 'objClusterDisk
+                    end if
+                next
+            end if
+        Next
+    
+End Function
+
+Private Function CreateDiscoveryData(ByRef objClusterDisk, ByRef objClusterDiskPartition, ByRef objClusterResource, _
+                                     ByRef strTargetComputer, ByRef strClusterName, ByRef objDiscoveryData) 'As Boolean
+
+    Dim objCSVInstance 'As MOMClassInstance
+
+    'Create the cluster shared volume instance hosted on the targeted cluster virtual server
+    Set objCSVInstance = objDiscoveryData.CreateClassInstance("$MPElement[Name='Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk']$")
+    'PrincipalName (host, key)
+    Call objCSVInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", strTargetComputer)
+    'ClusterSharedVolumeName (key)
+    Call objCSVInstance.AddProperty("$MPElement[Name='Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk']/ClusterResourceName$", objClusterResource.Properties_(WMI_NAME_PROPERTY_NAME))
+    'FriendlyVolumeName
+    Call objCSVInstance.AddProperty("$MPElement[Name='Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk']/ClusterDiskName$", objClusterDisk.Properties_(WMI_NAME_PROPERTY_NAME))
+    'PartitionName
+    Call objCSVInstance.AddProperty("$MPElement[Name='Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk']/PartitionName$", objClusterDiskPartition.Properties_(WMI_PATH_PROPERTY_NAME))
+    'PartitionFileSystem
+    Call objCSVInstance.AddProperty("$MPElement[Name='Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk']/PartitionFileSystem$", objClusterDiskPartition.Properties_(WMI_FILESYSTEM_PROPERTY_NAME))
+    'PartitionSize
+    Call objCSVInstance.AddProperty("$MPElement[Name='Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk']/PartitionSize$", objClusterDiskPartition.Properties_(WMI_TOTALSIZE_PROPERTY_NAME))
+    'ClusterName
+    Call objCSVInstance.AddProperty("$MPElement[Name='Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk']/ClusterName$", strClusterName)
+    'VolumeLabel
+    Call objCSVInstance.AddProperty("$MPElement[Name='Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk']/VolumeLabel$", objClusterDiskPartition.Properties_(WMI_VOLUMELABEL_PROPERTY_NAME))
+    Call objDiscoveryData.AddInstance(objCSVInstance)
+    CreateDiscoveryData = True
+    
+End Function
+
+'******************************************************************************
+'   FUNCTION:       GetScriptParameters
+'   DESCRIPTION:    Reads the script's parameters
+'                   and sets the global variables.
+'
+'   PARAMETERS:     OUT String strTargetComputer: Principal name of executing computer
+'                                                 (-Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName-)
+'                   OUT String strClusterName: Cluster name
+'   RETURNS:        Boolean: True if successful
+'******************************************************************************
+Private Function GetScriptParameters(ByRef strTargetComputer, ByRef strClusterName) 'As Boolean
+
+        Dim objArguments
+
+        On Error Resume Next
+
+        'cmdline: &lt;script&gt; True|False &lt;path to debug log&gt; True|False &lt;script id&gt; .MPElement. .Target/Id. .Target/Property[Name="Windows!Microsoft.Windows.Computer"]/PrincipalName.
+        Set objArguments = WScript.Arguments
+        If objArguments.Count &lt; 4 Then Exit Function
+
+        'Get parameters and set global variables
+        mblnLogSuccessEvent = CBool(objArguments(0))
+        mstrIdentifier = Replace(objArguments(1), Chr(34), "")
+        strTargetComputer = Replace(objArguments(2), Chr(34), "")
+        strClusterName = Replace(objArguments(3), Chr(34), "")
+
+        If Len(strTargetComputer) &gt; 0 And Len(strClusterName) &gt; 0 Then GetScriptParameters = True
+        
+End Function
+
+
+'******************************************************************************
+'   FUNCTION:       ConnectToWbemNs
+'   DESCRIPTION:    Connects to a WMI namespace
+'   PARAMETERS:     IN String strServerName: name of the computer. If empty the local computer will be used.
+'                   IN String strNameSpace: WMI namespace
+'                   OUT Object objSWbemServices: WbemScripting.SWbemServices object connected to the given
+'                                                namespace on the given server
+'   RETURNS:        Boolean: True if successful
+'******************************************************************************
+Private Function ConnectToWbemNS(ByRef strServerName, ByRef strNameSpace, ByRef objSWbemServices) 'As Boolean
+
+                Dim objSWbemLocator 'as WbemScripting.SWbemLocator
+
+                'Create a new WMI Locator object
+                Set objSWbemLocator = CreateObject("WbemScripting.SWbemLocator")
+
+                'Connect to WMI namespace on strServerName computer and create WMI Services object
+                Set objSWbemServices = objSWbemLocator.ConnectServer(strServerName, strNameSpace)
+
+                'Connect to WMI namespace on strServerName computer with alternative credentials and create WMI Services object
+                'Set objSWbemServices = objSWbemLocator.ConnectServer(strServerName, strNameSpace, strUserName, strPassWd)
+
+                'If object is initialised function will be successful
+                If objSWbemServices Is Nothing Then ConnectToWbemNS = False Else ConnectToWbemNS = True
+
+End Function
+
+'***************************************************************************************
+'   PROCEDURE:      CreatePerformanceTypedPropertyBag
+'   DESCRIPTION:    Generates a performance typed property bag and adds it to the script's XML output.
+'   PARAMETERS:     IN String strObjectName: name of the performance object
+'                   IN String strCounterName: name of the performance counter
+'                   IN String strInstanceName: name of the performance counter in instance
+'                   IN Variant varValue: value of the performance counter
+'                   IN String strCSVInstanceName: Friendly volume name of the cluster shared volume
+'                   IN Object objMomScriptAPI: initialised MOM.ScriptAPI object
+'***************************************************************************************
+Sub CreatePerformanceTypedPropertyBag(ByRef strObjectName, ByRef strCounterName, ByRef strInstanceName, _
+                                      ByRef varValue, ByRef strCSVInstanceName, ByRef objMomScriptAPI)
+
+    Dim objTypedPropertyBag 'As MOM.ScriptAPI.TypedPropertyBag
+    
+    'Create a new typed property bag of the performance data type
+    Set objTypedPropertyBag = objMomScriptAPI.CreateTypedPropertyBag(PERFORMANCE_DATA_TYPE)
+
+    'Add the values for the perf counter's object name, counter name, instance name and the value)
+    Call objTypedPropertyBag.AddValue(PERFORMANCE_OBJECT_NAME, CStr(strObjectName))
+    Call objTypedPropertyBag.AddValue(PERFORMANCE_COUNTER_NAME, CStr(strCounterName))
+    Call objTypedPropertyBag.AddValue(PERFORMANCE_INSTANCE_NAME, CStr(strInstanceName))
+    Call objTypedPropertyBag.AddValue(PERFORMANCE_VALUE_NAME, CStr(varValue))
+    
+    'Necessary information for the property bag data source filter condition
+    'to enable Agent cook down
+    Call objTypedPropertyBag.AddValue(INSTANCE_NAME, CStr(strCSVInstanceName))
+    
+    'Add the property bag to the script's XML output
+    Call objMomScriptAPI.AddItem(objTypedPropertyBag)
+
+End Sub
+
+	</script>
+</job>

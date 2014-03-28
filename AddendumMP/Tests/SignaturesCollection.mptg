@@ -1,0 +1,64 @@
+<TemplateGroup>
+  <Instances>
+    <Instance ID="Instancead122e8e2c2b461a804a5ac5069aa36f" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.CustomRule" Version="1.0.0.0">
+      <CustomRuleConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Id>DiskWriteSec.SignColl.Rule</Id>
+        <DisplayName>Collect Performance Signature for Disk Reads / Sec</DisplayName>
+        <Description>Description for the new rule</Description>
+        <Category>PerformanceCollection</Category>
+        <ConfirmDelivery>false</ConfirmDelivery>
+        <Target>ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk</Target>
+        <Enabled>true</Enabled>
+        <Remotable>true</Remotable>
+        <Priority>Normal</Priority>
+        <DiscardLevel>100</DiscardLevel>
+        <DataSources>
+          <RuleDataSourceItem>
+            <DataSourceId>DS</DataSourceId>
+            <DataSourceConfig>&lt;ComputerName&gt;$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$&lt;/ComputerName&gt;&lt;CounterName&gt;Avg. Disk Writes/Sec&lt;/CounterName&gt;&lt;ObjectName&gt;LogicalDisk&lt;/ObjectName&gt;&lt;InstanceName&gt;$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk"]/PartitionName$&lt;/InstanceName&gt;&lt;AllInstances&gt;false&lt;/AllInstances&gt;&lt;Frequency&gt;300&lt;/Frequency&gt;</DataSourceConfig>
+            <DataSourceType>SystemPerf!System.Performance.DataProvider</DataSourceType>
+          </RuleDataSourceItem>
+        </DataSources>
+        <ConditionDetectionConfig>&lt;SignatureID&gt;{d70ff56f-62b1-4b11-b382-8a571ae2391e}&lt;/SignatureID&gt;&lt;BusinessCycleLengthUnit&gt;Day&lt;/BusinessCycleLengthUnit&gt;&lt;BusinessCycleLengthInGivenUnit&gt;1&lt;/BusinessCycleLengthInGivenUnit&gt;&lt;EffectiveSamplingPeriodInSeconds&gt;300&lt;/EffectiveSamplingPeriodInSeconds&gt;&lt;Sensitivity&gt;2.81&lt;/Sensitivity&gt;&lt;LearningSettings&gt;&lt;LearningType&gt;Continuous&lt;/LearningType&gt;&lt;Offset1&gt;1&lt;/Offset1&gt;&lt;Offset2&gt;1&lt;/Offset2&gt;&lt;Offset3&gt;1&lt;/Offset3&gt;&lt;LearningRate&gt;2&lt;/LearningRate&gt;&lt;/LearningSettings&gt;&lt;SignatureCollectionSettings&gt;&lt;DBUpdatePeriodInSeconds&gt;300&lt;/DBUpdatePeriodInSeconds&gt;&lt;/SignatureCollectionSettings&gt;</ConditionDetectionConfig>
+        <ConditionDetectionId>CD</ConditionDetectionId>
+        <ConditionDetectionType>SystemPerf!System.Performance.SignatureCreatorWithoutCompression</ConditionDetectionType>
+        <WriteActions>
+          <RuleWriteActionItem>
+            <WriteActionId>WA</WriteActionId>
+            <WriteActionType>SC!Microsoft.SystemCenter.CollectSignature</WriteActionType>
+          </RuleWriteActionItem>
+        </WriteActions>
+      </CustomRuleConfig>
+    </Instance>
+    <Instance ID="Instance620ac4a503594fb5a3c253bff4cb3617" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.CustomRule" Version="1.0.0.0">
+      <CustomRuleConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Id>DiskReadSec.SignColl.Rule</Id>
+        <DisplayName>Collect Performance Signature for Disk Reads / Sec</DisplayName>
+        <Description>Description for the new rule</Description>
+        <Category>PerformanceCollection</Category>
+        <ConfirmDelivery>false</ConfirmDelivery>
+        <Target>ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk</Target>
+        <Enabled>true</Enabled>
+        <Remotable>true</Remotable>
+        <Priority>Normal</Priority>
+        <DiscardLevel>100</DiscardLevel>
+        <DataSources>
+          <RuleDataSourceItem>
+            <DataSourceId>DS</DataSourceId>
+            <DataSourceConfig>&lt;ComputerName&gt;$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$&lt;/ComputerName&gt;&lt;CounterName&gt;Avg. Disk sec/Transfer&lt;/CounterName&gt;&lt;ObjectName&gt;LogicalDisk&lt;/ObjectName&gt;&lt;InstanceName&gt;$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk"]/PartitionName$&lt;/InstanceName&gt;&lt;AllInstances&gt;false&lt;/AllInstances&gt;&lt;Frequency&gt;300&lt;/Frequency&gt;</DataSourceConfig>
+            <DataSourceType>SystemPerf!System.Performance.DataProvider</DataSourceType>
+          </RuleDataSourceItem>
+        </DataSources>
+        <ConditionDetectionConfig>&lt;SignatureID&gt;{d70ff56f-62b1-4b11-b382-8a571ae2391e}&lt;/SignatureID&gt;&lt;BusinessCycleLengthUnit&gt;Day&lt;/BusinessCycleLengthUnit&gt;&lt;BusinessCycleLengthInGivenUnit&gt;1&lt;/BusinessCycleLengthInGivenUnit&gt;&lt;EffectiveSamplingPeriodInSeconds&gt;300&lt;/EffectiveSamplingPeriodInSeconds&gt;&lt;Sensitivity&gt;2.81&lt;/Sensitivity&gt;&lt;LearningSettings&gt;&lt;LearningType&gt;Continuous&lt;/LearningType&gt;&lt;Offset1&gt;1&lt;/Offset1&gt;&lt;Offset2&gt;1&lt;/Offset2&gt;&lt;Offset3&gt;1&lt;/Offset3&gt;&lt;LearningRate&gt;2&lt;/LearningRate&gt;&lt;/LearningSettings&gt;&lt;SignatureCollectionSettings&gt;&lt;DBUpdatePeriodInSeconds&gt;300&lt;/DBUpdatePeriodInSeconds&gt;&lt;/SignatureCollectionSettings&gt;</ConditionDetectionConfig>
+        <ConditionDetectionId>CD</ConditionDetectionId>
+        <ConditionDetectionType>SystemPerf!System.Performance.SignatureCreatorWithoutCompression</ConditionDetectionType>
+        <WriteActions>
+          <RuleWriteActionItem>
+            <WriteActionId>WA</WriteActionId>
+            <WriteActionType>SC!Microsoft.SystemCenter.CollectSignature</WriteActionType>
+          </RuleWriteActionItem>
+        </WriteActions>
+      </CustomRuleConfig>
+    </Instance>
+  </Instances>
+</TemplateGroup>
