@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{D4B43EB3-688B-4EEE-86BD-088F0B28ABB3}") = "QND.ClusterDisk.Addendum", "QND.ClusterDisk.Addendum.mpproj", "{41A6B62F-6AAA-4C9E-A0B9-AB775BCF622E}"
 EndProject
+Project("{D4B43EB3-688B-4EEE-86BD-088F0B28ABB3}") = "QND.ClusterDisk.Addendum.overrides", "..\QND.ClusterDisk.Addendum.overrides\QND.ClusterDisk.Addendum.overrides.mpproj", "{D2886945-A987-4969-869E-E5741F8A9EDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,6 +17,10 @@ Global
 		{41A6B62F-6AAA-4C9E-A0B9-AB775BCF622E}.Debug|x86.Build.0 = Debug|x86
 		{41A6B62F-6AAA-4C9E-A0B9-AB775BCF622E}.Release|x86.ActiveCfg = Release|x86
 		{41A6B62F-6AAA-4C9E-A0B9-AB775BCF622E}.Release|x86.Build.0 = Release|x86
+		{D2886945-A987-4969-869E-E5741F8A9EDE}.Debug|x86.ActiveCfg = Debug|x86
+		{D2886945-A987-4969-869E-E5741F8A9EDE}.Debug|x86.Build.0 = Debug|x86
+		{D2886945-A987-4969-869E-E5741F8A9EDE}.Release|x86.ActiveCfg = Release|x86
+		{D2886945-A987-4969-869E-E5741F8A9EDE}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

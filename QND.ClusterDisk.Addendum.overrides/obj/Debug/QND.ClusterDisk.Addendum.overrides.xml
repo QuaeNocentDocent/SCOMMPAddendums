@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ManagementPack SchemaVersion="2.0" ContentReadable="true" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Manifest>
+    <Identity>
+      <ID>QND.ClusterDisk.Addendum.overrides</ID>
+      <Version>1.0.0.6</Version>
+    </Identity>
+    <Name>QND.ClusterDisk.Addendum.overrides</Name>
+    <References>
+      <Reference Alias="ClusterDisk">
+        <ID>Microsoft.Windows.Server.ClusterSharedVolumeMonitoring</ID>
+        <Version>6.0.7061.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="QCA">
+        <ID>QND.ClusterDisk.Addendum</ID>
+        <Version>1.0.0.69</Version>
+        <PublicKeyToken>920d8ca3e48c0337</PublicKeyToken>
+      </Reference>
+    </References>
+  </Manifest>
+  <Monitoring>
+    <Overrides>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.AvgDiskSecPerTransfer.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" Rule="QCA!QND.ClusterDisk.AvgDiskSecPerTransfer.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.DiskReadsPerSec.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" Rule="QCA!QND.ClusterDisk.DiskReadsPerSec.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.DiskWritesPerSec.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" Rule="QCA!QND.ClusterDisk.DiskWritesPerSec.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+    </Overrides>
+  </Monitoring>
+</ManagementPack>
