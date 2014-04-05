@@ -1,7 +1,7 @@
 ﻿<ManagementPackFragment SchemaVersion="2.0">
   <Monitoring>
     <Rules>
-      <Rule ID="QND.ClusterSharedVolume.Ext.#text('Rule Id')#" Enabled="true" Target="QND.ClusterSharedVolume.Ext" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+      <Rule ID="QND.ClusterSharedVolume.Ext.#text('Rule Id')#" Enabled="false" Target="QND.ClusterSharedVolume.Ext" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
         <Category>PerformanceCollection</Category>
         <DataSources>
           <DataSource ID="DS" TypeID="#alias('System.Performance.Library')#!System.Performance.OptimizedDataProvider">

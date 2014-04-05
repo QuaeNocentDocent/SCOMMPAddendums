@@ -1,8 +1,0 @@
-ReadsSec.Collection,Reads/sec,Cluster CSV File System,$Target/Property[Type="Progel.ClusterSharedVolume.Ext"]/VolumeId$,300,0.1,Percentage,12
-ReadLatency.Collection,Read Latency,Cluster CSV File System,$Target/Property[Type="Progel.ClusterSharedVolume.Ext"]/VolumeId$,300,0.005,Absolute,12
-WriteSec.Collection,Writes/sec,Cluster CSV File System,$Target/Property[Type="Progel.ClusterSharedVolume.Ext"]/VolumeId$,300,0.1,Percentage,12
-WriteLatency.Collection,Write Latency,Cluster CSV File System,$Target/Property[Type="Progel.ClusterSharedVolume.Ext"]/VolumeId$,300,0.005,Absolute,12
-Redir.ReadLatency.Collection,Redirected Read Latency,Cluster CSV File System,$Target/Property[Type="Progel.ClusterSharedVolume.Ext"]/VolumeId$,300,0.005,Absolute,12
-Redir.WriteSec.Collection,Redirected Writes/sec,Cluster CSV File System,$Target/Property[Type="Progel.ClusterSharedVolume.Ext"]/VolumeId$,300,0.1,Percentage,12
-Redir.WriteLatency.Collection,Redirected Write Latency,Cluster CSV File System,$Target/Property[Type="Progel.ClusterSharedVolume.Ext"]/VolumeId$,300,0.005,Absolute,12
-Redir.ReadSec.Collection,Redirected Reads/sec,Cluster CSV File System,$Target/Property[Type="Progel.ClusterSharedVolume.Ext"]/VolumeId$,300,0.1,Percentage,12

@@ -39,35 +39,43 @@
   </PropertyGroup>
   <ItemGroup>
     <ManagementPackReference Include="Microsoft.SystemCenter.DataWarehouse.Library">
-      <HintPath>C:\Local\Dev\OpsMgr\MPLib2012\Microsoft.SystemCenter.DataWarehouse.Library.mp</HintPath>
+      <HintPath>C:\Local\Dev\OpsMgr\GIT\scomosmpaddendums\AddendumMP\ReferencedMP\Microsoft.SystemCenter.DataWarehouse.Library.mp</HintPath>
       <Alias>SCDW</Alias>
       <MinVersion>7.0.8427.1</MinVersion>
       <PackageToBundle>False</PackageToBundle>
     </ManagementPackReference>
     <ManagementPackReference Include="Microsoft.SystemCenter.Library">
+      <HintPath>C:\Local\Dev\OpsMgr\GIT\scomosmpaddendums\AddendumMP\ReferencedMP\Microsoft.SystemCenter.Library.mp</HintPath>
       <Alias>SC</Alias>
+      <MinVersion>7.0.8427.0</MinVersion>
+    </ManagementPackReference>
+    <ManagementPackReference Include="Microsoft.SystemCenter.Visualization.Library">
+      <HintPath>C:\Local\Dev\OpsMgr\GIT\scomosmpaddendums\AddendumMP\ReferencedMP\Microsoft.SystemCenter.Visualization.Library.mp</HintPath>
+      <Alias>Visualization</Alias>
+      <MinVersion>7.0.8560.0</MinVersion>
       <PackageToBundle>False</PackageToBundle>
     </ManagementPackReference>
     <ManagementPackReference Include="Microsoft.Windows.Cluster.Library">
-      <HintPath>C:\Local\Dev\OpsMgr\MPLib2012\Microsoft.Windows.Cluster.Library.mp</HintPath>
+      <HintPath>C:\Local\Dev\OpsMgr\GIT\scomosmpaddendums\AddendumMP\ReferencedMP\Microsoft.Windows.Cluster.Library.mp</HintPath>
       <Alias>Cluster</Alias>
       <MinVersion>7.0.8427.0</MinVersion>
       <PackageToBundle>False</PackageToBundle>
     </ManagementPackReference>
     <ManagementPackReference Include="Microsoft.Windows.Library">
+      <HintPath>C:\Local\Dev\OpsMgr\GIT\scomosmpaddendums\AddendumMP\ReferencedMP\Microsoft.Windows.Library.mp</HintPath>
       <Alias>Windows</Alias>
-      <PackageToBundle>False</PackageToBundle>
+      <MinVersion>7.5.8501.0</MinVersion>
     </ManagementPackReference>
     <ManagementPackReference Include="Microsoft.Windows.Server.ClusterSharedVolumeMonitoring">
-      <HintPath>C:\local\dev\opsmgr\mplib2012\Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.mp</HintPath>
+      <HintPath>C:\Local\Dev\OpsMgr\GIT\scomosmpaddendums\AddendumMP\ReferencedMP\Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.mp</HintPath>
       <Alias>ClusterDisk</Alias>
-      <MinVersion>6.0.7061.0</MinVersion>
+      <MinVersion>6.0.7026.0</MinVersion>
       <PackageToBundle>False</PackageToBundle>
     </ManagementPackReference>
     <ManagementPackReference Include="Microsoft.Windows.Server.Library">
-      <HintPath>C:\local\dev\opsmgr\mplib2012\Microsoft.Windows.Server.Library.mp</HintPath>
+      <HintPath>C:\Local\Dev\OpsMgr\GIT\scomosmpaddendums\AddendumMP\ReferencedMP\Microsoft.Windows.Server.Library.mp</HintPath>
       <Alias>MWSL</Alias>
-      <MinVersion>6.0.7061.0</MinVersion>
+      <MinVersion>6.0.7026.0</MinVersion>
       <PackageToBundle>False</PackageToBundle>
     </ManagementPackReference>
     <ManagementPackReference Include="System.Health.Library">
@@ -76,10 +84,6 @@
     </ManagementPackReference>
     <ManagementPackReference Include="System.Library">
       <Alias>System</Alias>
-      <PackageToBundle>False</PackageToBundle>
-    </ManagementPackReference>
-    <ManagementPackReference Include="Microsoft.SystemCenter.Visualization.Library">
-      <Alias>Visualization</Alias>
       <PackageToBundle>False</PackageToBundle>
     </ManagementPackReference>
     <ManagementPackReference Include="System.Performance.Library">
@@ -93,13 +97,11 @@
     <Compile Include="CSV.mpx">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CSVMonitors.mptg.mpx">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="CSVPerfRules.mptg.mpx">
       <SubType>Code</SubType>
+      <DependentUpon>CSVPerfRules.mpsd</DependentUpon>
     </Compile>
-    <Compile Include="Disk.mpx">
+    <Compile Include="ClusterDisk.mpx">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Folders\Folders.mpx">
@@ -116,6 +118,8 @@
   <ItemGroup>
     <Folder Include="Monitors" />
     <Folder Include="Folders" />
+    <Folder Include="ReferencedMP" />
+    <Folder Include="SupportFiles" />
     <Folder Include="Views" />
     <Folder Include="Rules" />
     <Folder Include="Scripts" />
@@ -124,26 +128,22 @@
     <EmbeddedResource Include="Scripts\VolumeMapping.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CSVMonitors.csv">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="CSVMonitors.mpsd">
-      <SubType>Content</SubType>
-      <Generator>FragmentGenerator</Generator>
-    </Content>
     <Content Include="CSVOptPerfRules.templatesnippet">
       <SubType>Content</SubType>
     </Content>
     <Content Include="CSVPerfMonitor.templatesnippet">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="CSVPerfRules.csv">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="CSVPerfRules.mpsd">
       <SubType>Content</SubType>
       <Generator>FragmentGenerator</Generator>
     </Content>
+    <None Include="SupportFiles\CSVMonitors.csv">
+      <SubType>Content</SubType>
+    </None>
+    <None Include="SupportFiles\CSVPerfRules.csv">
+      <SubType>Content</SubType>
+    </None>
     <Content Include="Views\views.mptg">
       <SubType>Content</SubType>
       <Generator>FragmentGenerator</Generator>

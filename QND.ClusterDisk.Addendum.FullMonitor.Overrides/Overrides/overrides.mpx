@@ -1,0 +1,43 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<Monitoring>
+		<Overrides>
+			<RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.AvgDiskSecPerTransfer.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" Rule="QCA!QND.ClusterDisk.AvgDiskSecPerTransfer.Collection" Property="Enabled">
+				<Value>true</Value>
+			</RulePropertyOverride>
+			<RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.DiskReadsPerSec.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" Rule="QCA!QND.ClusterDisk.DiskReadsPerSec.Collection" Property="Enabled">
+				<Value>true</Value>
+			</RulePropertyOverride>
+			<RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.DiskWritesPerSec.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" Rule="QCA!QND.ClusterDisk.DiskWritesPerSec.Collection" Property="Enabled">
+				<Value>true</Value>
+			</RulePropertyOverride>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.FreeMB.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" 
+                            Rule="QCA!QND.ClusterDisk.FreeMB.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.FreeSpace.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" 
+                            Rule="QCA!QND.ClusterDisk.FreeSpace.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>      
+      <MonitorPropertyOverride ID="QND.ClusterDisk.AvgDiskSecPerTransfer.Override" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false"
+                               Monitor="QCA!QND.ClusterDisk.AvgDiskSecPerTransfer" Property="Enabled">
+        <Value>true</Value>
+    </MonitorPropertyOverride>
+      <MonitorPropertyOverride ID="QND.ClusterSharedVolume.Ext.ReadLatency.Monitor.Override" Context="QCA!QND.ClusterSharedVolume.Ext" Enforced="false"
+                               Monitor="QCA!QND.ClusterSharedVolume.Ext.ReadLatency.Monitor" Property="Enabled">
+        <Value>true</Value>
+      </MonitorPropertyOverride>
+      <MonitorPropertyOverride ID="QND.ClusterSharedVolume.Ext.WriteLatency.Monitor.Override" Context="QCA!QND.ClusterSharedVolume.Ext" Enforced="false"
+                               Monitor="QCA!QND.ClusterSharedVolume.Ext.WriteLatency.Monitor" Property="Enabled">
+        <Value>true</Value>        
+      </MonitorPropertyOverride>
+      <MonitorPropertyOverride ID="QND.ClusterSharedVolume.Ext.RedirReadLatency.Monitor.Override" Context="QCA!QND.ClusterSharedVolume.Ext" Enforced="false"
+                               Monitor="QCA!QND.ClusterSharedVolume.Ext.RedirReadLatency.Monitor" Property="Enabled">
+        <Value>true</Value>
+      </MonitorPropertyOverride>
+      <MonitorPropertyOverride ID="QND.ClusterSharedVolume.Ext.RedirWriteLatency.Monitor.Override" Context="QCA!QND.ClusterSharedVolume.Ext" Enforced="false"
+                               Monitor="QCA!QND.ClusterSharedVolume.Ext.RedirWriteLatency.Monitor" Property="Enabled">
+        <Value>true</Value>
+      </MonitorPropertyOverride>
+    </Overrides>
+	</Monitoring>
+</ManagementPackFragment>

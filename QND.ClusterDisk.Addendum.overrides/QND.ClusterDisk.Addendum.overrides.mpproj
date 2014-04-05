@@ -47,9 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <ManagementPackReference Include="Microsoft.Windows.Server.ClusterSharedVolumeMonitoring">
-      <HintPath>C:\local\dev\opsmgr\mplib2012\Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.mp</HintPath>
+      <HintPath>C:\Local\Dev\OpsMgr\GIT\scomosmpaddendums\AddendumMP\ReferencedMP\Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.mp</HintPath>
       <Alias>ClusterDisk</Alias>
-      <MinVersion>6.0.7061.0</MinVersion>
+      <MinVersion>6.0.7026.0</MinVersion>
       <PackageToBundle>False</PackageToBundle>
     </ManagementPackReference>
   </ItemGroup>

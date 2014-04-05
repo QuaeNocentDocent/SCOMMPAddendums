@@ -1,7 +1,7 @@
 ﻿<ManagementPackFragment SchemaVersion="2.0">
   <Monitoring>
     <Monitors>
-      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.#text('Rule Id')#" Accessibility="Public" Enabled="true" Target="QND.ClusterSharedVolume.Ext"
+      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.#text('Rule Id')#" Accessibility="Public" Enabled="false" Target="QND.ClusterSharedVolume.Ext"
              ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
         <Category>PerformanceHealth</Category>
         <AlertSettings AlertMessage="QND.ClusterSharedVolume.Ext.#text('Rule Id')#.AlertMessage">

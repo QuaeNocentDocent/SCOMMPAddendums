@@ -1,0 +1,172 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Rules>
+      <Rule ID="QND.ClusterDisk.AvgDiskSecPerTransfer.Collection" Enabled="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="PerformanceDS" TypeID="Perf!System.Performance.OptimizedDataProvider">
+            <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+            <CounterName>Avg. Disk sec/Transfer</CounterName>
+            <ObjectName>LogicalDisk</ObjectName>
+            <InstanceName>$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk"]/PartitionName$</InstanceName>
+            <AllInstances>false</AllInstances>
+            <Frequency>300</Frequency>
+            <Tolerance>0.015</Tolerance>
+            <ToleranceType>Absolute</ToleranceType>
+            <MaximumSampleSeparation>12</MaximumSampleSeparation>
+          </DataSource>
+        </DataSources>
+        <WriteActions>
+          <WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
+      <Rule ID="QND.ClusterDisk.DiskReadsPerSec.Collection" Enabled="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="PerformanceDS" TypeID="Perf!System.Performance.OptimizedDataProvider">
+            <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+            <CounterName>Disk Reads/sec</CounterName>
+            <ObjectName>LogicalDisk</ObjectName>
+            <InstanceName>$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk"]/PartitionName$</InstanceName>
+            <AllInstances>false</AllInstances>
+            <Frequency>300</Frequency>
+            <Tolerance>10</Tolerance>
+            <ToleranceType>Percentage</ToleranceType>
+            <MaximumSampleSeparation>12</MaximumSampleSeparation>
+          </DataSource>
+        </DataSources>
+        <WriteActions>
+          <WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
+      <Rule ID="QND.ClusterDisk.DiskWritesPerSec.Collection" Enabled="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="PerformanceDS" TypeID="Perf!System.Performance.OptimizedDataProvider">
+            <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+            <CounterName>Disk Writes/sec</CounterName>
+            <ObjectName>LogicalDisk</ObjectName>
+            <InstanceName>$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk"]/PartitionName$</InstanceName>
+            <AllInstances>false</AllInstances>
+            <Frequency>300</Frequency>
+            <Tolerance>10</Tolerance>
+            <ToleranceType>Percentage</ToleranceType>
+            <MaximumSampleSeparation>12</MaximumSampleSeparation>
+          </DataSource>
+        </DataSources>
+        <WriteActions>
+          <WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
+      <Rule ID="QND.ClusterDisk.FreeMB.Collection" Enabled="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="PerformanceDS" TypeID="Perf!System.Performance.OptimizedDataProvider">
+            <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+            <CounterName>Free Megabytes</CounterName>
+            <ObjectName>LogicalDisk</ObjectName>
+            <InstanceName>$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk"]/PartitionName$</InstanceName>
+            <AllInstances>false</AllInstances>
+            <Frequency>600</Frequency>
+            <Tolerance>10</Tolerance>
+            <ToleranceType>Percentage</ToleranceType>
+            <MaximumSampleSeparation>6</MaximumSampleSeparation>
+          </DataSource>
+        </DataSources>
+        <WriteActions>
+          <WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
+      <Rule ID="QND.ClusterDisk.FreeSpace.Collection" Enabled="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="PerformanceDS" TypeID="Perf!System.Performance.OptimizedDataProvider">
+            <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+            <CounterName>% Free Space</CounterName>
+            <ObjectName>LogicalDisk</ObjectName>
+            <InstanceName>$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk"]/PartitionName$</InstanceName>
+            <AllInstances>false</AllInstances>
+            <Frequency>600</Frequency>
+            <Tolerance>10</Tolerance>
+            <ToleranceType>Absolute</ToleranceType>
+            <MaximumSampleSeparation>6</MaximumSampleSeparation>
+          </DataSource>
+        </DataSources>
+        <WriteActions>
+          <WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
+    </Rules>
+    <Monitors>
+      <UnitMonitor ID="QND.ClusterDisk.AvgDiskSecPerTransfer" Accessibility="Public" Enabled="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" 
+                   ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
+        <Category>PerformanceHealth</Category>
+        <AlertSettings AlertMessage="QND.ClusterDisk.AvgDiskSecPerTransfer.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Warning</AlertSeverity>
+          <AlertParameters></AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="OverThreshold" MonitorTypeStateID="ConditionTrue" HealthState="Warning" />
+          <OperationalState ID="UnderThreshold" MonitorTypeStateID="ConditionFalse" HealthState="Success" />
+        </OperationalStates>
+        <Configuration>
+          <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+          <CounterName>Avg. Disk sec/Transfer</CounterName>
+          <ObjectName>LogicalDisk</ObjectName>
+          <InstanceName>$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk"]/PartitionName$</InstanceName>
+          <Frequency>60</Frequency>
+          <Threshold>0.04</Threshold>
+          <Direction>greater</Direction>
+          <NumSamples>15</NumSamples>
+        </Configuration>
+      </UnitMonitor>
+    </Monitors>
+  </Monitoring>
+  <Presentation>
+    <StringResources>
+      <StringResource ID="QND.ClusterDisk.AvgDiskSecPerTransfer.AlertMessage" />
+    </StringResources>
+  </Presentation>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="QND.ClusterDisk.AvgDiskSecPerTransfer.AlertMessage">
+          <Name>Logical disk transfer (reads and writes) latency  is too high</Name>
+          <Description>The threshold for the Logical Disk\Avg. Disk sec/Transfer performance counter has been exceeded.</Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterDisk.AvgDiskSecPerTransfer">
+          <Name>Average Logical Disk Seconds Per Transfer</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterDisk.AvgDiskSecPerTransfer" SubElementID="OverThreshold">
+          <Name>Disk response time is slow</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterDisk.AvgDiskSecPerTransfer" SubElementID="UnderThreshold">
+          <Name>Disk response time is normal</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterDisk.AvgDiskSecPerTransfer.Collection">
+          <Name>Cluster Disk - Average Seconds Per Transfer</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterDisk.DiskReadsPerSec.Collection">
+          <Name>Cluster Disk - Reads per Second</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterDisk.DiskWritesPerSec.Collection">
+          <Name>Cluster Disk - Writes per Second</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterDisk.FreeMB.Collection">
+          <Name>Cluster Disk - Free Megabytes</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.ClusterDisk.FreeSpace.Collection">
+          <Name>Cluster Disk - % Free Space</Name>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

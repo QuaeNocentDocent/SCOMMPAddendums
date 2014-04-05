@@ -72,7 +72,7 @@
 </TypeDefinitions>
   <Monitoring>
     <Discoveries>
-      <Discovery ID="QND.ClusterSharedVolume.Ext.Discovery" Enabled="false" Remotable="true" Priority="Normal" ConfirmDelivery="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume">
+      <Discovery ID="QND.ClusterSharedVolume.Ext.Discovery" Enabled="true" Remotable="true" Priority="Normal" ConfirmDelivery="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume">
         <Category>Discovery</Category>
         <DiscoveryTypes>
           <DiscoveryClass TypeID="QND.ClusterSharedVolume.Ext" />

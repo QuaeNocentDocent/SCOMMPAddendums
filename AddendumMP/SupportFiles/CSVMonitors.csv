@@ -1,0 +1,4 @@
+ReadLatency,Read Latency,Cluster CSV File System,$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$,60,0.1,15
+WriteLatency,Write Latency,Cluster CSV File System,$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$,60,0.1,15
+Redir.ReadLatency,Redirected Read Latency,Cluster CSV File System,$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$,60,0.1,15
+Redir.WriteLatency,Redirected Write Latency,Cluster CSV File System,$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$,60,0.1,15
