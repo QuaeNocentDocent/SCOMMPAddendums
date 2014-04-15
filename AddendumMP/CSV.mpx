@@ -2,18 +2,31 @@
   <TypeDefinitions>
     <EntityTypes>
       <ClassTypes>
-        <ClassType ID="QND.ClusterSharedVolume.Ext" Abstract="false" Accessibility="Public" Base="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume" Hosted="true">          
-          <Property ID="VolumeId" Type="string"/>
+        <ClassType ID="QND.CSV.PerfWatcher" Abstract="false" Accessibility="Public" Base="Windows!Microsoft.Windows.LogicalDisk" Hosted="true">   
+          <Property ID="ClusterSharedVolumeName" Type="string" Key="true" />
+          <Property ID="FriendlyVolumeName" Type="string" />
+          <Property ID="PartitionName" Type="string" />
+          <Property ID="PartitionFileSystem" Type="string" />
+          <Property ID="PartitionSize" Type="int" />
+          <Property ID="ClusterName" Type="string" />
+          <Property ID="VolumeLabel" Type="string" />          
         </ClassType>
-      </ClassTypes>      
+      </ClassTypes>
+      <RelationshipTypes>
+        <RelationshipType ID="Microsoft.Windows.Cluster.Contains.QND.CSV.PerfWatcher" Accessibility="Public" Abstract="false" Base="System!System.Containment">
+          <Source ID="Source" Type="Cluster!Microsoft.Windows.Cluster"/>
+          <Target ID="Target" Type="QND.CSV.PerfWatcher" />
+        </RelationshipType>
+      </RelationshipTypes>
     </EntityTypes>
     <ModuleTypes>
-    <DataSourceModuleType ID="QND.ClusterSharedVolume.Ext.Discovery.DS" Accessibility="Internal" Batching="false">
+    <DataSourceModuleType ID="QND.CSV.PerfWatcher.Discovery.DS" Accessibility="Internal" Batching="false">
       <Configuration>
         <xsd:element name="TraceLevel" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
         <xsd:element name="ScriptTimeout" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
         <xsd:element name="IntervalSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
         <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        <xsd:element name="TargetComputer" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />        
       </Configuration>
       <OverrideableParameters>
         <OverrideableParameter ID="TraceLevel" Selector="$Config/TraceLevel$" ParameterType="int" />
@@ -24,41 +37,15 @@
       <ModuleImplementation>
         <Composite>
           <MemberModules>
-            <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedPowerShell.DiscoveryProvider">
+            <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.DiscoveryProvider">
               <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
               <SyncTime>$Config/SyncTime$</SyncTime>
-              <ScriptName>OBPolicyDiscovery.ps1</ScriptName>
+              <ScriptName>Get-LocalCSV.vbs</ScriptName>
+              <Arguments>$Config/TraceLevel$ $MPElement$ $Target/Id$ $Config/TargetComputer$</Arguments>
               <ScriptBody>
-                $IncludeFileContent/Scripts/VolumeMapping.ps1$
+                $IncludeFileContent/Scripts/Get-LocalCSV.vbs$
               </ScriptBody>
-              <Parameters>
-                <Parameter>
-                  <Name>traceLevel</Name>
-                  <Value>$Config/TraceLevel$</Value>
-                </Parameter>
-                <Parameter>
-                  <Name>computerName</Name>
-                  <Value>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Value>
-                </Parameter>
-                <Parameter>
-                  <Name>ClusterSharedVolumeName</Name>
-                  <Value>$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume"]/ClusterSharedVolumeName$</Value>
-                </Parameter>
-                <Parameter>
-                  <Name>FriendlyVolumeName</Name>
-                  <Value>$Target/Property[Type="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume"]/FriendlyVolumeName$</Value>
-                </Parameter>                
-                <Parameter>
-                  <Name>sourceID</Name>
-                  <Value>$MPElement$</Value>
-                </Parameter>
-                <Parameter>
-                  <Name>ManagedEntityId</Name>
-                  <Value>$Target/Id$</Value>
-                </Parameter>
-              </Parameters>
               <TimeoutSeconds>$Config/ScriptTimeout$</TimeoutSeconds>
-              <StrictErrorHandling>false</StrictErrorHandling>
             </DataSource>
           </MemberModules>
           <Composition>
@@ -72,24 +59,37 @@
 </TypeDefinitions>
   <Monitoring>
     <Discoveries>
-      <Discovery ID="QND.ClusterSharedVolume.Ext.Discovery" Enabled="true" Remotable="true" Priority="Normal" ConfirmDelivery="false" Target="ClusterDisk!Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume">
+      <Discovery ID="QND.CSV.PerfWatcher.Discovery" Enabled="true" Remotable="true" Priority="Normal" ConfirmDelivery="false" Target="MWCML!Microsoft.Windows.Cluster.Node">
         <Category>Discovery</Category>
         <DiscoveryTypes>
-          <DiscoveryClass TypeID="QND.ClusterSharedVolume.Ext" />
+          <DiscoveryClass TypeID="QND.CSV.PerfWatcher" />
+          <DiscoveryRelationship TypeID="Microsoft.Windows.Cluster.Contains.QND.CSV.PerfWatcher" />
         </DiscoveryTypes>
-      <DataSource ID="DS" TypeID="QND.ClusterSharedVolume.Ext.Discovery.DS">
+      <DataSource ID="DS" TypeID="QND.CSV.PerfWatcher.Discovery.DS">
         <TraceLevel>1</TraceLevel>
         <ScriptTimeout>120</ScriptTimeout>
         <IntervalSeconds>86400</IntervalSeconds>
         <SyncTime />
+        <TargetComputer>$Target/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</TargetComputer>
       </DataSource>
       </Discovery>
     </Discoveries>
     <Monitors>
-      <UnitMonitor ID="QND.ClusterSharedVolume.Ext.ReadLatency.Monitor" Accessibility="Public" Enabled="false" Target="QND.ClusterSharedVolume.Ext"
+      <AggregateMonitor ID="QND.ClusterDisk.Cluster.CSV.Rollup" Accessibility="Public" ParentMonitorID="Health!System.Health.PerformanceState" Enabled="true" Priority="Normal"
+                        Remotable="true" Target="Cluster!Microsoft.Windows.Cluster">
+        <Category>PerformanceHealth</Category>
+        <AlertSettings>
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+        </AlertSettings>
+        <Algorithm>WorstOf</Algorithm>
+      </AggregateMonitor>
+      <UnitMonitor ID="QND.CSV.PerfWatcher.ReadLatency.Monitor" Accessibility="Public" Enabled="false" Target="QND.CSV.PerfWatcher"
        ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
         <Category>PerformanceHealth</Category>
-        <AlertSettings AlertMessage="QND.ClusterSharedVolume.Ext.ReadLatency.AlertMessage">
+        <AlertSettings AlertMessage="QND.CSV.PerfWatcher.ReadLatency.AlertMessage">
           <AlertOnState>Warning</AlertOnState>
           <AutoResolve>true</AutoResolve>
           <AlertPriority>Normal</AlertPriority>
@@ -104,13 +104,14 @@
           <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
           <CounterName>Read Latency</CounterName>
           <ObjectName>Cluster CSV File System</ObjectName>
-          <InstanceName>$Target/Property[Type="QND.ClusterSharedVolume.Ext"]/VolumeId$</InstanceName>
+          <InstanceName>$Target/Property[Type="Windows!Microsoft.Windows.LogicalDisk"]/VolumeName$</InstanceName>
           <Frequency>60</Frequency>
           <Threshold>0.1</Threshold>
           <Direction>greater</Direction>
           <NumSamples>15</NumSamples>
         </Configuration>
       </UnitMonitor>
+      <!--
       <UnitMonitor ID="QND.ClusterSharedVolume.Ext.WriteLatency.Monitor" Accessibility="Public" Enabled="false" Target="QND.ClusterSharedVolume.Ext"
   ParentMonitorID="Health!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Perf!System.Performance.ConsecutiveSamplesThreshold" ConfirmDelivery="false">
         <Category>PerformanceHealth</Category>
@@ -186,34 +187,45 @@
           <NumSamples>15</NumSamples>
         </Configuration>
       </UnitMonitor>      
+      -->
+      <DependencyMonitor ID="QND.ClusterDisk.Cluster.CSV.Dep" Accessibility="Public" MemberMonitor="QND.CSV.PerfWatcher.ReadLatency.Monitor" Enabled="true" ParentMonitorID="QND.ClusterDisk.Cluster.CSV.Rollup"
+         RelationshipType="Microsoft.Windows.Cluster.Contains.QND.CSV.PerfWatcher" Priority="Normal" Remotable="true" Target="Cluster!Microsoft.Windows.Cluster">
+        <Category>PerformanceHealth</Category>
+        <Algorithm>Percentage</Algorithm>
+        <AlgorithmParameter>30</AlgorithmParameter>
+        <MemberInMaintenance>Success</MemberInMaintenance>
+        <MemberUnAvailable>Error</MemberUnAvailable>
+      </DependencyMonitor>    
     </Monitors>
   </Monitoring>
   <Presentation>
     <StringResources>
-      <StringResource ID="QND.ClusterSharedVolume.Ext.ReadLatency.AlertMessage"/>
-      <StringResource ID="QND.ClusterSharedVolume.Ext.WriteLatency.AlertMessage"/>
+      <StringResource ID="QND.CSV.PerfWatcher.ReadLatency.AlertMessage"/>
+<!--      <StringResource ID="QND.ClusterSharedVolume.Ext.WriteLatency.AlertMessage"/>
       <StringResource ID="QND.ClusterSharedVolume.Ext.RedirReadLatency.AlertMessage"/>
       <StringResource ID="QND.ClusterSharedVolume.Ext.RedirWriteLatency.AlertMessage"/>
+      -->
     </StringResources>
   </Presentation>
   <LanguagePacks>
     <LanguagePack ID="ENU" IsDefault="true">
       <DisplayStrings>
-        <DisplayString ElementID="QND.ClusterSharedVolume.Ext">
+        <DisplayString ElementID="QND.CSV.PerfWatcher">
           <Name>Cluster Shared Volume Extended</Name>
         </DisplayString>
+<!--        
         <DisplayString ElementID="QND.ClusterSharedVolume.Ext" SubElementID="VolumeId">
           <Name>Volume Name</Name>
         </DisplayString>
-
-        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.ReadLatency.Monitor">
+-->
+        <DisplayString ElementID="QND.CSV.PerfWatcher.ReadLatency.Monitor">
           <Name>Read Latency</Name>
         </DisplayString>
-        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.ReadLatency.AlertMessage">
+        <DisplayString ElementID="QND.CSV.PerfWatcher.ReadLatency.AlertMessage">
           <Name>CSV Performance - Read Latency over threshold</Name>
           <Description>CSV performance degraded</Description>
         </DisplayString>
-
+<!--
         <DisplayString ElementID="QND.ClusterSharedVolume.Ext.WriteLatency.Monitor">
           <Name>Write Latency</Name>
         </DisplayString>
@@ -238,9 +250,10 @@
           <Name>CSV Performance - Redirected Write Latency over threshold</Name>
           <Description>CSV performance degraded</Description>
         </DisplayString>      
+-->        
       </DisplayStrings>
       <KnowledgeArticles>
-        <KnowledgeArticle ElementID="QND.ClusterSharedVolume.Ext.ReadLatency.Monitor">
+        <KnowledgeArticle ElementID="QND.CSV.PerfWatcher.ReadLatency.Monitor">
           <MamlContent>
             <section xmlns="http://schemas.microsoft.com/maml/2004/10">
               <title>Summary</title>
@@ -257,6 +270,7 @@
             </section>
           </MamlContent>
         </KnowledgeArticle>
+        <!--        
         <KnowledgeArticle ElementID="QND.ClusterSharedVolume.Ext.WriteLatency.Monitor">
           <MamlContent>
             <section xmlns="http://schemas.microsoft.com/maml/2004/10">
@@ -311,7 +325,8 @@
               <para>Check for enough bandwith for network used for redirected I/O. Check the causes of redirected I/O and if possibile minimize them.</para>
             </section>
           </MamlContent>
-        </KnowledgeArticle>        
+        </KnowledgeArticle>  
+        -->
       </KnowledgeArticles>
 
       
