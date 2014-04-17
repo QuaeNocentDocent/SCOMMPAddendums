@@ -67,6 +67,12 @@
       <MinVersion>6.0.7063.0</MinVersion>
       <PackageToBundle>False</PackageToBundle>
     </ManagementPackReference>
+    <ManagementPackReference Include="Microsoft.Windows.Cluster.Management.Monitoring">
+      <HintPath>C:\Local\Dev\OpsMgr\MPLib2012\Microsoft.Windows.Cluster.Management.Monitoring.mp</HintPath>
+      <Alias>MWCMM</Alias>
+      <MinVersion>6.0.7063.0</MinVersion>
+      <PackageToBundle>False</PackageToBundle>
+    </ManagementPackReference>
     <ManagementPackReference Include="Microsoft.Windows.Library">
       <HintPath>C:\Local\Dev\OpsMgr\GIT\scomosmpaddendums\AddendumMP\ReferencedMP\Microsoft.Windows.Library.mp</HintPath>
       <Alias>Windows</Alias>
@@ -103,23 +109,23 @@
     <Compile Include="CSV.mpx">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="CSVPerfRules.mptg.mpx">
+    <Compile Include="CSVPerfRules.mptg.mpx">
       <SubType>Code</SubType>
       <DependentUpon>CSVPerfRules.mpsd</DependentUpon>
-    </None>
+    </Compile>
     <Compile Include="ClusterDisk.mpx">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="Folders\Folders.mpx">
+    <Compile Include="Folders\Folders.mpx">
       <SubType>Code</SubType>
-    </None>
+    </Compile>
     <Compile Include="MPIdentity.mpx">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="Views\views.mptg.mpx">
+    <Compile Include="Views\views.mptg.mpx">
       <SubType>Code</SubType>
       <DependentUpon>Views\views.mptg</DependentUpon>
-    </None>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Monitors" />
@@ -138,23 +144,23 @@
     <Content Include="CSVOptPerfRules.templatesnippet">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="CSVPerfMonitor.templatesnippet">
-      <SubType>Content</SubType>
-    </Content>
-    <None Include="CSVPerfRules.mpsd">
+    <Content Include="CSVPerfRules.mpsd">
       <SubType>Content</SubType>
       <Generator>FragmentGenerator</Generator>
-    </None>
+    </Content>
     <None Include="SupportFiles\CSVMonitors.csv">
       <SubType>Content</SubType>
     </None>
     <None Include="SupportFiles\CSVPerfRules.csv">
       <SubType>Content</SubType>
     </None>
-    <None Include="Views\views.mptg">
+    <Content Include="SupportFiles\CSVPerfMonitor.templatesnippet">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Views\views.mptg">
       <SubType>Content</SubType>
       <Generator>FragmentGenerator</Generator>
-    </None>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VSAC\Microsoft.SystemCenter.OperationsManager.targets" />
 </Project>

@@ -184,7 +184,7 @@ End Function
 
 Private Function CreateDiscoveryData(ByRef objClusterSharedVolume, ByRef objClusterDiskPartition, ByRef objClusterResource, _
                                      ByRef strTargetComputer, ByRef strClusterName, ByRef oDiscoveryData) 'As Integer
-    Dim oCSVInstance, oCLusterInstance, oRel
+    Dim oCSVInstance, oCLusterInstance, oRel, oCSVForCluster
     DIm aParts, volumeName, perfName
     
    'Create Cluster Instance
@@ -192,42 +192,66 @@ Private Function CreateDiscoveryData(ByRef objClusterSharedVolume, ByRef objClus
    Call oClusterInstance.AddProperty("$MPElement[Name='Cluster!Microsoft.Windows.Cluster']/Name$", strClusterName)
 
     'Create the cluster shared volume instance hosted on the targeted cluster virtual server
-    Set oCSVInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='QND.CSV.PerfWatcher']$")
+    Set oCSVInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='QND.ClusterDisk.CSV.PerfWatcher']$")
 
     'PrincipalName (host, key)
     Call oCSVInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", strTargetComputer)
 
     'ClusterSharedVolumeName (key)
-    Call oCSVInstance.AddProperty("$MPElement[Name='QND.CSV.PerfWatcher']/ClusterSharedVolumeName$", objClusterResource.Properties_(WMI_NAME_PROPERTY_NAME))
-
-
+    Call oCSVInstance.AddProperty("$MPElement[Name='QND.ClusterDisk.CSV.PerfWatcher']/ClusterSharedVolumeName$", objClusterResource.Properties_(WMI_NAME_PROPERTY_NAME))
 
     'FriendlyVolumeName
     volumeName = objClusterSharedVolume.Properties_(WMI_NAME_PROPERTY_NAME)
     aParts = Split(volumeName, "\")
     perfName = aParts(UBound(aParts))
-    Call oCSVInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.LogicalDisk']/VolumeName$", perfName)
-    Call oCSVInstance.AddProperty("$MPElement[Name='QND.CSV.PerfWatcher']/FriendlyVolumeName$", volumeName)
-    'PartitionName
-    Call oCSVInstance.AddProperty("$MPElement[Name='QND.CSV.PerfWatcher']/PartitionName$", objClusterDiskPartition.Properties_(WMI_PATH_PROPERTY_NAME))
-    'PartitionFileSystem
-    Call oCSVInstance.AddProperty("$MPElement[Name='QND.CSV.PerfWatcher']/PartitionFileSystem$", objClusterDiskPartition.Properties_(WMI_FILESYSTEM_PROPERTY_NAME))
-    'PartitionSize
-    Call oCSVInstance.AddProperty("$MPElement[Name='QND.CSV.PerfWatcher']/PartitionSize$", objClusterDiskPartition.Properties_(WMI_TOTALSIZE_PROPERTY_NAME))
-    'ClusterName
-    Call oCSVInstance.AddProperty("$MPElement[Name='QND.CSV.PerfWatcher']/ClusterName$", strClusterName)
-    'VolumeLabel
-    Call oCSVInstance.AddProperty("$MPElement[Name='QND.CSV.PerfWatcher']/VolumeLabel$", objClusterDiskPartition.Properties_(WMI_VOLUMELABEL_PROPERTY_NAME))
+    Call oCSVInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.LogicalDevice']/DeviceID$", perfName)
+    Call oCSVInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.LogicalDevice']/Name$", objClusterDiskPartition.Properties_(WMI_VOLUMELABEL_PROPERTY_NAME))
+    Call oCSVInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.LogicalDisk']/VolumeName$", volumeName)
 
+    'PartitionName
+    Call oCSVInstance.AddProperty("$MPElement[Name='QND.ClusterDisk.CSV.PerfWatcher']/PartitionName$", objClusterDiskPartition.Properties_(WMI_PATH_PROPERTY_NAME))
+    'PartitionFileSystem
+    Call oCSVInstance.AddProperty("$MPElement[Name='QND.ClusterDisk.CSV.PerfWatcher']/PartitionFileSystem$", objClusterDiskPartition.Properties_(WMI_FILESYSTEM_PROPERTY_NAME))
+    'PartitionSize
+    Call oCSVInstance.AddProperty("$MPElement[Name='QND.ClusterDisk.CSV.PerfWatcher']/PartitionSize$", objClusterDiskPartition.Properties_(WMI_TOTALSIZE_PROPERTY_NAME))
+    'ClusterName
+    Call oCSVInstance.AddProperty("$MPElement[Name='QND.ClusterDisk.CSV.PerfWatcher']/ClusterName$", strClusterName)
+
+    Call oCSVInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", strTargetComputer & " - " & objClusterResource.Properties_(WMI_NAME_PROPERTY_NAME))
     Call oDiscoveryData.AddInstance(oCSVInstance)
 
-    Set oRel = oDiscoveryData.CreateRelationshipInstance("$MPElement[Name='Microsoft.Windows.Cluster.Contains.QND.CSV.PerfWatcher']$")
+    'Create the cluster shared volume instance hosted on the targeted cluster virtual server
+    Set oCSVForCluster = oDiscoveryData.CreateClassInstance("$MPElement[Name='QND.ClusterDisk.CSV.ForCluster']$")
+
+    'ClusterSharedVolumeName (key)
+    Call oCSVForCluster.AddProperty("$MPElement[Name='QND.ClusterDisk.CSV.ForCluster']/ClusterSharedVolumeName$", objClusterResource.Properties_(WMI_NAME_PROPERTY_NAME))
+    Call oCSVForCluster.AddProperty("$MPElement[Name='QND.ClusterDisk.CSV.ForCluster']/ClusterName$", strClusterName)
+
+    'FriendlyVolumeName
+    Call oCSVForCluster.AddProperty("$MPElement[Name='QND.ClusterDisk.CSV.ForCluster']/FriendlyVolumeName$", volumeName)
+    'PartitionName
+    Call oCSVForCluster.AddProperty("$MPElement[Name='QND.ClusterDisk.CSV.ForCluster']/PartitionName$", objClusterDiskPartition.Properties_(WMI_PATH_PROPERTY_NAME))
+    'PartitionFileSystem
+    Call oCSVForCluster.AddProperty("$MPElement[Name='QND.ClusterDisk.CSV.ForCluster']/PartitionFileSystem$", objClusterDiskPartition.Properties_(WMI_FILESYSTEM_PROPERTY_NAME))
+    'PartitionSize
+    Call oCSVForCluster.AddProperty("$MPElement[Name='QND.ClusterDisk.CSV.ForCluster']/PartitionSize$", objClusterDiskPartition.Properties_(WMI_TOTALSIZE_PROPERTY_NAME))
+    'VolumeLabel
+    Call oCSVForCluster.AddProperty("$MPElement[Name='QND.ClusterDisk.CSV.ForCluster']/VolumeLabel$", objClusterDiskPartition.Properties_(WMI_VOLUMELABEL_PROPERTY_NAME))
+    Call oCSVForCluster.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", objClusterResource.Properties_(WMI_NAME_PROPERTY_NAME))
+    Call oDiscoveryData.AddInstance(oCSVForCluster)
+
+    Set oRel = oDiscoveryData.CreateRelationshipInstance("$MPElement[Name='Microsoft.Windows.Cluster.Contains.QND.ClusterDisk.CSV.ForCluster']$")
     oRel.Source = oClusterInstance
+    oRel.Target = oCSVForCluster
+    Call oDiscoveryData.AddInstance(oRel)
+    Set oRel = oDiscoveryData.CreateRelationshipInstance("$MPElement[Name='QND.ClusterDisk.CSV.ForCluster.Contains.QND.ClusterDisk.CSV.PerfWatcher']$")
+    oRel.Source = oCSVForCluster
     oRel.Target = oCSVInstance
-    oDiscoveryData.AddInstance(oRel)
+    Call oDiscoveryData.AddInstance(oRel)
         
     If Err.number <> 0 Then
        CreateDiscoveryData = False
+    	    Call LogEvent(FAILURE_EVENT_ID,EVENT_TYPE_ERROR, ErrorMsg(Err, "error creating disocvery data."), TRACE_ERROR)
        Exit Function
     End If 
 

@@ -5,8 +5,8 @@
       <!-- In this section, you can create more folders. Edit the DisplayString for this folder 
            to change the name the user sees in the console. More information can be found in 
            the Management Pack Development Kit: http://msdn.microsoft.com/en-us/library/ee533810.aspx -->
-		<Folder ID="QND.ClusterDisk.ClusterSharedVolume.folder" Accessibility="Internal" ParentFolder="MWSL!Microsoft.Windows.Server.ViewFolder.Performance" />
-		<Folder ID="QND.ClusterDisk.Clusterdisk.folder" Accessibility="Internal" ParentFolder="MWSL!Microsoft.Windows.Server.ViewFolder.Performance" />
+		<Folder ID="QND.ClusterDisk.ClusterSharedVolume.folder" Accessibility="Internal" ParentFolder="MWCMM!Microsoft.Windows.Cluster.ViewFolder.Root" />
+		<Folder ID="QND.ClusterDisk.Clusterdisk.folder" Accessibility="Internal" ParentFolder="MWCMM!Microsoft.Windows.Cluster.ViewFolder.Root" />
 
 	</Folders>
 

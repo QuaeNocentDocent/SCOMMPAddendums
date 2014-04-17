@@ -1,7 +1,7 @@
 ﻿<ManagementPackFragment SchemaVersion="2.0">
   <Monitoring>
     <Rules>
-      <Rule ID="QND.ClusterSharedVolume.Ext.#text('Rule Id')#" Enabled="false" Target="QND.ClusterSharedVolume.Ext" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+      <Rule ID="QND.ClusterDisk.CSV.#text('Rule Id')#" Enabled="false" Target="QND.ClusterDisk.CSV.PerfWatcher" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
         <Category>PerformanceCollection</Category>
         <DataSources>
           <DataSource ID="DS" TypeID="#alias('System.Performance.Library')#!System.Performance.OptimizedDataProvider">
@@ -26,7 +26,7 @@
   <LanguagePacks>
     <LanguagePack ID="ENU" IsDefault="true">
       <DisplayStrings>
-        <DisplayString ElementID="QND.ClusterSharedVolume.Ext.#text('Rule Id')#">
+        <DisplayString ElementID="QND.ClusterDisk.CSV.#text('Rule Id')#">
           <Name>Collection rule for performance counter #text('Perf Counter Name')#.</Name>
         </DisplayString>
       </DisplayStrings>
