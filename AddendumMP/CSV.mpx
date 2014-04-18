@@ -131,8 +131,8 @@
           <DiscoveryRelationship TypeID="Microsoft.Windows.Cluster.Contains.QND.ClusterDisk.CSV.ForCluster" />
         </DiscoveryTypes>
       <DataSource ID="DS" TypeID="QND.ClusterDisk.CSV.PerfWatcher.Discovery.DS">
-        <TraceLevel>4</TraceLevel>
-        <ScriptTimeout>120</ScriptTimeout>
+        <TraceLevel>1</TraceLevel>
+        <ScriptTimeout>300</ScriptTimeout>
         <IntervalSeconds>86400</IntervalSeconds>
         <SyncTime />
         <TargetComputer>$Target/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</TargetComputer>
@@ -458,6 +458,10 @@
         </DisplayString>
         <DisplayString ElementID="QND.ClusterDisk.Cluster.CSV.Perf.Dep">
           <Name>CSVs Performance</Name>
+        </DisplayString>
+
+        <DisplayString ElementID="QND.ClusterDisk.Cluster.CSV.Avail.Dep">
+          <Name>CSVs Availability</Name>
         </DisplayString>
       </DisplayStrings>
       <KnowledgeArticles>
