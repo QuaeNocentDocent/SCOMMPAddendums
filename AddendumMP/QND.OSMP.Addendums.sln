@@ -9,6 +9,8 @@ Project("{D4B43EB3-688B-4EEE-86BD-088F0B28ABB3}") = "QND.ClusterDisk.Addendum.ov
 EndProject
 Project("{D4B43EB3-688B-4EEE-86BD-088F0B28ABB3}") = "QND.ClusterDisk.Addendum.FullMonitor.Overrides", "..\QND.ClusterDisk.Addendum.FullMonitor.Overrides\QND.ClusterDisk.Addendum.FullMonitor.Overrides.mpproj", "{854C0353-F4B7-4166-A7FF-4273B83CD8FB}"
 EndProject
+Project("{D4B43EB3-688B-4EEE-86BD-088F0B28ABB3}") = "QND.Windows.Server.2012R2.Addendum", "..\QND.Windows.Server.2012R2.Addendum\QND.Windows.Server.2012R2.Addendum.mpproj", "{30180F8C-8DFE-4764-AEA4-A227733DB509}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -27,6 +29,10 @@ Global
 		{854C0353-F4B7-4166-A7FF-4273B83CD8FB}.Debug|x86.Build.0 = Debug|x86
 		{854C0353-F4B7-4166-A7FF-4273B83CD8FB}.Release|x86.ActiveCfg = Release|x86
 		{854C0353-F4B7-4166-A7FF-4273B83CD8FB}.Release|x86.Build.0 = Release|x86
+		{30180F8C-8DFE-4764-AEA4-A227733DB509}.Debug|x86.ActiveCfg = Debug|x86
+		{30180F8C-8DFE-4764-AEA4-A227733DB509}.Debug|x86.Build.0 = Debug|x86
+		{30180F8C-8DFE-4764-AEA4-A227733DB509}.Release|x86.ActiveCfg = Release|x86
+		{30180F8C-8DFE-4764-AEA4-A227733DB509}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

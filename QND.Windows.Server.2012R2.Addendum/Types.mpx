@@ -1,0 +1,49 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <ModuleTypes>
+      <ProbeActionModuleType ID="QND.DiskSpaceGet.PT" Accessibility="Public" Batching="false">
+        <Configuration>
+          <IncludeSchemaTypes>
+            <SchemaType>System!System.CommandExecuterSchema</SchemaType>
+          </IncludeSchemaTypes>
+          <xsd:element name="TraceLevel" type="xsd:integer" />
+          <xsd:element minOccurs="1" name="ComputerName" type="xsd:string" />
+          <xsd:element minOccurs="1" name="DiskLabel" type="xsd:string" />
+          <xsd:element name="ScriptTimeout" type="xsd:integer" />
+          <xsd:element minOccurs="0" maxOccurs="1" name="EventPolicy" type="CommandExecuterEventPolicyType" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TraceLevel" Selector="$Config/TraceLevel$" ParameterType="int" />
+          <OverrideableParameter ID="ScriptTimeout" Selector="$Config/ScriptTimeout$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="WA1" TypeID="System!System.CommandExecuterProbe">
+                <ApplicationName>%windir%\system32\cscript.exe</ApplicationName>
+                <WorkingDirectory />
+                <CommandLine>//nologo Progel.Library.DiskInfo.vbs $Config/TraceLevel$ "$Config/ComputerName$" "$Config/DiskLabel$"</CommandLine>
+                <SecureInput></SecureInput>
+                <TimeoutSeconds>$Config/ScriptTimeout$</TimeoutSeconds>
+                <RequireOutput>true</RequireOutput>
+
+                <DefaultEventPolicy>
+                  <Severity>2</Severity>
+                  <StdOutMatches />
+                  <StdErrMatches>\a+</StdErrMatches>
+                  <ExitCodeMatches>[^0]+</ExitCodeMatches>
+                </DefaultEventPolicy>
+                <EventPolicy>$Config/EventPolicy$</EventPolicy>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="WA1" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.CommandOutput</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </ProbeActionModuleType>
+    </ModuleTypes>
+  </TypeDefinitions>
+</ManagementPackFragment>
