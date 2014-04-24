@@ -1,0 +1,44 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <ModuleTypes>
+      <ProbeActionModuleType ID="QND.DiskSpaceGet.PT" Accessibility="Public" Batching="false">
+        <Configuration>
+          <xsd:element name="ComputerName" type="xsd:string" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="DiskLabel" type="xsd:string" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TimeoutSeconds" type="xsd:integer" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="StrictErrorHandling" type="xsd:boolean" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="WA1" TypeID="Windows!Microsoft.Windows.PowerShellProbe">
+                <ScriptName>Get-DiskSpace.ps1</ScriptName>
+                <ScriptBody>$IncludeFileContent/Scripts/Get-DiskSpace.ps1$</ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>DiskLabel</Name>
+                    <Value>$Config/DiskLabel$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>TargetComputer</Name>
+                    <Value>$Config/ComputerName$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>$Config/StrictErrorHandling$</StrictErrorHandling>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="WA1" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>Windows!Microsoft.Windows.SerializedObjectData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </ProbeActionModuleType>
+    </ModuleTypes>
+  </TypeDefinitions>
+</ManagementPackFragment>

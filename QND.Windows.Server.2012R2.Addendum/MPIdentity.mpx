@@ -1,0 +1,45 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="QND.Windows.Server.2012R2.Addendum">
+          <Name>QND Windows Server 2012 and 2012 R2 Addendum</Name>
+          <Description>Adds important rules and monitors to the standard Windows Server 2012 and 2012 R2 management packs.</Description>
+        </DisplayString>
+      </DisplayStrings>
+      <KnowledgeArticles>
+        <KnowledgeArticle ElementID="QND.Windows.Server.2012R2.Addendum">
+
+            <MamlContent>
+              <section xmlns="http://schemas.microsoft.com/maml/2004/10">
+                <title>Summary</title>
+                <para>This Management Pack integrates the standard Windows Server 2012 and 2012 R2 monitors and rules</para>
+                <para>The MP adds the following alerting rules:</para>
+                <list>
+                  <listItem>
+                    <para>Unexpected Shutdown</para>
+                  </listItem>
+                  <listItem>
+                    <para>Broken Domain trust relationship</para>
+                  </listItem>
+                  <listItem>
+                    <para>Netlogon - Domain authentication failed (3270)</para>
+                  </listItem>
+                </list>
+                <para>Additionally the management pack define the following probes:</para>
+                <list>
+                  <listItem>
+                    <para>Task - Get disk space info</para>
+                  </listItem>
+                  <listItem>
+                    <para>Diagnostic - Get Disk Info Diagnostic</para>
+                  </listItem>
+                </list>
+              </section>
+            </MamlContent>
+          </KnowledgeArticle>          
+
+      </KnowledgeArticles>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

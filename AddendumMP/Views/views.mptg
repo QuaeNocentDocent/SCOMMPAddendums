@@ -7,7 +7,7 @@
         <ViewConfiguration>&lt;Criteria&gt;&lt;Object&gt;LogicalDisk&lt;/Object&gt;&lt;Instance /&gt;&lt;Counter&gt;Avg. Disk sec/Transfer&lt;/Counter&gt;&lt;/Criteria&gt;</ViewConfiguration>
         <Visible>true</Visible>
         <Accessibility>Internal</Accessibility>
-        <Id>QND.ClusterDisk.Clusterdisk.Average.Seconds.Per.Transfer.View</Id>
+        <Id>Average.Seconds.Per.Transfer.View</Id>
         <DisplayName>Cluster Disk - Average Seconds Per Transfer</DisplayName>
         <Description>Description for the new view</Description>
         <Target>ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk</Target>
@@ -21,7 +21,7 @@
         <ViewConfiguration>&lt;Criteria&gt;&lt;Object&gt;LogicalDisk&lt;/Object&gt;&lt;Instance /&gt;&lt;Counter&gt;Disk Reads/sec&lt;/Counter&gt;&lt;/Criteria&gt;</ViewConfiguration>
         <Visible>true</Visible>
         <Accessibility>Internal</Accessibility>
-        <Id>QND.ClusterDisk.Clusterdisk.Reads.per.Second.View</Id>
+        <Id>Reads.per.Second.View</Id>
         <DisplayName>Cluster Disk - Reads per Second</DisplayName>
         <Description>Description for the new view</Description>
         <Target>ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk</Target>
@@ -35,10 +35,24 @@
         <ViewConfiguration>&lt;Criteria&gt;&lt;Object&gt;LogicalDisk&lt;/Object&gt;&lt;Instance /&gt;&lt;Counter&gt;Disk Writes/sec&lt;/Counter&gt;&lt;/Criteria&gt;</ViewConfiguration>
         <Visible>true</Visible>
         <Accessibility>Internal</Accessibility>
-        <Id>QND.ClusterDisk.Clusterdisk.Writes.per.Second.View</Id>
+        <Id>Writes.per.Second.View</Id>
         <DisplayName>Cluster Disk - Writes per Second</DisplayName>
         <Description>Description for the new view</Description>
         <Target>ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk</Target>
+        <Category>Operations</Category>
+      </CustomViewConfig>
+    </Instance>
+    <Instance ID="Instanced6fa9465ad13442f9e63d582b8ca44b2" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.CustomView" Version="1.0.0.0">
+      <CustomViewConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <ViewFolder>QND.ClusterDisk.ClusterSharedVolume.folder</ViewFolder>
+        <ViewType>SC!Microsoft.SystemCenter.StateViewType</ViewType>
+        <ViewConfiguration>&lt;Presentation&gt;&lt;ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending"&gt;&lt;Name&gt;State&lt;/Name&gt;&lt;Id&gt;QND.ClusterDisk.CSV.ForCluster&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending"&gt;&lt;Name&gt;Maintenance Mode&lt;/Name&gt;&lt;Id&gt;InMaintenanceMode&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending"&gt;&lt;Name&gt;Name&lt;/Name&gt;&lt;Id&gt;Name&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending"&gt;&lt;Name&gt;Path&lt;/Name&gt;&lt;Id&gt;Path&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending"&gt;&lt;Name&gt;Display Name&lt;/Name&gt;&lt;Id&gt;System.Entity/DisplayName&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending"&gt;&lt;Name&gt;ClusterName&lt;/Name&gt;&lt;Id&gt;QND.ClusterDisk.CSV.ForCluster/ClusterName&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending"&gt;&lt;Name&gt;ClusterSharedVolumeName&lt;/Name&gt;&lt;Id&gt;QND.ClusterDisk.CSV.ForCluster/ClusterSharedVolumeName&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="7" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending"&gt;&lt;Name&gt;FriendlyVolumeName&lt;/Name&gt;&lt;Id&gt;QND.ClusterDisk.CSV.ForCluster/FriendlyVolumeName&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="8" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending"&gt;&lt;Name&gt;PartitionName&lt;/Name&gt;&lt;Id&gt;QND.ClusterDisk.CSV.ForCluster/PartitionName&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="9" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending"&gt;&lt;Name&gt;PartitionFileSystem&lt;/Name&gt;&lt;Id&gt;QND.ClusterDisk.CSV.ForCluster/PartitionFileSystem&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="10" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending"&gt;&lt;Name&gt;PartitionSize&lt;/Name&gt;&lt;Id&gt;QND.ClusterDisk.CSV.ForCluster/PartitionSize&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="11" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending"&gt;&lt;Name&gt;VolumeLabel&lt;/Name&gt;&lt;Id&gt;QND.ClusterDisk.CSV.ForCluster/VolumeLabel&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="12" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending"&gt;&lt;Name&gt;Cluster Shared Volume Extended&lt;/Name&gt;&lt;Id&gt;QND.ClusterDisk.CSV.PerfWatcher&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="13" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending"&gt;&lt;Name&gt;Cluster Shared Volume&lt;/Name&gt;&lt;Id&gt;Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.ClusterSharedVolume&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;/Presentation&gt;</ViewConfiguration>
+        <Visible>true</Visible>
+        <Accessibility>Internal</Accessibility>
+        <Id>CSV.State.View</Id>
+        <DisplayName>CSV State</DisplayName>
+        <Description>Description for the new view</Description>
+        <Target>QND.ClusterDisk.CSV.ForCluster</Target>
         <Category>Operations</Category>
       </CustomViewConfig>
     </Instance>

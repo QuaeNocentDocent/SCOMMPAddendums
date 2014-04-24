@@ -17,25 +17,60 @@
       <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.FreeSpace.Collection" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false" 
                             Rule="QCA!QND.ClusterDisk.FreeSpace.Collection" Property="Enabled">
         <Value>true</Value>
-      </RulePropertyOverride>      
+      </RulePropertyOverride>
+
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.CSV.ReadsSec.Collection" Context="QCA!QND.ClusterDisk.CSV.PerfWatcher" Enforced="false"
+                      Rule="QCA!QND.ClusterDisk.CSV.ReadsSec.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.CSV.ReadLatency.Collection" Context="QCA!QND.ClusterDisk.CSV.PerfWatcher" Enforced="false"
+                      Rule="QCA!QND.ClusterDisk.CSV.ReadLatency.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.CSV.WriteSec.Collection" Context="QCA!QND.ClusterDisk.CSV.PerfWatcher" Enforced="false"
+                      Rule="QCA!QND.ClusterDisk.CSV.WriteSec.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.CSV.WriteLatency.Collection" Context="QCA!QND.ClusterDisk.CSV.PerfWatcher" Enforced="false"
+                      Rule="QCA!QND.ClusterDisk.CSV.WriteLatency.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.CSV.Redir.ReadLatency.Collection" Context="QCA!QND.ClusterDisk.CSV.PerfWatcher" Enforced="false"
+                Rule="QCA!QND.ClusterDisk.CSV.Redir.ReadLatency.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.CSV.Redir.WriteSec.Collection" Context="QCA!QND.ClusterDisk.CSV.PerfWatcher" Enforced="false"
+                      Rule="QCA!QND.ClusterDisk.CSV.Redir.WriteSec.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.CSV.Redir.WriteLatency.Collection" Context="QCA!QND.ClusterDisk.CSV.PerfWatcher" Enforced="false"
+                      Rule="QCA!QND.ClusterDisk.CSV.Redir.WriteLatency.Collection" Property="Enabled">
+        <Value>true</Value>
+      </RulePropertyOverride>
+      <RulePropertyOverride ID="OverrideForRule.QND.ClusterDisk.CSV.Redir.ReadSec.Collection" Context="QCA!QND.ClusterDisk.CSV.PerfWatcher" Enforced="false"
+                      Rule="QCA!QND.ClusterDisk.CSV.Redir.ReadSec.Collection" Property="Enabled">
+        <Value>true</Value>
+      
+      </RulePropertyOverride>
       <MonitorPropertyOverride ID="QND.ClusterDisk.AvgDiskSecPerTransfer.Override" Context="ClusterDisk!Microsoft.Windows.Server.ClusterDisksMonitoring.ClusterDisk" Enforced="false"
                                Monitor="QCA!QND.ClusterDisk.AvgDiskSecPerTransfer" Property="Enabled">
         <Value>true</Value>
     </MonitorPropertyOverride>
-      <MonitorPropertyOverride ID="QND.ClusterSharedVolume.Ext.ReadLatency.Monitor.Override" Context="QCA!QND.ClusterSharedVolume.Ext" Enforced="false"
-                               Monitor="QCA!QND.ClusterSharedVolume.Ext.ReadLatency.Monitor" Property="Enabled">
+      <MonitorPropertyOverride ID="QND.ClusterDisk.CSV.PerfWatcher.ReadLatency.Monitor.Override" Context="QCA!QND.ClusterDisk.CSV.PerfWatcher" Enforced="false"
+                               Monitor="QCA!QND.ClusterDisk.CSV.PerfWatcher.ReadLatency.Monitor" Property="Enabled">
         <Value>true</Value>
       </MonitorPropertyOverride>
-      <MonitorPropertyOverride ID="QND.ClusterSharedVolume.Ext.WriteLatency.Monitor.Override" Context="QCA!QND.ClusterSharedVolume.Ext" Enforced="false"
-                               Monitor="QCA!QND.ClusterSharedVolume.Ext.WriteLatency.Monitor" Property="Enabled">
+      <MonitorPropertyOverride ID="QND.ClusterDisk.CSV.PerfWatcher.WriteLatency.Monitor.Override" Context="QCA!QND.ClusterDisk.CSV.PerfWatcher" Enforced="false"
+                               Monitor="QCA!QND.ClusterDisk.CSV.PerfWatcher.WriteLatency.Monitor" Property="Enabled">
         <Value>true</Value>        
       </MonitorPropertyOverride>
-      <MonitorPropertyOverride ID="QND.ClusterSharedVolume.Ext.RedirReadLatency.Monitor.Override" Context="QCA!QND.ClusterSharedVolume.Ext" Enforced="false"
-                               Monitor="QCA!QND.ClusterSharedVolume.Ext.RedirReadLatency.Monitor" Property="Enabled">
+      <MonitorPropertyOverride ID="QND.ClusterDisk.CSV.PerfWatcher.RedirReadLatency.Monitor.Override" Context="QCA!QND.ClusterDisk.CSV.PerfWatcher" Enforced="false"
+                               Monitor="QCA!QND.ClusterDisk.CSV.PerfWatcher.RedirReadLatency.Monitor" Property="Enabled">
         <Value>true</Value>
       </MonitorPropertyOverride>
-      <MonitorPropertyOverride ID="QND.ClusterSharedVolume.Ext.RedirWriteLatency.Monitor.Override" Context="QCA!QND.ClusterSharedVolume.Ext" Enforced="false"
-                               Monitor="QCA!QND.ClusterSharedVolume.Ext.RedirWriteLatency.Monitor" Property="Enabled">
+      <MonitorPropertyOverride ID="QND.ClusterDisk.CSV.PerfWatcher.RedirWriteLatency.Monitor.Override" Context="QCA!QND.ClusterDisk.CSV.PerfWatcher" Enforced="false"
+                               Monitor="QCA!QND.ClusterDisk.CSV.PerfWatcher.RedirWriteLatency.Monitor" Property="Enabled">
         <Value>true</Value>
       </MonitorPropertyOverride>
     </Overrides>

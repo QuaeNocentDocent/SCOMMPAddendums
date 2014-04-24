@@ -61,6 +61,18 @@
       <MinVersion>7.0.8427.0</MinVersion>
       <PackageToBundle>False</PackageToBundle>
     </ManagementPackReference>
+    <ManagementPackReference Include="Microsoft.Windows.Cluster.Management.Library">
+      <HintPath>C:\Local\Dev\OpsMgr\MPLib2012\Microsoft.Windows.Cluster.Management.Library.mp</HintPath>
+      <Alias>MWCML</Alias>
+      <MinVersion>6.0.7063.0</MinVersion>
+      <PackageToBundle>False</PackageToBundle>
+    </ManagementPackReference>
+    <ManagementPackReference Include="Microsoft.Windows.Cluster.Management.Monitoring">
+      <HintPath>C:\Local\Dev\OpsMgr\MPLib2012\Microsoft.Windows.Cluster.Management.Monitoring.mp</HintPath>
+      <Alias>MWCMM</Alias>
+      <MinVersion>6.0.7063.0</MinVersion>
+      <PackageToBundle>False</PackageToBundle>
+    </ManagementPackReference>
     <ManagementPackReference Include="Microsoft.Windows.Library">
       <HintPath>C:\Local\Dev\OpsMgr\GIT\scomosmpaddendums\AddendumMP\ReferencedMP\Microsoft.Windows.Library.mp</HintPath>
       <Alias>Windows</Alias>
@@ -125,13 +137,11 @@
     <Folder Include="Scripts" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Scripts\Get-LocalCSV.vbs" />
     <EmbeddedResource Include="Scripts\VolumeMapping.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CSVOptPerfRules.templatesnippet">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="CSVPerfMonitor.templatesnippet">
       <SubType>Content</SubType>
     </Content>
     <Content Include="CSVPerfRules.mpsd">
@@ -144,6 +154,9 @@
     <None Include="SupportFiles\CSVPerfRules.csv">
       <SubType>Content</SubType>
     </None>
+    <Content Include="SupportFiles\CSVPerfMonitor.templatesnippet">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Views\views.mptg">
       <SubType>Content</SubType>
       <Generator>FragmentGenerator</Generator>
