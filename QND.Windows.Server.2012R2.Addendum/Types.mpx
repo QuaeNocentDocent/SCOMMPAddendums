@@ -3,37 +3,32 @@
     <ModuleTypes>
       <ProbeActionModuleType ID="QND.DiskSpaceGet.PT" Accessibility="Public" Batching="false">
         <Configuration>
-          <IncludeSchemaTypes>
-            <SchemaType>System!System.CommandExecuterSchema</SchemaType>
-          </IncludeSchemaTypes>
-          <xsd:element name="TraceLevel" type="xsd:integer" />
-          <xsd:element minOccurs="1" name="ComputerName" type="xsd:string" />
-          <xsd:element minOccurs="1" name="DiskLabel" type="xsd:string" />
-          <xsd:element name="ScriptTimeout" type="xsd:integer" />
-          <xsd:element minOccurs="0" maxOccurs="1" name="EventPolicy" type="CommandExecuterEventPolicyType" />
+          <xsd:element name="ComputerName" type="xsd:string" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="DiskLabel" type="xsd:string" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TimeoutSeconds" type="xsd:integer" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="StrictErrorHandling" type="xsd:boolean" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
         </Configuration>
         <OverrideableParameters>
-          <OverrideableParameter ID="TraceLevel" Selector="$Config/TraceLevel$" ParameterType="int" />
-          <OverrideableParameter ID="ScriptTimeout" Selector="$Config/ScriptTimeout$" ParameterType="int" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
         </OverrideableParameters>
         <ModuleImplementation Isolation="Any">
           <Composite>
             <MemberModules>
-              <ProbeAction ID="WA1" TypeID="System!System.CommandExecuterProbe">
-                <ApplicationName>%windir%\system32\cscript.exe</ApplicationName>
-                <WorkingDirectory />
-                <CommandLine>//nologo Progel.Library.DiskInfo.vbs $Config/TraceLevel$ "$Config/ComputerName$" "$Config/DiskLabel$"</CommandLine>
-                <SecureInput></SecureInput>
-                <TimeoutSeconds>$Config/ScriptTimeout$</TimeoutSeconds>
-                <RequireOutput>true</RequireOutput>
-
-                <DefaultEventPolicy>
-                  <Severity>2</Severity>
-                  <StdOutMatches />
-                  <StdErrMatches>\a+</StdErrMatches>
-                  <ExitCodeMatches>[^0]+</ExitCodeMatches>
-                </DefaultEventPolicy>
-                <EventPolicy>$Config/EventPolicy$</EventPolicy>
+              <ProbeAction ID="WA1" TypeID="Windows!Microsoft.Windows.PowerShellProbe">
+                <ScriptName>Get-DiskSpace.ps1</ScriptName>
+                <ScriptBody>$IncludeFileContent/Scripts/Get-DiskSpace.ps1$</ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>DiskLabel</Name>
+                    <Value>$Config/DiskLabel$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>TargetComputer</Name>
+                    <Value>$Config/ComputerName$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>$Config/StrictErrorHandling$</StrictErrorHandling>
               </ProbeAction>
             </MemberModules>
             <Composition>
@@ -41,7 +36,7 @@
             </Composition>
           </Composite>
         </ModuleImplementation>
-        <OutputType>System!System.CommandOutput</OutputType>
+        <OutputType>Windows!Microsoft.Windows.SerializedObjectData</OutputType>
         <InputType>System!System.BaseData</InputType>
       </ProbeActionModuleType>
     </ModuleTypes>
