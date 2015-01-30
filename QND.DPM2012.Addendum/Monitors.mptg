@@ -3,7 +3,7 @@
     <Instance ID="Instance1cb8bbbf42bb4bd8ba0ce5a2d4aaa2da" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.UnitMonitor" Version="1.0.0.0">
       <UnitMonitorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
         <MonitorType>QND.DPM2012.SPFreeSpace.MT</MonitorType>
-        <MonitorConfig>&lt;IntervalSeconds&gt;900&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;&lt;/SyncTime&gt;&lt;TimeoutSeconds&gt;120&lt;/TimeoutSeconds&gt;&lt;TraceLevel&gt;1&lt;/TraceLevel&gt;&lt;Threshold1Perc&gt;15&lt;/Threshold1Perc&gt;&lt;Threshold2Perc&gt;5&lt;/Threshold2Perc&gt;&lt;Threshold2Abs&gt;500&lt;/Threshold2Abs&gt;</MonitorConfig>
+        <MonitorConfig>&lt;IntervalSeconds&gt;3611&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;&lt;/SyncTime&gt;&lt;TimeoutSeconds&gt;120&lt;/TimeoutSeconds&gt;&lt;TraceLevel&gt;2&lt;/TraceLevel&gt;&lt;Threshold1Perc&gt;15&lt;/Threshold1Perc&gt;&lt;Threshold2Perc&gt;5&lt;/Threshold2Perc&gt;&lt;Threshold2Abs&gt;500&lt;/Threshold2Abs&gt;</MonitorConfig>
         <MonitorOperationalStates>
           <OperationalState>
             <OperationalStateId>Healthy</OperationalStateId>
@@ -40,6 +40,81 @@
         <AlertSeverity>MatchMonitorHealth</AlertSeverity>
         <AlertName>DPM 2012 - Storage Pool Free Space under threshold</AlertName>
         <AlertDescription>Storage Pool Free Space is under the defined thresholds</AlertDescription>
+        <ConfirmDelivery>false</ConfirmDelivery>
+      </UnitMonitorConfig>
+    </Instance>
+    <Instance ID="Instanceca615b1f5cd0400093c7d1881d9fe3c3" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.UnitMonitor" Version="1.0.0.0">
+      <UnitMonitorConfig xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <MonitorType>QND.DPM2012.DSSLAStatus.MT</MonitorType>
+        <MonitorConfig>&lt;IntervalSeconds&gt;3600&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;&lt;/SyncTime&gt;&lt;TimeoutSeconds&gt;300&lt;/TimeoutSeconds&gt;&lt;TraceLevel&gt;2&lt;/TraceLevel&gt;&lt;DataSourceId&gt;$Target/Property[Type="DPM2012!Microsoft.SystemCenter.DataProtectionManager.2011.Library.DataSource"]/DPMObjectID$&lt;/DataSourceId&gt;</MonitorConfig>
+        <MonitorOperationalStates>
+          <OperationalState>
+            <OperationalStateId>InSLA</OperationalStateId>
+            <OperationalStateDisplayName>InSLA</OperationalStateDisplayName>
+            <MonitorTypeStateId>InSLA</MonitorTypeStateId>
+            <HealthState>Success</HealthState>
+          </OperationalState>
+          <OperationalState>
+            <OperationalStateId>OutSLA</OperationalStateId>
+            <OperationalStateDisplayName>OutSLA</OperationalStateDisplayName>
+            <MonitorTypeStateId>OutSLA</MonitorTypeStateId>
+            <HealthState>Error</HealthState>
+          </OperationalState>
+        </MonitorOperationalStates>
+        <ParentMonitor>Health!System.Health.AvailabilityState</ParentMonitor>
+        <Accessibility>Internal</Accessibility>
+        <Id>DSSLA</Id>
+        <DisplayName>DPM: DS In SLA</DisplayName>
+        <Description>Monitors the datasource recopery point SLA</Description>
+        <Target>DPM2012!Microsoft.SystemCenter.DataProtectionManager.2011.Library.DataSource</Target>
+        <Enabled>true</Enabled>
+        <Category>AvailabilityHealth</Category>
+        <Remotable>false</Remotable>
+        <Priority>Normal</Priority>
+        <AlertAutoResolve>true</AlertAutoResolve>
+        <AlertOnState>Error</AlertOnState>
+        <AlertPriority>Normal</AlertPriority>
+        <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+        <AlertName>DPM: Datasource protection out of SLA</AlertName>
+        <AlertDescription>The datasource recovery point is older than the defined SLA.
+See Alert context for more information.</AlertDescription>
+        <ConfirmDelivery>false</ConfirmDelivery>
+      </UnitMonitorConfig>
+    </Instance>
+    <Instance ID="Instance28b07bde522b422ebb5dc2ef3d08bef5" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.UnitMonitor" Version="1.0.0.0">
+      <UnitMonitorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <MonitorType>QND.DPM2012.PGSLAStatus.MT</MonitorType>
+        <MonitorConfig>&lt;IntervalSeconds&gt;3600&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;&lt;/SyncTime&gt;&lt;TimeoutSeconds&gt;300&lt;/TimeoutSeconds&gt;&lt;TraceLevel&gt;2&lt;/TraceLevel&gt;&lt;PGId&gt;$Target/Property[Type="DPM2012!Microsoft.SystemCenter.DataProtectionManager.2011.Library.ProtectionGroup"]/DPMObjectID$&lt;/PGId&gt;&lt;Threshold&gt;0&lt;/Threshold&gt;</MonitorConfig>
+        <MonitorOperationalStates>
+          <OperationalState>
+            <OperationalStateId>InSLA</OperationalStateId>
+            <OperationalStateDisplayName>InSLA</OperationalStateDisplayName>
+            <MonitorTypeStateId>InSLA</MonitorTypeStateId>
+            <HealthState>Success</HealthState>
+          </OperationalState>
+          <OperationalState>
+            <OperationalStateId>OutSLA</OperationalStateId>
+            <OperationalStateDisplayName>OutSLA</OperationalStateDisplayName>
+            <MonitorTypeStateId>OutSLA</MonitorTypeStateId>
+            <HealthState>Error</HealthState>
+          </OperationalState>
+        </MonitorOperationalStates>
+        <ParentMonitor>Health!System.Health.AvailabilityState</ParentMonitor>
+        <Accessibility>Internal</Accessibility>
+        <Id>PGSLA</Id>
+        <DisplayName>DPM: PG In SLA</DisplayName>
+        <Description>Description for the new unit monitor.</Description>
+        <Target>QND.DPM2012.SLAProtectionGroup</Target>
+        <Enabled>true</Enabled>
+        <Category>AvailabilityHealth</Category>
+        <Remotable>true</Remotable>
+        <Priority>Normal</Priority>
+        <AlertAutoResolve>true</AlertAutoResolve>
+        <AlertOnState>Warning</AlertOnState>
+        <AlertPriority>Normal</AlertPriority>
+        <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+        <AlertName>DPM - Protection Group has data sources breaching SLA</AlertName>
+        <AlertDescription>There are datasources with recovery points older than the SLA.</AlertDescription>
         <ConfirmDelivery>false</ConfirmDelivery>
       </UnitMonitorConfig>
     </Instance>

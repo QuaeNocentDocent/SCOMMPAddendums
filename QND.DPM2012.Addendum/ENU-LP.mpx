@@ -1,0 +1,308 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="QND.DPM2012.SPFreeSpace.MT" SubElementID="OverThreshold1">
+          <Name>Under 1st threshold</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.DPM2012.SPFreeSpace.MT" SubElementID="OverThreshold2">
+          <Name>Under 2nd threshold</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.DPM2012.SPFreeSpace.MT" SubElementID="Threshold1Perc">
+          <Name>Threshold1 %</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.DPM2012.SPFreeSpace.MT" SubElementID="Threshold2Perc">
+          <Name>Threshold2 %</Name>
+        </DisplayString>  
+        <DisplayString ElementID="QND.DPM2012.SPFreeSpace.MT" SubElementID="Threshold2Abs">
+          <Name>Threshold2 GB</Name>
+        </DisplayString>        
+      </DisplayStrings>
+      <KnowledgeArticles>
+
+        <KnowledgeArticle ElementID="QND.DPM2012.Addendum.PGSLA">
+          <MamlContent>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Summary</maml:title>
+              <maml:para>The monitor indicates if the Protection Group data sources are within the defined SLA. If more than the set threshold are not compliant the monitor goes unhealthy. By default no alert is raised.</maml:para>
+            </maml:section>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Configuration</maml:title>
+              <maml:para>The following options can be configured on this monitor:</maml:para>
+              <maml:table>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Option</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Definition</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Default</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Interval</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Amount of time in seconds between checks of the SLA status</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>3600 seconds</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Sync Time</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Fixed time at which sync the monitor execution</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>no sync</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Timeout seconds</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Amount in seconds to wait for the monitoring script to finish</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>300</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Trace Level</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Level of tracing for the monitoring script. Never to be set above 4m if 5 is used the script dumps the properties and terminate ine rror. This is by design.</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>2</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Threshold</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Maximum number of data sources breaching the SLA before turning unhealthy.</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>0</maml:para>
+                  </maml:entry>
+                </maml:row>
+              </maml:table>
+            </maml:section>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Causes</maml:title>
+              <maml:para>This monitor enters an error state when at least one data source more than the threshold set is breaching the defined SLA.</maml:para>
+            </maml:section>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Resolutions</maml:title>
+              <maml:para>See data source related alerts for more info.</maml:para>
+            </maml:section>
+          </MamlContent>
+        </KnowledgeArticle>
+        <KnowledgeArticle ElementID="QND.DPM2012.Addendum.DSSLA">
+          <MamlContent>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Summary</maml:title>
+              <maml:para>The monitor indicates if the data source is within the defined SLA. The SLA is defined at the Protection group level. If the data source is not withing the defined SLA an alert is raised.</maml:para>
+            </maml:section>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Configuration</maml:title>
+              <maml:para>The following options can be configured on this monitor:</maml:para>
+              <maml:table>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Option</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Definition</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Default</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Interval</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Amount of time in seconds between checks of the SLA status</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>3600 seconds</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Sync Time</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Fixed time at which sync the monitor execution</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>no sync</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Timeout seconds</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Amount in seconds to wait for the monitoring script to finish</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>300</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Trace Level</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Level of tracing for the monitoring script. Never to be set above 4 if 5 is used the script dumps the properties and terminate in error. This is by design.</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>2</maml:para>
+                  </maml:entry>
+                </maml:row>
+              </maml:table>
+            </maml:section>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Causes</maml:title>
+              <maml:para>This monitor enters an error state when the latest data source recovery point is older than the defined SLA.</maml:para>
+            </maml:section>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Resolutions</maml:title>
+              <maml:para>
+                In the alert context more data can be found. Health Explorer or other alerts can address to the root cause of the issue. If not you can use the Troubleshoot DataSource Task.
+                <!-- the task si set as internal <maml:navigationLink>
+                  <maml:linkText>Troubleshoot DataSource Task</maml:linkText>
+                  <maml:uri condition="ConsoleTask" href="DPMD!Microsoft.SystemCenter.DataProtectionManager.2011.Discovery.TroubleshootDatasource&amp;tasktarget={$Target$}" uri="MOM.Console.Exe" />
+                </maml:navigationLink> --> </maml:para>
+            </maml:section>
+          </MamlContent>
+        </KnowledgeArticle>
+        <KnowledgeArticle ElementID="QND.DPM2012.Addendum.SPFreeSpace">
+          <MamlContent>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Summary</maml:title>
+              <maml:para>The monitor check if the disk/storage pool free space is under a specified threshold. If so raises an alert.</maml:para>
+            </maml:section>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Configuration</maml:title>
+              <maml:para>The following options can be configured on this monitor:</maml:para>
+              <maml:table>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Option</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Definition</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Default</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Interval</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Amount of time in seconds between checks of the SLA status</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>3611 seconds</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Sync Time</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Fixed time at which sync the monitor execution</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>no sync</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Timeout seconds</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Amount in seconds to wait for the monitoring script to finish</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>120</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Trace Level</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>Level of tracing for the monitoring script. Never to be set above 4 if 5 is used the script dumps the properties and terminate in error. This is by design.</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>2</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Threshold1Perc</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>If the percentage of free space is under this threshold a warning alert is raised.</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>15</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Threshold2Perc</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>If the percentage of free space is under this threshold a error alert is raised.</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>5</maml:para>
+                  </maml:entry>
+                </maml:row>
+                <maml:row>
+                  <maml:entry>
+                    <maml:para>Threshold2Abs</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>If the free space is under this threshold in GB an error alert is raised.</maml:para>
+                  </maml:entry>
+                  <maml:entry>
+                    <maml:para>500</maml:para>
+                  </maml:entry>
+                </maml:row>                
+              </maml:table>
+            </maml:section>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Causes</maml:title>
+              <maml:para>This monitor enters an error state when disk/storage pool free space is approaching the depletion level.</maml:para>
+            </maml:section>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Resolutions</maml:title>
+              <maml:para>
+                Check for the datasources that are allocating the space, redeuce the protection period or give more space to the pool.
+              </maml:para>
+            </maml:section>
+          </MamlContent>
+        </KnowledgeArticle>
+      </KnowledgeArticles>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

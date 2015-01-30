@@ -14,9 +14,6 @@
 #				- SourceId
 #				- ManagedEntityId
 # Command Line - .\test.ps1 4 "serverName" '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}' '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}'
-# If discovery must be added the followinf parameters
-#				SourceId ($MPElement$ )
-#				ManagedEntityId ($Target/Id$)
 #
 # Output properties
 #
@@ -36,7 +33,7 @@
 param([int]$traceLevel=$(throw 'must have a value'))
 
 	[Threading.Thread]::CurrentThread.CurrentCulture = "en-US"        
-    [Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
+	[Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
 	
 #Constants used for event logging
 $SCRIPT_NAME			= "Get-DPMSPStats"
@@ -78,11 +75,11 @@ $StateDataType       = 3
 
 function Log-Params
 {
-    $line=''
-    foreach($key in $MyInvocation.BoundParameters.Keys) {$line += "$key=$($MyInvocation.BoundParameters[$key])  "}
-	Log-Event $START_EVENT_ID $EVENT_TYPE_INFORMATION  ("Starting script. Invocation Name:$($MyInvocation.InvocationName)`n Parameters`n $line") $TRACE_INFO
+	param($Invocation)
+	$line=''
+	foreach($key in $Invocation.BoundParameters.Keys) {$line += "$key=$($Invocation.BoundParameters[$key])  "}
+	Log-Event $START_EVENT_ID $EVENT_TYPE_INFORMATION  ("Starting script. Invocation Name:$($Invocation.InvocationName)`n Parameters`n $line") $TRACE_INFO
 }
-
 function Log-Event
 {
 	param($eventID, $eventType, $msg, $level)
@@ -103,10 +100,11 @@ function Log-Event
 
 	$dtStart = Get-Date
 	$P_TraceLevel = $traceLevel
+	Log-Params $MyInvocation
 try
 {
 	Import-Module DataProtectionManager
-	$SPTotals = Get-DPMdisk | Measure-Object -prop TotalCapacity,UnallocatedSpace -sum 
+	$SPTotals = Get-DPMDisk | Measure-Object -prop TotalCapacity,UnallocatedSpace -sum 
 	$PercentFreePool = [single] (($SPTotals[1].Sum / $SPTotals[0].Sum) * 100)
 	$FreePoolGB = [single] ($SPTotals[1].Sum/1GB)
 				$bag = $g_API.CreateTypedPropertyBag($PerformanceDataType)
