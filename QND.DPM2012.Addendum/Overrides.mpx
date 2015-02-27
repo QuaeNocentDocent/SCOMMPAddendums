@@ -9,6 +9,12 @@
                                Monitor="QND.DPM2012.Addendum.DSSLA" Property="Enabled">
         <Value>false</Value>
       </MonitorPropertyOverride>
+      <!-- waiting for MP re-release
+      <RulePropertyOverride ID="QND.DPM2012.DisableStandardSLARule" Context="DPM2012!Microsoft.SystemCenter.DataProtectionManager.2011.Library.DPMServer" 
+                            Rule="DPMD!Microsoft.SystemCenter.DataProtectionManager.2012.Discovery.SLAMissedAlert"
+                            Enforced="false" Property="Enabled">
+        <Value>false</Value>
+      </RulePropertyOverride> -->
     </Overrides>
   </Monitoring>
 </ManagementPackFragment>

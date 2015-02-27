@@ -33,7 +33,7 @@
     <ManagementPackReference Include="Microsoft.SystemCenter.DataProtectionManager.2012.Discovery">
       <HintPath>C:\Local\Dev\OpsMgr\MPLib2012\Microsoft.SystemCenter.DataProtectionManager.2012.Discovery.mp</HintPath>
       <Alias>DPMD</Alias>
-      <MinVersion>4.2.1126.0</MinVersion>
+      <MinVersion>4.2.1250.0</MinVersion>
       <PackageToBundle>False</PackageToBundle>
     </ManagementPackReference>
     <ManagementPackReference Include="Microsoft.SystemCenter.DataProtectionManager.2012.Library">

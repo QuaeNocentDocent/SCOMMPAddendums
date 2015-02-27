@@ -1,7 +1,7 @@
 <TemplateGroup>
   <Instances>
     <Instance ID="Instance1cb8bbbf42bb4bd8ba0ce5a2d4aaa2da" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.UnitMonitor" Version="1.0.0.0">
-      <UnitMonitorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <UnitMonitorConfig xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <MonitorType>QND.DPM2012.SPFreeSpace.MT</MonitorType>
         <MonitorConfig>&lt;IntervalSeconds&gt;3611&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;&lt;/SyncTime&gt;&lt;TimeoutSeconds&gt;120&lt;/TimeoutSeconds&gt;&lt;TraceLevel&gt;2&lt;/TraceLevel&gt;&lt;Threshold1Perc&gt;15&lt;/Threshold1Perc&gt;&lt;Threshold2Perc&gt;5&lt;/Threshold2Perc&gt;&lt;Threshold2Abs&gt;500&lt;/Threshold2Abs&gt;</MonitorConfig>
         <MonitorOperationalStates>
@@ -44,7 +44,7 @@
       </UnitMonitorConfig>
     </Instance>
     <Instance ID="Instanceca615b1f5cd0400093c7d1881d9fe3c3" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.UnitMonitor" Version="1.0.0.0">
-      <UnitMonitorConfig xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <UnitMonitorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
         <MonitorType>QND.DPM2012.DSSLAStatus.MT</MonitorType>
         <MonitorConfig>&lt;IntervalSeconds&gt;3600&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;&lt;/SyncTime&gt;&lt;TimeoutSeconds&gt;300&lt;/TimeoutSeconds&gt;&lt;TraceLevel&gt;2&lt;/TraceLevel&gt;&lt;DataSourceId&gt;$Target/Property[Type="DPM2012!Microsoft.SystemCenter.DataProtectionManager.2011.Library.DataSource"]/DPMObjectID$&lt;/DataSourceId&gt;</MonitorConfig>
         <MonitorOperationalStates>
@@ -103,7 +103,7 @@ See Alert context for more information.</AlertDescription>
         <Accessibility>Internal</Accessibility>
         <Id>PGSLA</Id>
         <DisplayName>DPM: PG In SLA</DisplayName>
-        <Description>Description for the new unit monitor.</Description>
+        <Description>Monitors the Protection Group SLA</Description>
         <Target>QND.DPM2012.SLAProtectionGroup</Target>
         <Enabled>true</Enabled>
         <Category>AvailabilityHealth</Category>
