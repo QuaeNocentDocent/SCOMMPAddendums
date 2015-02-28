@@ -141,28 +141,84 @@ param($SourceId, $ManagedEntityId)
 
 try
 {
-		if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
+	if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
+
 
 	if (!(get-command -Module Hyper-V -Name Get-VM -ErrorAction SilentlyContinue)) {
 		Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("Get-VM Commandlet doesn't exist.") $TRACE_WARNING
 		Throw-EmptyDiscovery
 	}
 
-	$vms = Get-VM | where {$_.ReplicationMode.Value__ -ne 0}	#use the enum codes instead of labels 0 = 'None'
+	
+	$vms = @(gwmi Msvm_ComputerSystem -namespace "root\virtualization\v2" | where {$_.ReplicationMode -ne 0 -and $_.ReplicationMode -ne $null})
 	foreach($vm in $vms) {
-		$replica = Get-VMReplication -VM $vm
-		$replicaAgeHours = ([DateTime]::Now - $replica.LastReplicationTime).TotalHours
+		$VMId = $vm.Name
+		$LastReplicationTime=[System.Management.ManagementDateTimeConverter]::ToDateTime($vm.LastReplicationTime) 
+		$VMReplicationMode=$vm.ReplicationMode
+		$VMReplicationHealthCode=$vm.ReplicationHealth
+		$VMReplicationStateCode=$vm.ReplicationState
+
+	#need to use Msvm_ReplicationRelationship
+	$VMReplicationState= switch ($VMReplicationStateCode)
+	{
+		0: {'Disabled'}
+		1: {'Ready for replication'}
+		2: {'Waiting to complete initial replication'}
+		3: {'Replicating'}
+		4: {'Synced replication complete'}
+		5: {'Recovered'}
+		6: {'Committed'}
+		7: {'Suspended'}
+		8: {'Critical'}
+		9: {'Waiting to start resynchronization'}
+		10: {'Resynchronizing'}
+		11: {'Resynchronization suspended'}
+		12: {'Failover in progress'}
+		13: {'Failback in progress'}
+		14: {'Failback complete'}
+		default: {'Unknown'};
+	}
+		
+		$VMReplicationHealth= switch ($VMReplicationHealthCode) {
+			0: {'Disabled'}
+			1: {'OK'}	
+			2: {'Warning'}
+			3: {'Critical'}
+			default: {'Unknown'}
+		}
+
+		$replicaAgeHours = ([DateTime]::Now - $LastReplicationTime).TotalHours
 		$bag = $g_api.CreatePropertyBag()
-		$bag.AddValue('VMId',$vm.VMId.ToString())
-		$bag.AddValue('ReplicationMode',$vm.ReplicationMode.value__ ) #to be used in filters, we just monitor primary replica side ==1
-		$bag.AddValue('ReplicationHealthCode',$vm.ReplicationHealth.value__)
-		$bag.AddValue('ReplicationHealth',$vm.ReplicationHealth.ToString())
-		$bag.AddValue('ReplicationStateCode',$vm.ReplicationState.value__)
-		$bag.AddValue('ReplicationState',$vm.ReplicationState.ToString())
+		$bag.AddValue('VMId',$VMId)
+		$bag.AddValue('ReplicationMode', $VMReplicationMode) #to be used in filters, we just monitor primary replica side ==1
+		$bag.AddValue('ReplicationHealthCode',$VMReplicationHealthCode)
+		$bag.AddValue('ReplicationHealth',$VMReplicationHealth)
+		$bag.AddValue('ReplicationStateCode',$VMReplicationStateCode)
+		$bag.AddValue('ReplicationState',$VMReplicationState)
 		$bag.AddValue('ReplicaAgeHours',$replicaAgeHours)
 		$bag
-		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($vm.VMName) has been processed") $TRACE_DEBUG
+
+	$message="$($vm.Name) Replica State is: $($vmreplicationstatecode) Replica Health Is: $($vmreplicationhealthcode). Replica Age is: $replicaAgeHours"
+		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($vm.VMName) has been processed `n $message") $TRACE_DEBUG
 	}
+
+	#Debug the pèowershll module has issues in both caching (results doesn't change between iterations and values returned so we're not going to use POSH
+	$vms = Get-VM | where {$_.ReplicationMode.Value__ -ne 0}	#use the enum codes instead of labels 0 = 'None'
+	$vms=$null #debug not using POSH
+	foreach($vm in $vms) {
+		$replica = Get-VMReplication -VM $vm
+		$VMId = $vm.VMId.ToString()
+		$LastReplicationTime=$replica.LastReplicationTime
+		$VMReplicationMode=$vm.ReplicationMode.value__
+		$VMReplicationHealthCode=$replica.ReplicationHealth.Value__
+		$VMReplicationStateCode=$replica.ReplicationState.Value__
+		$VMReplicationState=$replica.ReplicationState.ToString()
+		$VMRepliactionHealth=$replica.ReplicationHealth.ToString()	
+		$message="$($vm.Name) Replica State is: $($vmreplicationstatecode) Replica Health Is: $($vmreplicationhealthcode). Replica Age is: $replicaAgeHours"
+		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($vm.VMName) has been processed `n $message") $TRACE_DEBUG
+
+	}
+
 	Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("has completed successfully in " + ((Get-Date)- ($dtstart)).TotalSeconds + " seconds.") $TRACE_INFO
 }
 Catch [Exception] {

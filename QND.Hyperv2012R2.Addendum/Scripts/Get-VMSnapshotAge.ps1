@@ -165,22 +165,23 @@ try
 		Throw-EmptyDiscovery
 	}
 
-	$vms = get-vm | where {$_.ParentSnapshotId -ne $null}
+	$vms = get-vm # | where {$_.ParentSnapshotId -ne $null}
 
 
 	foreach($vm in $vms) {
 		$snapshotAgeHours = 0
 		$message=''
-		$snapshots = Get-SnapshotTree -VM $vm
-		foreach($snapKey in $snapshots.Keys) {
-			if ($snapshots[$snapKey][0] -le [DateTime]'1900-01-01') {
-				$snapConfig = Get-Item -Path "$($vm.ConfigurationLocation)\Snapshots\$($snapKey).xml"
-				$snapshots[$snapKey][0] = $snapCOnfig.CreationTime
+		if ($vm.ParentSnapshotID -ne $null) {
+			$snapshots = Get-SnapshotTree -VM $vm
+			foreach($snapKey in $snapshots.Keys) {
+				if ($snapshots[$snapKey][0] -le [DateTime]'1900-01-01') {
+					$snapConfig = Get-Item -Path "$($vm.ConfigurationLocation)\Snapshots\$($snapKey).xml"
+					$snapshots[$snapKey][0] = $snapCOnfig.CreationTime
+				}
+				$message+="$($snapshots[$snapKey][1]) - $($snapshots[$snapKey][0]) `n"
+				if ( $snapshotAgeHours -lt ([DateTime]::Now - $snapshots[$snapKey][0]).TotalHours) {$snapshotAgeHours=([DateTime]::Now - $snapshots[$snapKey][0]).TotalHours }
 			}
-			$message+="$($snapshots[$snapKey][1]) - $($snapshots[$snapKey][0]) `n"
-			if ( $snapshotAgeHours -lt ([DateTime]::Now - $snapshots[$snapKey][0]).TotalHours) {$snapshotAgeHours=([DateTime]::Now - $snapshots[$snapKey][0]).TotalHours }
 		}
-
 		$bag = $g_api.CreatePropertyBag()
 		$bag.AddValue('VMId',$vm.VMId.ToString())
 		$bag.AddValue('OldestSnapshotAgeHours',$snapshotAgeHours ) 
