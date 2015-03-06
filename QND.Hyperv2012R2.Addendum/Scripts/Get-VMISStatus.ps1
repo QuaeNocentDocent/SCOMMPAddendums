@@ -2,9 +2,9 @@
 #SET ErrorLevel to 5 so show discovery info
 
 #*************************************************************************
-# Script Name - Get-VMSnapShotAge.ps1
-# Author	  - Daniele Grandini - Progel spa
-# Version  - 1.0 27/02/2015
+# Script Name - Get-VMISStaus.ps1
+# Author	  -  Daniele Grandini - Progel spa
+# Version  - 1.0 01.03.2015
 # Purpose     - 
 #               
 # Assumptions - 
@@ -24,7 +24,7 @@
 # Status
 #
 # Version History
-#	  1.0 21.02.2015 DG First Release
+#	  1.0 01.03.2015 DG First Release
 #     
 #
 # (c) Copyright 2015, Progel spa, All Rights Reserved
@@ -40,12 +40,12 @@ param([int]$traceLevel=$(throw 'must have a value'))
 	[Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
 	
 #Constants used for event logging
-$SCRIPT_NAME			= "Get-VMSnapshotAge.ps1"
+$SCRIPT_NAME			= "Get-VMISStatus.ps1"
 $SCRIPT_ARGS = 1
 $SCRIPT_STARTED			= 831
 $PROPERTYBAG_CREATED	= 832
 $SCRIPT_ENDED			= 835
-$SCRIPT_VERSION = "1.01"
+$SCRIPT_VERSION = "1.0"
 
 #region Constants
 #Trace Level Costants
@@ -129,28 +129,11 @@ param($SourceId, $ManagedEntityId)
 }
 #endregion
 
-Function Get-SnapshotTree()
-{
-	param($vm,[hashtable] $tree=@{})
-	if ($vm.ParentSnapshotId -ne $null) {
-		#$tree += $vm.ParentSnapShotId
-		$parent = Get-VMSnapshot -Id $vm.ParentSnapShotId
-		$tree.Add($vm.ParentSnapshotId, @($parent.CreationTime,$parent.Name))
-		Get-SnapshotTree -vm $parent -tree $tree | Out-Null
-		#$parentTree = Get-SnapshotTree -vm $parent -tree @{}
-		#$tree += $parentTree
-		# or 
-		# Get-SnapshotTree -vm $parent -tree $tree
-		#
-		#
-	}
-	return $tree
-}
 
 #Start by setting up API object.
 	$P_TraceLevel = $TRACE_VERBOSE
 	$g_Api = New-Object -comObject 'MOM.ScriptAPI'
-	#$g_RegistryStatePath = "HKLM\" + $g_API.GetScriptStateKeyPath($SCRIPT_NAME)
+	$g_RegistryStatePath = "HKLM\" + $g_API.GetScriptStateKeyPath($SCRIPT_NAME)
 
 	$dtStart = Get-Date
 	$P_TraceLevel = $traceLevel
@@ -158,37 +141,55 @@ Function Get-SnapshotTree()
 
 try
 {
-		if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
+	if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
+
 
 	if (!(get-command -Module Hyper-V -Name Get-VM -ErrorAction SilentlyContinue)) {
 		Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("Get-VM Commandlet doesn't exist.") $TRACE_WARNING
 		Exit 1;
 	}
-
-	$vms = get-vm # | where {$_.ParentSnapshotId -ne $null}
-
-
+	$store = Get-Item -Path Registry::$g_RegistryStatePath
+	$ISPersisted = @{}
+	foreach($value in $store.GetValueNames()) {
+		$ISPersisted.Add($value,$store.GetValue($value))
+		Remove-ItemProperty -Path Registry::$g_RegistryStatePath -Name $value
+	}
+	$vms = Get-VM
 	foreach($vm in $vms) {
-		$snapshotAgeHours = 0
-		$message=''
-		if ($vm.ParentSnapshotID -ne $null) {
-			$snapshots = Get-SnapshotTree -VM $vm
-			foreach($snapKey in $snapshots.Keys) {
-				if ($snapshots[$snapKey][0] -le [DateTime]'1900-01-01') {
-					$snapConfig = Get-Item -Path "$($vm.ConfigurationLocation)\Snapshots\$($snapKey).xml"
-					$snapshots[$snapKey][0] = $snapCOnfig.CreationTime
-				}
-				$message+="$($snapshots[$snapKey][1]) - $($snapshots[$snapKey][0]) `n"
-				if ( $snapshotAgeHours -lt ([DateTime]::Now - $snapshots[$snapKey][0]).TotalHours) {$snapshotAgeHours=([DateTime]::Now - $snapshots[$snapKey][0]).TotalHours }
+		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("Processing $($vm.VMName)") $TRACE_DEBUG
+
+		$ISVersion = $vm.IntegrationServicesVersion
+		$ISState= $vm.IntegrationServicesState
+		$ISStateCode = switch($ISState) {
+			'Up to date' {1}
+			'Update required' {2}
+			default: {0}
+		}
+
+		if ([String]::IsNullOrEmpty($ISVersion) -or $ISState -eq $null) {
+			if($ISPersisted.ContainsKey($vm.VMId)) {
+				$ISVersion = [String]::Split(',',$ISPersisted[$vm.VMId])[0]
+				$ISStateCode = [String]::Split(',',$ISPersisted[$vm.VMId])[1]
 			}
 		}
+		if ([String]::IsNullOrEmpty($ISVersion) -or $ISState -eq $null) {
+			Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("Integration Services Info MIssing for $($vm.VMName)") $TRACE_INFO
+			continue
+		}
+		New-ItemProperty -Path Registry::$g_RegistryStatePath -Name $vm.VMId -PropertyType String -Value ([String]::Join(',',$ISVersion,$ISStateCode))
+
 		$bag = $g_api.CreatePropertyBag()
 		$bag.AddValue('VMId',$vm.VMId.ToString())
-		$bag.AddValue('OldestSnapshotAgeHours',$snapshotAgeHours ) 
-		$bag.AddValue('SnapshotHistory',$message)
+		$bag.AddValue('ISVersion', $ISVersion) #to be used in filters, we just monitor primary replica side ==1
+		$bag.AddValue('ISStateCode',$ISStateCode)
+		$bag.AddValue('ISState',$ISState)
 		$bag
+
+		$message="$($vm.VMName) IS State is: $ISStateCode Version is: $ISVersion"
 		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($vm.VMName) has been processed `n $message") $TRACE_DEBUG
+
 	}
+
 	Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("has completed successfully in " + ((Get-Date)- ($dtstart)).TotalSeconds + " seconds.") $TRACE_INFO
 }
 Catch [Exception] {
@@ -196,21 +197,3 @@ Catch [Exception] {
 	write-Verbose $("TRAPPED: " + $_.Exception.GetType().FullName); 
 	Write-Verbose $("TRAPPED: " + $_.Exception.Message); 
 }
-
-
-
-
-
-
-
-
-#$snapshotFile=$vm.SnapshotFileLocation
-#$configFileLocartion="$($vm.ConfigurationsFileLocation)\Snapshots"
-
-
-foreach($v in $vms) {
-	$snapshots = Get-SnapshotTree -VM $v
-	$snapConfig = Get-Item -Path "$($vm.ConfigurationLocation)\Snapshots\$($snap.Id).xml"
-	$snapCOnfig.CreationTime
-}
-

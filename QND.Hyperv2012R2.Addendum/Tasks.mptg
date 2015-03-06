@@ -1,0 +1,39 @@
+<TemplateGroup>
+  <Instances>
+    <Instance ID="Instance20404dd4788c4b2a8acaf4580df22fc9" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.CustomTask" Version="1.0.0.0">
+      <CustomTaskConfig xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <Accessibility>Internal</Accessibility>
+        <Id>GetVMReplicaStatus.Task</Id>
+        <DisplayName>Hyper-V - get VM replica Status</DisplayName>
+        <Description>Get VM replica Status</Description>
+        <Target>QND.Hyperv2012R2.ReplicaVM</Target>
+        <Enabled>true</Enabled>
+        <Category>Maintenance</Category>
+        <Timeout>300</Timeout>
+        <Remotable>true</Remotable>
+        <ProbeActionId>PA</ProbeActionId>
+        <ProbeActionConfig>&lt;TimeoutSeconds&gt;60&lt;/TimeoutSeconds&gt;&lt;TraceLevel&gt;2&lt;/TraceLevel&gt;&lt;VMId&gt;$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$&lt;/VMId&gt;</ProbeActionConfig>
+        <ProbeActionType>QND.Hyperv2012R2.VMReplicaStatusTask.PT</ProbeActionType>
+        <WriteActionId>WA</WriteActionId>
+      </CustomTaskConfig>
+    </Instance>
+    <Instance ID="Instance632085f02e0f4e918e2a0de1bfc41cfa" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.CustomTask" Version="1.0.0.0">
+      <CustomTaskConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Accessibility>Internal</Accessibility>
+        <Id>ResumeVMReplica.Task</Id>
+        <DisplayName>Hyper-V - Resume VM Replica</DisplayName>
+        <Description>Resume VM Rewplica without Resync</Description>
+        <Target>QND.Hyperv2012R2.ReplicaVM</Target>
+        <Enabled>true</Enabled>
+        <Category>Maintenance</Category>
+        <Timeout>300</Timeout>
+        <Remotable>true</Remotable>
+        <ProbeActionId>PA</ProbeActionId>
+        <WriteActionId>WA</WriteActionId>
+        <WriteActionConfig>&lt;TimeoutSeconds&gt;300&lt;/TimeoutSeconds&gt;&lt;TraceLevel&gt;2&lt;/TraceLevel&gt;&lt;VMId&gt;$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$&lt;/VMId&gt;</WriteActionConfig>
+        <WriteActionType>QND.Hyperv2012R2.ResumeReplica.WAT</WriteActionType>
+        <WriteActionTarget />
+      </CustomTaskConfig>
+    </Instance>
+  </Instances>
+</TemplateGroup>

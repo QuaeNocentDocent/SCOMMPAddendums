@@ -2,9 +2,9 @@
 #SET ErrorLevel to 5 so show discovery info
 
 #*************************************************************************
-# Script Name - Get-VMSnapShotAge.ps1
-# Author	  - Daniele Grandini - Progel spa
-# Version  - 1.0 27/02/2015
+# Script Name - Resume-VMReplicaWA.ps1
+# Author	  -  - Progel spa
+# Version  - 1.0 24.09.2007
 # Purpose     - 
 #               
 # Assumptions - 
@@ -34,18 +34,19 @@
 
 
 # Get the named parameters
-param([int]$traceLevel=$(throw 'must have a value'))
+param([int]$traceLevel=$(throw 'must have a value'),
+	[string]$VMGuid)
 
 	[Threading.Thread]::CurrentThread.CurrentCulture = "en-US"        
 	[Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
 	
 #Constants used for event logging
-$SCRIPT_NAME			= "Get-VMSnapshotAge.ps1"
+$SCRIPT_NAME			= "Get-VMReplicaStatus.ps1"
 $SCRIPT_ARGS = 1
 $SCRIPT_STARTED			= 831
 $PROPERTYBAG_CREATED	= 832
 $SCRIPT_ENDED			= 835
-$SCRIPT_VERSION = "1.01"
+$SCRIPT_VERSION = "1.0"
 
 #region Constants
 #Trace Level Costants
@@ -129,23 +130,6 @@ param($SourceId, $ManagedEntityId)
 }
 #endregion
 
-Function Get-SnapshotTree()
-{
-	param($vm,[hashtable] $tree=@{})
-	if ($vm.ParentSnapshotId -ne $null) {
-		#$tree += $vm.ParentSnapShotId
-		$parent = Get-VMSnapshot -Id $vm.ParentSnapShotId
-		$tree.Add($vm.ParentSnapshotId, @($parent.CreationTime,$parent.Name))
-		Get-SnapshotTree -vm $parent -tree $tree | Out-Null
-		#$parentTree = Get-SnapshotTree -vm $parent -tree @{}
-		#$tree += $parentTree
-		# or 
-		# Get-SnapshotTree -vm $parent -tree $tree
-		#
-		#
-	}
-	return $tree
-}
 
 #Start by setting up API object.
 	$P_TraceLevel = $TRACE_VERBOSE
@@ -158,37 +142,31 @@ Function Get-SnapshotTree()
 
 try
 {
-		if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
+	if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
+
 
 	if (!(get-command -Module Hyper-V -Name Get-VM -ErrorAction SilentlyContinue)) {
 		Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("Get-VM Commandlet doesn't exist.") $TRACE_WARNING
 		Exit 1;
 	}
-
-	$vms = get-vm # | where {$_.ParentSnapshotId -ne $null}
-
-
-	foreach($vm in $vms) {
-		$snapshotAgeHours = 0
-		$message=''
-		if ($vm.ParentSnapshotID -ne $null) {
-			$snapshots = Get-SnapshotTree -VM $vm
-			foreach($snapKey in $snapshots.Keys) {
-				if ($snapshots[$snapKey][0] -le [DateTime]'1900-01-01') {
-					$snapConfig = Get-Item -Path "$($vm.ConfigurationLocation)\Snapshots\$($snapKey).xml"
-					$snapshots[$snapKey][0] = $snapCOnfig.CreationTime
-				}
-				$message+="$($snapshots[$snapKey][1]) - $($snapshots[$snapKey][0]) `n"
-				if ( $snapshotAgeHours -lt ([DateTime]::Now - $snapshots[$snapKey][0]).TotalHours) {$snapshotAgeHours=([DateTime]::Now - $snapshots[$snapKey][0]).TotalHours }
-			}
+		$vm = Get-VM | where {$_.VMId -ieq $VMGuid}
+		if ($vm) {
+			Reset-VMReplicationStatistics -VM $vm
+			Resume-VMReplication -VM $vm
+			Start-Sleep -Seconds 60
+			$replica = Get-VMReplication -VM $vm
+			Write-Host "$($vm.Name) Replication mode: $($vm.ReplicationMode.ToString())"
+			Write-Host "Replication Health: $($replica.ReplicationHealth.ToString()) State: $($replica.ReplicationState.ToString())"
+			Write-Host "Last replication: $($replica.LastReplicationTime)"
+			Write-Host "Replica state dump: "
+			$replica | fl *
+			Write-Host "Replica measure dump: "
+			Measure-VMReplica -VM $vm | fl *
 		}
-		$bag = $g_api.CreatePropertyBag()
-		$bag.AddValue('VMId',$vm.VMId.ToString())
-		$bag.AddValue('OldestSnapshotAgeHours',$snapshotAgeHours ) 
-		$bag.AddValue('SnapshotHistory',$message)
-		$bag
-		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($vm.VMName) has been processed `n $message") $TRACE_DEBUG
-	}
+		else {
+			Write-Host "VM with Guid $VMGuid not found on host!"
+		}
+
 	Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("has completed successfully in " + ((Get-Date)- ($dtstart)).TotalSeconds + " seconds.") $TRACE_INFO
 }
 Catch [Exception] {
@@ -196,21 +174,3 @@ Catch [Exception] {
 	write-Verbose $("TRAPPED: " + $_.Exception.GetType().FullName); 
 	Write-Verbose $("TRAPPED: " + $_.Exception.Message); 
 }
-
-
-
-
-
-
-
-
-#$snapshotFile=$vm.SnapshotFileLocation
-#$configFileLocartion="$($vm.ConfigurationsFileLocation)\Snapshots"
-
-
-foreach($v in $vms) {
-	$snapshots = Get-SnapshotTree -VM $v
-	$snapConfig = Get-Item -Path "$($vm.ConfigurationLocation)\Snapshots\$($snap.Id).xml"
-	$snapCOnfig.CreationTime
-}
-

@@ -34,7 +34,8 @@
 
 
 # Get the named parameters
-param([int]$traceLevel=$(throw 'must have a value'))
+param([int]$traceLevel=$(throw 'must have a value'),
+	[string]$VMGuid)
 
 	[Threading.Thread]::CurrentThread.CurrentCulture = "en-US"        
 	[Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
@@ -146,10 +147,27 @@ try
 
 	if (!(get-command -Module Hyper-V -Name Get-VM -ErrorAction SilentlyContinue)) {
 		Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("Get-VM Commandlet doesn't exist.") $TRACE_WARNING
-		Throw-EmptyDiscovery
+		Exit 1;
 	}
 
-	
+	if ($VMGuid -ine 'ignore') {	#here we're in atask targeted at a specific VM
+		$vm = Get-VM | where {$_.VMId -ieq $VMGuid}
+		if ($vm) {
+			$replica = Get-VMReplication -VM $vm
+			Write-Host "$($vm.Name) Replication mode: $($vm.ReplicationMode.ToString())"
+			Write-Host "Replication Health: $($replica.ReplicationHealth.ToString()) State: $($replica.ReplicationState.ToString())"
+			Write-Host "Last replication: $($replica.LastReplicationTime)"
+			Write-Host "Replica state dump: "
+			$replica | fl *
+			Write-Host "Replica measure dump: "
+			Mesaure-VMReplica -VM $vm | fl *
+		}
+		else {
+			Write-Host "VM with Guid $VMGuid not found on host!"
+		}
+		exit;
+	}
+
 	$vms = @(gwmi Msvm_ComputerSystem -namespace "root\virtualization\v2" | where {$_.ReplicationMode -ne 0 -and $_.ReplicationMode -ne $null})
 	foreach($vm in $vms) {
 		$VMId = $vm.Name
@@ -161,30 +179,30 @@ try
 	#need to use Msvm_ReplicationRelationship
 	$VMReplicationState= switch ($VMReplicationStateCode)
 	{
-		0: {'Disabled'}
-		1: {'Ready for replication'}
-		2: {'Waiting to complete initial replication'}
-		3: {'Replicating'}
-		4: {'Synced replication complete'}
-		5: {'Recovered'}
-		6: {'Committed'}
-		7: {'Suspended'}
-		8: {'Critical'}
-		9: {'Waiting to start resynchronization'}
-		10: {'Resynchronizing'}
-		11: {'Resynchronization suspended'}
-		12: {'Failover in progress'}
-		13: {'Failback in progress'}
-		14: {'Failback complete'}
-		default: {'Unknown'};
+		0 {'Disabled'}
+		1 {'Ready for replication'}
+		2 {'Waiting to complete initial replication'}
+		3 {'Replicating'}
+		4 {'Synced replication complete'}
+		5 {'Recovered'}
+		6 {'Committed'}
+		7 {'Suspended'}
+		8 {'Critical'}
+		9 {'Waiting to start resynchronization'}
+		10 {'Resynchronizing'}
+		11 {'Resynchronization suspended'}
+		12 {'Failover in progress'}
+		13 {'Failback in progress'}
+		14 {'Failback complete'}
+		default {'Unknown'};
 	}
 		
 		$VMReplicationHealth= switch ($VMReplicationHealthCode) {
-			0: {'Disabled'}
-			1: {'OK'}	
-			2: {'Warning'}
-			3: {'Critical'}
-			default: {'Unknown'}
+			0 {'Disabled'}
+			1 {'OK'}	
+			2 {'Warning'}
+			3 {'Critical'}
+			default {'Unknown'}
 		}
 
 		$replicaAgeHours = ([DateTime]::Now - $LastReplicationTime).TotalHours

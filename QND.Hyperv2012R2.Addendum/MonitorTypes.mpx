@@ -375,6 +375,90 @@
           </RegularDetections>
         </MonitorImplementation>
       </UnitMonitorType>      
+     <UnitMonitorType ID="QND.Hyperv2012R2.VMISStatus.MT" Accessibility="Public">
+        <MonitorTypeStates>
+          <MonitorTypeState ID="UpToDate"/>
+          <MonitorTypeState ID="NeedsUpdate"/>
+        </MonitorTypeStates>
+        <Configuration>
+          <xsd:element name="IntervalSeconds" type="xsd:int" />
+          <xsd:element name="SyncTime" type="xsd:string" />
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="VMId" type="xsd:string" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$"/>
+        </OverrideableParameters>
+        <MonitorImplementation>
+          <MemberModules>
+            <DataSource ID="DS" TypeID="QND.Hyperv2012R2.GetVMISStatus.DS">
+              <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+              <SyncTime>$Config/SyncTime$</SyncTime>
+              <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              <TraceLevel>$Config/TraceLevel$</TraceLevel>
+            </DataSource>
+            <ConditionDetection ID="FilterVM" TypeID="System!System.ExpressionFilter">
+                  <Expression>
+                  <SimpleExpression>
+                    <ValueExpression>
+                      <XPathQuery Type="String">Property[@Name='VMId']</XPathQuery>
+                    </ValueExpression>
+                    <Operator>Equal</Operator>
+                    <ValueExpression>
+                      <Value Type="String">$Config/VMId$</Value>
+                    </ValueExpression>
+                  </SimpleExpression>
+                  </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="HealthyCD" TypeID="System!System.ExpressionFilter">
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="String">Property[@Name='ISStateCode']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>Equal</Operator>
+                      <ValueExpression>
+                        <Value Type="String">1</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>                  
+            </ConditionDetection>
+            <ConditionDetection ID="WarningCD" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="String">Property[@Name='ISStateCode']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>NotEqual</Operator>
+                  <ValueExpression>
+                    <Value Type="String">1</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+          </MemberModules>
+          <RegularDetections>
+            <RegularDetection MonitorTypeStateID="UpToDate">
+              <Node ID="HealthyCD">
+                <Node ID="FilterVM">
+                  <Node ID="DS" />
+                </Node>
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="NeedsUpdate">
+              <Node ID="WarningCD">
+                <Node ID="FilterVM">
+                  <Node ID="DS" />
+                </Node>
+              </Node>
+            </RegularDetection>
+          </RegularDetections>
+        </MonitorImplementation>
+      </UnitMonitorType>            
     </MonitorTypes>
   </TypeDefinitions>
 </ManagementPackFragment>

@@ -105,14 +105,26 @@
     <Compile Include="ReplicaVMClass.mpx">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Tasks.mptg.mpx">
+      <SubType>Code</SubType>
+      <DependentUpon>Tasks.mptg</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scripts" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Scripts\Discover-PrimaryReplicaVM.ps1" />
+    <EmbeddedResource Include="Scripts\Get-VMISStatus.ps1" />
     <EmbeddedResource Include="Scripts\Get-VMSnapshotAge.ps1" />
     <EmbeddedResource Include="Scripts\Get-VMReplicaStatus.ps1" />
+    <EmbeddedResource Include="Scripts\Resume-VMReplicaWA.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Tasks.mptg">
+      <SubType>Content</SubType>
+      <Generator>FragmentGenerator</Generator>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VSAC\Microsoft.SystemCenter.OperationsManager.targets" />
 </Project>
