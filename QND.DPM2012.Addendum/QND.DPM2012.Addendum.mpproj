@@ -129,9 +129,6 @@
       <SubType>Code</SubType>
       <DependentUpon>PerfRules.mptg</DependentUpon>
     </Compile>
-    <Compile Include="Recoveries.mpx">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="SLAProtectionGroup.mpx">
       <SubType>Code</SubType>
     </Compile>

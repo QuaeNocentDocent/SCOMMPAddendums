@@ -100,6 +100,15 @@
           <VMId>$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$</VMId>
         </ProbeAction>
       </Diagnostic>
+      <Diagnostic ID="QND.Hyperv2012R2.GetReplicaStatusError.Diagnostic" Comment="Get Replica Status" Accessibility="Public" Enabled="true" Target="QND.Hyperv2012R2.ReplicaVM"
+                  Monitor="QND.Hyperv2012R2.VMReplica.Status" ExecuteOnState="Error" Remotable="false" Timeout="300">
+        <Category>Maintenance</Category>
+        <ProbeAction ID="PA" TypeID="QND.Hyperv2012R2.VMReplicaStatusTask.PT">
+          <TimeoutSeconds>120</TimeoutSeconds>
+          <TraceLevel>2</TraceLevel>
+          <VMId>$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$</VMId>
+        </ProbeAction>
+      </Diagnostic>      
     </Diagnostics>
   </Monitoring>
   <Presentation>

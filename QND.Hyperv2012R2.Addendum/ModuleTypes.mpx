@@ -60,6 +60,7 @@
         </ModuleImplementation>
         <OutputType>System!System.Discovery.Data</OutputType>
       </DataSourceModuleType>
+  
       <DataSourceModuleType ID="QND.Hyperv2012R2.GetVMReplicaStatus.DS" Accessibility="Public" Batching="false">
         <Configuration>
           <xsd:element name="IntervalSeconds" type="xsd:int" />
