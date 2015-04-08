@@ -198,6 +198,7 @@
           <xsd:element name="SyncTime" type="xsd:string" />
           <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" />
           <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="ResetDays" type="xsd:int" minOccurs="0" maxOccurs="1" default="30"/>          
           <xsd:element name="ObjectName" type="xsd:string" />
           <xsd:element name="CounterName" type="xsd:string" />
           <xsd:element name="InstanceProperty" type="xsd:string" />
@@ -241,6 +242,7 @@
                 <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
                 <TraceLevel>$Config/TraceLevel$</TraceLevel>
                 <VMGuid>ignore</VMGuid>
+                <ResetDays>$Config/ResetDays$</ResetDays>
               </ProbeAction>
               <ConditionDetection ID="TypeFilter" TypeID="System!System.ExpressionFilter">
                 <Expression>
@@ -271,8 +273,10 @@
             <Composition>
               <Node ID="OptimizedFilter">
               <Node ID="Mapper">
-              <Node ID ="GetStatus">
-                <Node ID="Scheduler"></Node>
+                <Node ID="TypeFilter">
+                <Node ID ="GetStatus">
+                  <Node ID="Scheduler"></Node>
+              </Node>
               </Node>
               </Node>
               </Node>
@@ -344,6 +348,7 @@
         <OutputType>Perf!System.Performance.Data</OutputType>
       </DataSourceModuleType>
 
+     
            
         <ProbeActionModuleType ID="QND.Hyperv2012R2.VMReplicaStatus.PT" Accessibility="Public" Batching="false">
         <Configuration>
@@ -542,11 +547,13 @@
         <Configuration>
           <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" />
           <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="VMGuid" type="xsd:string" minOccurs="0" maxOccurs="1" />          
+          <xsd:element name="VMGuid" type="xsd:string" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="ResetDays" type="xsd:int" minOccurs="0" maxOccurs="1" default="30"/>
         </Configuration>
         <OverrideableParameters>
           <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
           <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$"/>
+          <OverrideableParameter ID="ResetDays" Selector="$Config/ResetDays$" ParameterType="int" />          
         </OverrideableParameters>
         <ModuleImplementation>
           <Composite>
@@ -564,6 +571,10 @@
                   <Parameter>
                     <Name>VMGuid</Name>
                     <Value>$Config/VMGuid$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>ResetDays</Name>
+                    <Value>$Config/ResetDays$</Value>
                   </Parameter>
                 </Parameters>
                 <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
@@ -624,7 +635,7 @@
         <OutputType>System!System.PropertyBagData</OutputType>
         <InputType>System!System.BaseData</InputType>
       </ProbeActionModuleType>
-            <ConditionDetectionModuleType ID="QND.Hyperv.2012R2.DeltaPerSecAndFilter" Accessibility="Public" Batching="false" Stateful="true" PassThrough="false">
+      <ConditionDetectionModuleType ID="QND.Hyperv.2012R2.DeltaPerSecAndFilter" Accessibility="Public" Batching="false" Stateful="true" PassThrough="false">
         <Configuration>
           <xsd:element minOccurs="1" maxOccurs="1" name="NumSamples" type="xsd:unsignedInt"/>
           <xsd:element name="InstanceFilter" type="xsd:string" minOccurs="1" maxOccurs="1" />
@@ -634,15 +645,13 @@
             <MemberModules>
               <ConditionDetection ID="Filter" TypeID="System!System.ExpressionFilter">
                 <Expression>
-                  <SimpleExpression>
+                  <RegExExpression>
                     <ValueExpression>
                       <XPathQuery Type="String">/DataItem/InstanceName</XPathQuery>
                     </ValueExpression>
-                    <Operator>Equal</Operator>
-                    <ValueExpression>
-                      <Value Type="String">$Config/InstanceFilter$</Value>
-                    </ValueExpression>
-                  </SimpleExpression>
+                    <Operator>MatchesRegularExpression</Operator>
+                    <Pattern>$Config/InstanceFilter$</Pattern>
+                  </RegExExpression>
                 </Expression>
               </ConditionDetection>
               <ConditionDetection ID="DeltaPerSec" TypeID="Perf!System.Performance.DeltaValueCondition">
@@ -662,6 +671,78 @@
           <InputType>Perf!System.Performance.Data</InputType>
         </InputTypes>
       </ConditionDetectionModuleType>
+      <ConditionDetectionModuleType ID="QND.Hyperv.2012R2.DeltaAbsAndFilter" Accessibility="Public" Batching="false" Stateful="true" PassThrough="false">
+        <Configuration>
+          <xsd:element minOccurs="1" maxOccurs="1" name="NumSamples" type="xsd:unsignedInt"/>
+          <xsd:element name="InstanceFilter" type="xsd:string" minOccurs="1" maxOccurs="1" />
+        </Configuration>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <ConditionDetection ID="Filter" TypeID="System!System.ExpressionFilter">
+                <Expression>
+                  <RegExExpression>
+                    <ValueExpression>
+                      <XPathQuery Type="String">/DataItem/InstanceName</XPathQuery>
+                    </ValueExpression>
+                    <Operator>MatchesRegularExpression</Operator>
+                    <Pattern>$Config/InstanceFilter$</Pattern>
+                  </RegExExpression>
+                </Expression>
+              </ConditionDetection>
+              <ConditionDetection ID="Delta" TypeID="Perf!System.Performance.DeltaValueCondition">
+                <NumSamples>$Config/NumSamples$</NumSamples>
+                <Absolute>true</Absolute>
+              </ConditionDetection>
+            </MemberModules>
+            <Composition>
+              <Node ID="Delta">
+                <Node ID="Filter"></Node>
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>Perf!System.Performance.Data</OutputType>
+        <InputTypes>
+          <InputType>Perf!System.Performance.Data</InputType>
+        </InputTypes>
+      </ConditionDetectionModuleType>
+      <ConditionDetectionModuleType ID="QND.Hyperv.2012R2.PerfAvgAndFilter" Accessibility="Public" Batching="false" Stateful="true" PassThrough="false">
+        <Configuration>
+          <xsd:element minOccurs="1" maxOccurs="1" name="NumSamples" type="xsd:unsignedInt"/>
+          <xsd:element name="InstanceFilter" type="xsd:string" minOccurs="1" maxOccurs="1" />
+        </Configuration>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <ConditionDetection ID="Filter" TypeID="System!System.ExpressionFilter">
+                <Expression>
+                  <RegExExpression>
+                    <ValueExpression>
+                      <XPathQuery Type="String">/DataItem/InstanceName</XPathQuery>
+                    </ValueExpression>
+                    <Operator>MatchesRegularExpression</Operator>
+                    <Pattern>$Config/InstanceFilter$</Pattern>
+                  </RegExExpression>
+                </Expression>
+              </ConditionDetection>
+              <ConditionDetection ID="Avg" TypeID="Perf!System.Performance.AveragerCondition">
+                <NumSamples>$Config/NumSamples$</NumSamples>
+              </ConditionDetection>
+            </MemberModules>
+            <Composition>
+              <Node ID="Avg">
+                <Node ID="Filter"></Node>
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>Perf!System.Performance.Data</OutputType>
+        <InputTypes>
+          <InputType>Perf!System.Performance.Data</InputType>
+        </InputTypes>
+      </ConditionDetectionModuleType>
+
       <WriteActionModuleType ID="QND.Hyperv2012R2.ResumeReplica.WAT" Accessibility="Public">
         <Configuration>
           <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" />

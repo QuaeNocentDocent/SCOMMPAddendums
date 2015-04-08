@@ -203,20 +203,27 @@ try
 			$oInstance = $oDiscoveryData.CreateClassInstance("$MPElement[Name='QND.Hyperv.2012R2.VM']$")
 			$oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $vm.VMName)		  
 			$oInstance.AddProperty("$MPElement[Name='SHL!System.ComputerHardware']/NumberOfProcessors$",  (NullIsZero $vm.ProcessorCount))
-			$oInstance.AddProperty("$MPElement[Name='SHL!System.ComputerHardware']/Model$",  'Virutal Machine')	
+			$oInstance.AddProperty("$MPElement[Name='SHL!System.ComputerHardware']/Model$",  'Virtual Machine')	
 			$oInstance.AddProperty("$MPElement[Name='SHL!System.ComputerHardware']/Manufacturer$",  'Microsoft Hyper-V')	
 			$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/HostName$", $HostComputerIdentity)
 			$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/VirtualMachineId$", $vm.Id.ToString())
 			$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/VirtualMachineName$", $vm.VMName)
 
-			$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/ISVersion$", $vm.IntegrationServicesVersion)
+			if($vm.IntegrationServicesVersion) {$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/ISVersion$", $vm.IntegrationServicesVersion.ToString())}
 			$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/RMEnabled$", (NullIsFalse $vm.ResourceMeteringEnabled))
 			$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/VMGeneration$", (NullIsZero $vm.Generation))
 			$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/HA$", (NullIsFalse $vm.IsClustered))
-			$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/MinMemory$", (NullIsZero ($vm.MemoryMinimum/1MB)))
-			$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/MaxMemory$", (NullIsZero ($vm.MemoryMaximum/1MB)))
-			$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/StartMemory$", (NullIsZero ($vm.MemoryStartup/1MB)))
-
+	#there's a bug in HypervPOSH for fixed memory VMs, sometimes wrong values are returned for minimum and maximum memory
+			if($vm.DynamicMemoryEnabled) {
+				$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/MinMemory$", (NullIsZero ($vm.MemoryMinimum/1MB)))
+				$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/MaxMemory$", (NullIsZero ($vm.MemoryMaximum/1MB)))
+				$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/StartMemory$", (NullIsZero ($vm.MemoryStartup/1MB)))
+			}
+			else {
+				$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/MinMemory$", (NullIsZero ($vm.MemoryStartup/1MB)))
+				$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/MaxMemory$", (NullIsZero ($vm.MemoryStartup/1MB)))
+				$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/StartMemory$", (NullIsZero ($vm.MemoryStartup/1MB)))
+			}
 			if((NullIsFalse $vm.IsClustered) -eq $true) {$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/HVFarm$", $HVFarm)}
 			else {$oInstance.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/HVFarm$", $HostComputerIdentity)}
 
@@ -249,16 +256,19 @@ try
 			foreach($disk in $vm.HardDrives) {
 				$oDisk = $oDiscoveryData.CreateClassInstance("$MPElement[Name='QND.HyperV.2012R2.VirtualDrive']$")	
 				$oDisk.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/VirtualMachineId$", $vm.Id.ToString())	
-				$oDisk.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $disk.Name)		
+				$oDisk.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", "$($vm.Name) - $($disk.Name)")		
 				$oDisk.AddProperty("$MPElement[Name='QND.HyperV.VMHardwareComponent']/DeviceId$", $disk.Id)
 				$oDisk.AddProperty("$MPElement[Name='QND.HyperV.VMHardwareComponent']/Name$", $disk.Name)
-				$oDisk.AddProperty("$MPElement[Name='QND.HyperV.2012R2.VirtualDrive']/ConnectedControllerName$", $disk.ControllerType.ToString())
+				if($disk.ControllerType) {$oDisk.AddProperty("$MPElement[Name='QND.HyperV.2012R2.VirtualDrive']/ConnectedControllerName$", $disk.ControllerType.ToString())}
 				$oDisk.AddProperty("$MPElement[Name='QND.HyperV.2012R2.VirtualDrive']/ImageFile$", $disk.Path)
+				try {$perfInstance = $disk.Path.Replace('\','-')}
+				catch {$perfInstance=''}				
+				$oDisk.AddProperty("$MPElement[Name='QND.HyperV.VMHardwareComponent']/PerfInstance$", $perfInstance )
 				
 				$details = $diskDetails | where {$_.Path -ieq $disk.Path}
 				If($details) {
-					$oDisk.AddProperty("$MPElement[Name='QND.HyperV.2012R2.VirtualDrive']/VHDFormat$", $details.VhdFormat.ToString())
-					$oDisk.AddProperty("$MPElement[Name='QND.HyperV.2012R2.VirtualDrive']/VHDType$", $details.VhdType.ToString())
+					if($details.VhdFormat) {$oDisk.AddProperty("$MPElement[Name='QND.HyperV.2012R2.VirtualDrive']/VHDFormat$", $details.VhdFormat.ToString())}
+					if($details.VhdType) {$oDisk.AddProperty("$MPElement[Name='QND.HyperV.2012R2.VirtualDrive']/VHDType$", $details.VhdType.ToString())}
 					$oDisk.AddProperty("$MPElement[Name='QND.HyperV.2012R2.VirtualDrive']/MaxSizeGB$", (NullIsZero ($details.Size/1GB)))
 				}
 				$oDiscoveryData.AddInstance($oDisk)
@@ -271,11 +281,14 @@ try
 			foreach($nic in $vm.NetworkAdapters) {
 				$oNic = $oDiscoveryData.CreateClassInstance("$MPElement[Name='QND.HyperV.2012R2.VirtualNetworkAdapter']$")	
 				$oNic.AddProperty("$MPElement[Name='QND.Hyperv.2012R2.VM']/VirtualMachineId$", $vm.Id.ToString())		
-				$oNic.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", "$($nic.Name) on $($nic.SwitchName)")	
+				$oNic.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", "$($vm.Name) - $($nic.Name) on $($nic.SwitchName)")	
 				$oNic.AddProperty("$MPElement[Name='QND.HyperV.VMHardwareComponent']/DeviceId$", $nic.Id)
 				$oNic.AddProperty("$MPElement[Name='QND.HyperV.VMHardwareComponent']/Name$", "$($nic.Name) on $($nic.SwitchName)")
 				if($nic.SwitchId) {$oNic.AddProperty("$MPElement[Name='QND.HyperV.2012R2.VirtualNetworkAdapter']/SwitchId$", $nic.SwitchId.ToString())}
 				$oNic.AddProperty("$MPElement[Name='QND.HyperV.2012R2.VirtualNetworkAdapter']/SwitchName$", $nic.SwitchName)
+				try {$perfInstance = ("$($vm.Name)_$($nic.Name)_$($vm.Id.ToString())--$($nic.AdapterId.ToString())").Replace('\','--')}
+				catch {$perfInstance=''}
+				$oNic.AddProperty("$MPElement[Name='QND.HyperV.VMHardwareComponent']/PerfInstance$", $nicInstance)
 				$oDiscoveryData.AddInstance($oNic)
 				#$rel = $oDiscoveryData.CreateRelationshipInstance("$MPElement[Name='QND.Hyperv.2012R2.VMHostsVMHardwareComponent']$")
 				#$Rel.Source=$oInstance
@@ -284,10 +297,10 @@ try
 			
 			}
 	
-			Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("$($vm.VMName) has been disocvered on $HostComputerIdentity") $TRACE_INFO
+			Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("$($vm.VMName) has been discovered on $HostComputerIdentity") $TRACE_INFO
 		}
 		Catch [Exception] {
-			Log-Event $STOP_EVENT_ID $EVENT_TYPE_ERROR ("Failed to disocver $($vm.VMName) on $HostComputerIdentity $($Error[0].Exception)") $TRACE_ERROR
+			Log-Event $STOP_EVENT_ID $EVENT_TYPE_ERROR ("Failed to discover $($vm.VMName) on $HostComputerIdentity $($Error[0].Exception)") $TRACE_ERROR
 		}
 	}
 

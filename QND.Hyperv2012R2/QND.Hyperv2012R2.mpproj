@@ -111,7 +111,11 @@
     <Compile Include="Groups.mpx">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="PerfRules.mpx">
+    <Compile Include="HypervHostPerfRules.mptg.mpx">
+      <SubType>Code</SubType>
+      <DependentUpon>HypervHostPerfRules.mptg</DependentUpon>
+    </Compile>
+    <Compile Include="VMMeasurePerfRules.mpx">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ManagementPack.mpx">
@@ -147,6 +151,10 @@
     <Compile Include="VMMonitorsFromStdMP.mpx">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="VMPerfRules.mptg.mpx">
+      <SubType>Code</SubType>
+      <DependentUpon>VMPerfRules.mptg</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scripts" />
@@ -163,6 +171,16 @@
     <EmbeddedResource Include="Scripts\Resume-VMReplicaWA.ps1" />
     <EmbeddedResource Include="Scripts\Write-Me.ps1" />
     <EmbeddedResource Include="Scripts\Write-TriggerEvent.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="HypervHostPerfRules.mptg">
+      <SubType>Content</SubType>
+      <Generator>FragmentGenerator</Generator>
+    </Content>
+    <Content Include="VMPerfRules.mptg">
+      <SubType>Content</SubType>
+      <Generator>FragmentGenerator</Generator>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VSAC\Microsoft.SystemCenter.OperationsManager.targets" />
 </Project>

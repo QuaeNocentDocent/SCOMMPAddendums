@@ -34,6 +34,7 @@
         <ClassType ID="QND.HyperV.VMHardwareComponent" Accessibility="Public" Abstract="true" Base="Virtualization!System.VirtualHardwareComponent" Hosted="true" Singleton="false">
           <Property ID="DeviceId" Type="string" Key="true" CaseSensitive="false" MaxLength="255" MinLength="0" />
           <Property ID="Name" Type="string" Key="false" CaseSensitive="false" MaxLength="255" MinLength="0" />
+          <Property ID="PerfInstance" Type="string" Key="false" CaseSensitive="false" MaxLength="255" MinLength="0" />
         </ClassType>
       </ClassTypes>
       <RelationshipTypes>
@@ -107,9 +108,13 @@
         <DisplayString ElementID="QND.HyperV.VMHardwareComponent" SubElementID="Name">
           <Name>Name</Name>
         </DisplayString>
-        <DisplayString ElementID="QND.HyperV.2012R2.VirtualDrive">
-          <Name>Hyper-V 2012R2 - VM Drive (QND)</Name>
+        <DisplayString ElementID="QND.HyperV.VMHardwareComponent" SubElementID="PerfInstance">
+          <Name>Performance Instance Name</Name>
         </DisplayString>        
+        <DisplayString ElementID="QND.HyperV.2012R2.VirtualDrive">
+          <Name>Hyper-V 2012R2 - VM Disk (QND)</Name>
+        </DisplayString>
+        
         <DisplayString ElementID="QND.HyperV.2012R2.VirtualDrive" SubElementID="ConnectedControllerName">
           <Name>Controller</Name>
         </DisplayString>

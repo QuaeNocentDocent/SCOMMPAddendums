@@ -35,7 +35,8 @@
 
 # Get the named parameters
 param([int]$traceLevel=$(throw 'must have a value'),
-	[string]$VMGuid)
+	[string]$VMGuid,
+	[int]$ResetDays)
 
 	[Threading.Thread]::CurrentThread.CurrentCulture = "en-US"        
 	[Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
@@ -223,13 +224,13 @@ Function Process-VM
 		$bag
 	}
 	#end reset the statistics
-	Reset-VMResourceMetering -VMName $measure.VMName
+	#Reset-VMResourceMetering -VMName $measure.VMName
 	Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($measure.VMName) has been processed") $TRACE_VERBOSE
 }
 #Start by setting up API object.
 	$P_TraceLevel = $TRACE_VERBOSE
 	$g_Api = New-Object -comObject 'MOM.ScriptAPI'
-	#$g_RegistryStatePath = "HKLM\" + $g_API.GetScriptStateKeyPath($SCRIPT_NAME)
+	$g_RegistryStatePath = "HKLM:\" + $g_API.GetScriptStateKeyPath($SCRIPT_NAME)
 
 	$dtStart = Get-Date
 	$P_TraceLevel = $traceLevel
@@ -239,12 +240,12 @@ try
 {
 	if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
 
-
 	if (!(get-command -Module Hyper-V -Name Get-VM -ErrorAction SilentlyContinue)) {
 		Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("Get-VM Commandlet doesn't exist.") $TRACE_WARNING
 		Exit 1;
 	}
 
+	
 	if ($VMGuid -ine 'ignore') {	#here we're in atask targeted at a specific VM
 		$measure = Get-VM | where {$_.VMId -ieq $VMGuid -and $_.ResourceMeteringEnabled -eq $true} | Measure-VM
 		if($measure) {Process-VM $measure}
@@ -262,6 +263,17 @@ try
 			Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("$($measure.VMName) error getting performace info $($Error[0].Exception)") $TRACE_WARNING
 		}
 	}
+
+	#check if we need to reset measures
+	$regVault = Get-Item $g_RegistryStatePath
+	if($regVault.GetValueNames() -contains 'LastReset') {
+		$lastReset = [DateTime] (Get-ItemProperty -Path $g_RegistryStatePath -Name LastReset).LastReset
+		if(([DateTime]::Now-$lastReset).TotalDays -gt $ResetDays) {
+			Get-VM | where {$_.ResourceMeteringEnabled -eq $true} | Reset-VMResourceMetering
+			Set-ItemProperty -Path $g_RegistryStatePath -Name LastReset -Value ([DateTime]::Now)
+		}
+	}
+	else {Set-ItemProperty -Path $g_RegistryStatePath -Name LastReset -Value ([DateTime]::Now)}
 
 	Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("has completed successfully in " + ((Get-Date)- ($dtstart)).TotalSeconds + " seconds.") $TRACE_INFO
 }
