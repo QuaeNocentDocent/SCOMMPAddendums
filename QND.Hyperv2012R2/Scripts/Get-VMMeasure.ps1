@@ -265,16 +265,17 @@ try
 	}
 
 	#check if we need to reset measures
-	$regVault = Get-Item $g_RegistryStatePath
-	if($regVault.GetValueNames() -contains 'LastReset') {
-		$lastReset = [DateTime] (Get-ItemProperty -Path $g_RegistryStatePath -Name LastReset).LastReset
-		if(([DateTime]::Now-$lastReset).TotalDays -gt $ResetDays) {
-			Get-VM | where {$_.ResourceMeteringEnabled -eq $true} | Reset-VMResourceMetering
-			Set-ItemProperty -Path $g_RegistryStatePath -Name LastReset -Value ([DateTime]::Now)
+	if($ResetDays -gt 0) {
+		$regVault = Get-Item $g_RegistryStatePath
+		if($regVault.GetValueNames() -contains 'LastReset') {
+			$lastReset = [DateTime] (Get-ItemProperty -Path $g_RegistryStatePath -Name LastReset).LastReset
+			if(([DateTime]::Now-$lastReset).TotalDays -gt $ResetDays) {
+				Get-VM | where {$_.ResourceMeteringEnabled -eq $true} | Reset-VMResourceMetering
+				Set-ItemProperty -Path $g_RegistryStatePath -Name LastReset -Value ([DateTime]::Now)
+			}
 		}
+		else {Set-ItemProperty -Path $g_RegistryStatePath -Name LastReset -Value ([DateTime]::Now)}
 	}
-	else {Set-ItemProperty -Path $g_RegistryStatePath -Name LastReset -Value ([DateTime]::Now)}
-
 	Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("has completed successfully in " + ((Get-Date)- ($dtstart)).TotalSeconds + " seconds.") $TRACE_INFO
 }
 Catch [Exception] {

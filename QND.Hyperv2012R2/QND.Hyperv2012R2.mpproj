@@ -115,6 +115,9 @@
       <SubType>Code</SubType>
       <DependentUpon>HypervHostPerfRules.mptg</DependentUpon>
     </Compile>
+    <Compile Include="VMGenericMonitors.mpx">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="VMMeasurePerfRules.mpx">
       <SubType>Code</SubType>
     </Compile>
@@ -163,8 +166,10 @@
     <EmbeddedResource Include="Scripts\Discover-PrimaryReplicaVM.ps1" />
     <EmbeddedResource Include="Scripts\Discover-VM.ps1" />
     <EmbeddedResource Include="Scripts\Get-VHDStats.ps1" />
+    <EmbeddedResource Include="Scripts\Get-VMDetails.ps1" />
     <EmbeddedResource Include="Scripts\Get-VMISStatus.ps1" />
     <EmbeddedResource Include="Scripts\Get-VMMeasure.ps1" />
+    <EmbeddedResource Include="Scripts\Get-VMMemoryStatus.ps1" />
     <EmbeddedResource Include="Scripts\Get-VMReplicaStatus.ps1" />
     <EmbeddedResource Include="Scripts\Get-VMSnapshotAge.ps1" />
     <EmbeddedResource Include="Scripts\Get-VMUptime.ps1" />

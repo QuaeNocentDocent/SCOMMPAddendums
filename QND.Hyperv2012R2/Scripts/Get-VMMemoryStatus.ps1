@@ -40,7 +40,7 @@ param([int]$traceLevel=$(throw 'must have a value'))
 	[Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
 	
 #Constants used for event logging
-$SCRIPT_NAME			= "Get-VMISStatus.ps1"
+$SCRIPT_NAME			= "Get-VMMemoryStatus.ps1"
 $SCRIPT_ARGS = 1
 $SCRIPT_STARTED			= 831
 $PROPERTYBAG_CREATED	= 832
@@ -133,7 +133,7 @@ param($SourceId, $ManagedEntityId)
 #Start by setting up API object.
 	$P_TraceLevel = $TRACE_VERBOSE
 	$g_Api = New-Object -comObject 'MOM.ScriptAPI'
-	$g_RegistryStatePath = "HKLM:\" + $g_API.GetScriptStateKeyPath($SCRIPT_NAME)
+	#$g_RegistryStatePath = "HKLM:\" + $g_API.GetScriptStateKeyPath($SCRIPT_NAME)
 
 	$dtStart = Get-Date
 	$P_TraceLevel = $traceLevel
@@ -148,45 +148,35 @@ try
 		Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("Get-VM Commandlet doesn't exist.") $TRACE_WARNING
 		Exit 1;
 	}
-	$store = Get-Item -Path Registry::$g_RegistryStatePath
-	$ISPersisted = @{}
-	foreach($value in $store.GetValueNames()) {
-		$ISPersisted.Add($value,$store.GetValue($value))
-		Remove-ItemProperty -Path Registry::$g_RegistryStatePath -Name $value
-	}
 	$vms = Get-VM
 	foreach($vm in $vms) {
 		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("Processing $($vm.VMName)") $TRACE_DEBUG
-
-		$ISVersion = $vm.IntegrationServicesVersion
-		$ISState= $vm.IntegrationServicesState
-		$ISStateCode = switch($ISState) {
-			'Up to date' {1}
-			'Update required' {2}
-			default: {0}
+		try {
+		if($vm.DynamicMemoryEnabled ) {
+			if([String]::IsNullOrEmpty($vm.MemoryStatus)) {$status='OK'}
+			else {$status=$vm.MemoryStatus}
+			if($vm.MemoryDemand -eq 0) {$pressure=0}
+			else {$pressure = [math]::Round(($vm.MemoryDemand/$vm.MemoryAssigned)*100,0)}
 		}
-
-		if ([String]::IsNullOrEmpty($ISVersion) -or $ISState -eq $null) {
-			if($ISPersisted.ContainsKey($vm.VMId)) {
-				$ISVersion = [String]::Split(',',$ISPersisted[$vm.VMId])[0]
-				$ISStateCode = [String]::Split(',',$ISPersisted[$vm.VMId])[1]
-			}
+		else {
+			$status='OK'
+			$pressure=0
 		}
-		if ([String]::IsNullOrEmpty($ISVersion) -or $ISState -eq $null) {
-			Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("Integration Services Info MIssing for $($vm.VMName)") $TRACE_INFO
-			continue
-		}
-		New-ItemProperty -Path Registry::$g_RegistryStatePath -Name $vm.VMId -PropertyType String -Value ([String]::Join(',',$ISVersion,$ISStateCode))
-
+		
 		$bag = $g_api.CreatePropertyBag()
 		$bag.AddValue('VMId',$vm.VMId.ToString())
-		$bag.AddValue('ISVersion', $ISVersion) #to be used in filters, we just monitor primary replica side ==1
-		$bag.AddValue('ISStateCode',$ISStateCode)
-		$bag.AddValue('ISState',$ISState)
+		$bag.AddValue('MemStatus', $status) 
+		$bag.AddValue('Pressure',$pressure)
+		$bag.AddValue('Demand',[math]::Round($vm.MemoryDemand/1MB,0))
+		$bag.AddValue('Assigned',[math]::Round($vm.MemoryAssigned/1MB,0))
 		$bag
 
 		$message="$($vm.VMName) IS State is: $ISStateCode Version is: $ISVersion"
 		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($vm.VMName) has been processed `n $message") $TRACE_DEBUG
+		}
+		catch [Exception] {
+			Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("$($vm.Name) error getting memory status $($Error[0].Exception)") $TRACE_WARNING
+		}
 
 	}
 
