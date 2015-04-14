@@ -895,7 +895,182 @@
         <OutputType>Windows!Microsoft.Windows.SerializedObjectData</OutputType>
         <InputType>System!System.BaseData</InputType>
     
-</WriteActionModuleType>      
+</WriteActionModuleType>
+      <WriteActionModuleType ID="QND.Hyperv.2012R2.VMActions.WAT" Accessibility="Public">
+        <Configuration>
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="VMId" type="xsd:string" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="Action" type="xsd:string" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="Param1" type="xsd:string" minOccurs="1" maxOccurs="1" />          
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <WriteAction ID="WA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
+                <ScriptName>Start-VMAction.ps1</ScriptName>
+                <ScriptBody>
+                  $IncludeFileContent/Scripts/Start-VMAction.ps1$
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>TraceLevel</Name>
+                    <Value>$Config/TraceLevel$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>VMId</Name>
+                    <Value>$Config/VMId$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>op</Name>
+                    <Value>$Config/Action$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>Param1</Name>
+                    <Value>$Config/Param1$</Value>
+                  </Parameter>                  
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>true</StrictErrorHandling>
+                <!-- true only for Tasks -->
+              </WriteAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="WA" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>Windows!Microsoft.Windows.SerializedObjectData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </WriteActionModuleType>
+      <!-- the following clones are useful to have a proper display string on the task dialog -->
+      <WriteActionModuleType ID="QND.Hyperv.2012R2.VMStop.WAT" Accessibility="Public">
+        <Configuration>
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="VMId" type="xsd:string" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="Action" type="xsd:string" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="Param1" type="xsd:string" minOccurs="1" maxOccurs="1" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+          <OverrideableParameter ID="Param1" ParameterType="string" Selector="$Config/Param1$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <WriteAction ID="WA" TypeID="QND.Hyperv.2012R2.VMActions.WAT">
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <TraceLevel>$Config/TraceLevel$</TraceLevel>
+                <VMId>$Config/VMId$</VMId>
+                <Action>$Config/Action$</Action>
+                <Param1>$Config/Param1$</Param1>
+              </WriteAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="WA" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>Windows!Microsoft.Windows.SerializedObjectData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </WriteActionModuleType>
+      <WriteActionModuleType ID="QND.Hyperv.2012R2.VMMigrate.WAT" Accessibility="Public">
+        <Configuration>
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="VMId" type="xsd:string" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="Action" type="xsd:string" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="Param1" type="xsd:string" minOccurs="1" maxOccurs="1" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+          <OverrideableParameter ID="Param1" ParameterType="string" Selector="$Config/Param1$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <WriteAction ID="WA" TypeID="QND.Hyperv.2012R2.VMActions.WAT">
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <TraceLevel>$Config/TraceLevel$</TraceLevel>
+                <VMId>$Config/VMId$</VMId>
+                <Action>$Config/Action$</Action>
+                <Param1>$Config/Param1$</Param1>
+              </WriteAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="WA" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>Windows!Microsoft.Windows.SerializedObjectData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </WriteActionModuleType>
+      <WriteActionModuleType ID="QND.Hyperv.2012R2.VMCheckpoint.WAT" Accessibility="Public">
+        <Configuration>
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="VMId" type="xsd:string" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="Action" type="xsd:string" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="Param1" type="xsd:string" minOccurs="1" maxOccurs="1" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+          <OverrideableParameter ID="Param1" ParameterType="string" Selector="$Config/Param1$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <WriteAction ID="WA" TypeID="QND.Hyperv.2012R2.VMActions.WAT">
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <TraceLevel>$Config/TraceLevel$</TraceLevel>
+                <VMId>$Config/VMId$</VMId>
+                <Action>$Config/Action$</Action>
+                <Param1>$Config/Param1$</Param1>
+              </WriteAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="WA" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>Windows!Microsoft.Windows.SerializedObjectData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </WriteActionModuleType>
     </ModuleTypes>
   </TypeDefinitions>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="QND.Hyperv.2012R2.VMActions.WAT" SubElementID="TraceLevel">
+          <Name>Trace Level (1-5)</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv.2012R2.VMStop.WAT" SubElementID="TraceLevel">
+          <Name>Trace Level (1-5)</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv.2012R2.VMStop.WAT" SubElementID="Param1">
+          <Name>Mode (Force|Ignore)</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv.2012R2.VMMigrate.WAT" SubElementID="TraceLevel">
+          <Name>Trace Level (1-5)</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv.2012R2.VMMigrate.WAT" SubElementID="Param1">
+          <Name>Node (best|node name)</Name>
+        </DisplayString>     
+        <DisplayString ElementID="QND.Hyperv.2012R2.VMCheckpoint.WAT" SubElementID="TraceLevel">
+          <Name>Trace Level (1-5)</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv.2012R2.VMCheckpoint.WAT" SubElementID="Param1">
+          <Name>Checkpoint Name</Name>
+        </DisplayString>        
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
 </ManagementPackFragment>

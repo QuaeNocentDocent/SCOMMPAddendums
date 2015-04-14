@@ -142,9 +142,6 @@
     <Compile Include="ReplicaVMClass.mpx">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Tasks.mptg.mpx">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="VHDMonitors.mpx">
       <SubType>Code</SubType>
     </Compile>
@@ -157,6 +154,10 @@
     <Compile Include="VMPerfRules.mptg.mpx">
       <SubType>Code</SubType>
       <DependentUpon>VMPerfRules.mptg</DependentUpon>
+    </Compile>
+    <Compile Include="VMTasks.mptg.mpx">
+      <SubType>Code</SubType>
+      <DependentUpon>VMTasks.mptg</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +175,7 @@
     <EmbeddedResource Include="Scripts\Get-VMSnapshotAge.ps1" />
     <EmbeddedResource Include="Scripts\Get-VMUptime.ps1" />
     <EmbeddedResource Include="Scripts\Resume-VMReplicaWA.ps1" />
+    <EmbeddedResource Include="Scripts\Start-VMAction.ps1" />
     <EmbeddedResource Include="Scripts\Write-Me.ps1" />
     <EmbeddedResource Include="Scripts\Write-TriggerEvent.ps1" />
   </ItemGroup>
@@ -183,6 +185,10 @@
       <Generator>FragmentGenerator</Generator>
     </Content>
     <Content Include="VMPerfRules.mptg">
+      <SubType>Content</SubType>
+      <Generator>FragmentGenerator</Generator>
+    </Content>
+    <Content Include="VMTasks.mptg">
       <SubType>Content</SubType>
       <Generator>FragmentGenerator</Generator>
     </Content>
