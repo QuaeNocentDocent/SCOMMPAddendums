@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{854c0353-f4b7-4166-a7ff-4273b83cd8fb}</ProjectGuid>
+    <RootNamespace>QND.ClusterDisk.Addendum.FullMonitor.Overrides</RootNamespace>
+    <Name>QND.ClusterDisk.Addendum.FullMonitor.Overrides</Name>
+    <ManagementPackName>QND.ClusterDisk.Addendum.FullMonitor.Overrides</ManagementPackName>
+    <Version>1.0.0.0</Version>
+    <MpFrameworkVersion>v7.0</MpFrameworkVersion>
+    <MpFrameworkProfile>OM</MpFrameworkProfile>
+    <ProductVersion>1.1.0.0</ProductVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <GenerateSealed>false</GenerateSealed>
+    <Company>MyCompany</Company>
+    <Copyright>Copyright (c) MyCompany. All rights reserved.</Copyright>
+    <DelaySigning>false</DelaySigning>
+    <AssemblyOriginatorKeyFile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <DelaySigning>false</DelaySigning>
+    <Company>MyCompany</Company>
+    <Copyright>Copyright (c) MyCompany. All rights reserved.</Copyright>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AddendumMP\QND.ClusterDisk.Addendum.mpproj">
+      <Name>QND.ClusterDisk.Addendum</Name>
+      <Project>{41a6b62f-6aaa-4c9e-a0b9-ab775bcf622e}</Project>
+      <Private>True</Private>
+      <Alias>QCA</Alias>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ManagementPackReference Include="Microsoft.Windows.Cluster.Library">
+      <HintPath>C:\Local\Dev\OpsMgr\MPLib2012\Microsoft.Windows.Cluster.Library.mp</HintPath>
+      <Alias>MWCL</Alias>
+      <MinVersion>7.0.8427.0</MinVersion>
+    </ManagementPackReference>
+    <ManagementPackReference Include="Microsoft.Windows.Server.ClusterSharedVolumeMonitoring">
+      <HintPath>C:\Local\Dev\OpsMgr\MPLib2012\Microsoft.Windows.Server.ClusterSharedVolumeMonitoring.mp</HintPath>
+      <Alias>ClusterDisk</Alias>
+      <MinVersion>6.0.7026.0</MinVersion>
+      <PackageToBundle>False</PackageToBundle>
+    </ManagementPackReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Overrides\overrides.mpx">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Overrides" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VSAC\Microsoft.SystemCenter.OperationsManager.targets" />
+</Project>

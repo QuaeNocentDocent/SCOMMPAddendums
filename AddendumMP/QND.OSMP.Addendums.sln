@@ -13,10 +13,6 @@ Project("{D4B43EB3-688B-4EEE-86BD-088F0B28ABB3}") = "QND.Windows.Server.2012R2.A
 EndProject
 Project("{D4B43EB3-688B-4EEE-86BD-088F0B28ABB3}") = "QND.DPM2012.Addendum", "..\QND.DPM2012.Addendum\QND.DPM2012.Addendum.mpproj", "{BC593344-7DE2-45D0-9169-52FEC2FB36A4}"
 EndProject
-Project("{D4B43EB3-688B-4EEE-86BD-088F0B28ABB3}") = "QND.Hyperv2012R2.Addendum", "..\QND.Hyperv2012R2.Addendum\QND.Hyperv2012R2.Addendum.mpproj", "{24D261A8-413C-41B1-AF89-8084BC64826E}"
-EndProject
-Project("{D4B43EB3-688B-4EEE-86BD-088F0B28ABB3}") = "QND.Hyperv2012R2", "..\QND.Hyperv2012R2\QND.Hyperv2012R2.mpproj", "{14EC5ADD-D29A-4AD8-A0FF-0A4FEE136DB0}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -43,14 +39,6 @@ Global
 		{BC593344-7DE2-45D0-9169-52FEC2FB36A4}.Debug|x86.Build.0 = Debug|x86
 		{BC593344-7DE2-45D0-9169-52FEC2FB36A4}.Release|x86.ActiveCfg = Release|x86
 		{BC593344-7DE2-45D0-9169-52FEC2FB36A4}.Release|x86.Build.0 = Release|x86
-		{24D261A8-413C-41B1-AF89-8084BC64826E}.Debug|x86.ActiveCfg = Debug|x86
-		{24D261A8-413C-41B1-AF89-8084BC64826E}.Debug|x86.Build.0 = Debug|x86
-		{24D261A8-413C-41B1-AF89-8084BC64826E}.Release|x86.ActiveCfg = Release|x86
-		{24D261A8-413C-41B1-AF89-8084BC64826E}.Release|x86.Build.0 = Release|x86
-		{14EC5ADD-D29A-4AD8-A0FF-0A4FEE136DB0}.Debug|x86.ActiveCfg = Debug|x86
-		{14EC5ADD-D29A-4AD8-A0FF-0A4FEE136DB0}.Debug|x86.Build.0 = Debug|x86
-		{14EC5ADD-D29A-4AD8-A0FF-0A4FEE136DB0}.Release|x86.ActiveCfg = Release|x86
-		{14EC5ADD-D29A-4AD8-A0FF-0A4FEE136DB0}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
