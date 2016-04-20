@@ -84,20 +84,20 @@
         <!-- This is the string users of the Operations Console and Web Console will see. 
              Descriptions are also helpful when the user is doing a search in the Console. -->
         <DisplayString ElementID="QND.DPM2012.SLAProtectionGroup">
-          <Name>Protection Group with SLA</Name>
+          <Name>QND - DPM Protection Group with SLA</Name>
           <Description></Description>
         </DisplayString>
         <DisplayString ElementID="QND.DPM2012.SLAProtectionGroup" SubElementID="SLA">
           <Name>SLA in hours</Name>
         </DisplayString>
         <DisplayString ElementID="QND.DPM2012.DataSourceswithSLA.Group">
-          <Name>DPM Data Sources with SLA</Name>
+          <Name>QND - DPM Data Sources with SLA</Name>
         </DisplayString>
         <DisplayString ElementID="QND.DPM2012.DataSourceswSLA.Discovery">
           <Name>DPM Data Sources with SLA Discovery</Name>
         </DisplayString>
         <DisplayString ElementID="QND.DPM2012.DataSourceswithoutSLA.Group">
-          <Name>DPM Data Sources without SLA</Name>
+          <Name>QND - DPM Data Sources without SLA</Name>
         </DisplayString>
         <DisplayString ElementID="QND.DPM2012.DataSourceswithoutSLA.Discovery">
           <Name>DPM Data Sources without SLA Discovery</Name>

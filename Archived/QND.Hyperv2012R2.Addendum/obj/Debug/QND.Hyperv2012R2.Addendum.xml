@@ -1,0 +1,2950 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ManagementPack SchemaVersion="2.0" ContentReadable="true" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Manifest>
+    <Identity>
+      <ID>QND.Hyperv2012R2.Addendum</ID>
+      <Version>1.0.0.91</Version>
+    </Identity>
+    <Name>QND.Hyperv2012R2.Addendum</Name>
+    <References>
+      <Reference Alias="Hyperv2012R2">
+        <ID>Microsoft.Windows.HyperV.2012.R2.Discovery</ID>
+        <Version>7.1.10104.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="HypervLib">
+        <ID>Microsoft.Windows.HyperV.Library</ID>
+        <Version>7.1.10104.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Windows">
+        <ID>Microsoft.Windows.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="WSLib">
+        <ID>Microsoft.Windows.Server.Library</ID>
+        <Version>6.0.6959.1</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Health">
+        <ID>System.Health.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="System">
+        <ID>System.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+    </References>
+  </Manifest>
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+        <ClassType ID="QND.Hyperv2012R2.ReplicaVM" Base="Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.VirtualMachine" Accessibility="Public" Abstract="false" Hosted="true" Singleton="false">
+          <Property ID="PrimaryServerName" Key="false" Type="string" />
+          <Property ID="ReplicaServerName" Key="false" Type="string" />
+          <Property ID="RelationshipType" Key="false" Type="string" />
+          <Property ID="ReplicationMode" Key="false" Type="string" />
+          <Property ID="FrequencySec" Key="false" Type="int" />
+        </ClassType>
+      </ClassTypes>
+    </EntityTypes>
+    <ModuleTypes>
+      <DataSourceModuleType ID="QND.Hyperv2012R2.VM.DynamicDiscovery.DSType" Accessibility="Internal" Batching="false">
+        <Configuration>
+          <xsd:element name="TraceLevel" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TimeoutSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TargetComputer" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TraceLevel" Selector="$Config/TraceLevel$" ParameterType="int" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.EventProvider">
+                <ComputerName>$Config/TargetComputer$</ComputerName>
+                <LogName>Operations Manager</LogName>
+                <AllowProxying>false</AllowProxying>
+                <Expression>
+                  <And>
+                    <Expression>
+                      <RegExExpression>
+                        <ValueExpression>
+                          <XPathQuery Type="UnsignedInteger">EventDisplayNumber</XPathQuery>
+                        </ValueExpression>
+                        <Operator>MatchesRegularExpression</Operator>
+                        <Pattern>62001</Pattern>
+                      </RegExExpression>
+                    </Expression>
+                    <Expression>
+                      <SimpleExpression>
+                        <ValueExpression>
+                          <XPathQuery Type="Integer">EventLevel</XPathQuery>
+                        </ValueExpression>
+                        <Operator>Equal</Operator>
+                        <ValueExpression>
+                          <Value Type="Integer">4</Value>
+                        </ValueExpression>
+                      </SimpleExpression>
+                    </Expression>
+                    <Expression>
+                      <SimpleExpression>
+                        <ValueExpression>
+                          <XPathQuery Type="String">PublisherName</XPathQuery>
+                        </ValueExpression>
+                        <Operator>Equal</Operator>
+                        <ValueExpression>
+                          <Value Type="String">Hyper-V Dynamic Discovery</Value>
+                        </ValueExpression>
+                      </SimpleExpression>
+                    </Expression>
+                  </And>
+                </Expression>
+              </DataSource>
+              <ProbeAction ID="Discover" TypeID="QND.Hyperv2012R2.VMDiscovery.PT">
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <TraceLevel>$Config/TraceLevel$</TraceLevel>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Discover">
+                <Node ID="DS" />
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.Discovery.Data</OutputType>
+      </DataSourceModuleType>
+      <DataSourceModuleType ID="QND.Hyperv2012R2.ReplicaVM.Discovery.DSType" Accessibility="Internal" Batching="false">
+        <Configuration>
+          <xsd:element name="TraceLevel" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="IntervalSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TimeoutSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TargetComputer" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="HVServerId" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TraceLevel" Selector="$Config/TraceLevel$" ParameterType="int" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedPowerShell.DiscoveryProvider">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+                <ScriptName>Discover-PrimaryReplicaVM.ps1</ScriptName>
+                <ScriptBody>
+                  <![CDATA[#TO SHOW VERBOSE MESSAGES SET $VerbosePreference="continue"
+#SET ErrorLevel to 5 so show discovery info
+
+#*************************************************************************
+# Script Name - Discover-PrimaryReplicaVM.ps1
+# Author	  -  - Progel spa
+# Version  - 1.0 24.09.2007
+# Purpose     - 
+#               
+# Assumptions - 
+#				
+#               
+# Parameters  - TraceLevel
+#             - ComputerName
+#				- SourceId
+#				- ManagedEntityId
+# Command Line - .\test.ps1 4 "serverName" '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}' '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}'
+# If discovery must be added the followinf parameters
+#				SourceId ($ MPElement $ )
+#				ManagedEntityId ($ Target/Id $)
+#
+# Output properties
+#
+# Status
+#
+# Version History
+#	  1.0 21.02.2015 DG First Release
+#     
+#
+# (c) Copyright 2015, Progel spa, All Rights Reserved
+# Proprietary and confidential to Progel srl              
+#
+#*************************************************************************
+
+
+# Get the named parameters
+param([int]$traceLevel=$(throw 'must have a value'),
+[string]$computerName=$(throw 'must have a value'),
+[string]$HVServerId=$(throw 'must have a value'),
+[string]$sourceID=$(throw 'must have a value'),
+[string]$ManagedEntityId=$(throw 'must have a value'))
+
+	[Threading.Thread]::CurrentThread.CurrentCulture = "en-US"        
+	[Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
+	
+#Constants used for event logging
+$SCRIPT_NAME			= "Discover-PrimaryReplicaVM.ps1"
+$SCRIPT_ARGS = 4
+$SCRIPT_STARTED			= 831
+$PROPERTYBAG_CREATED	= 832
+$SCRIPT_ENDED			= 835
+$SCRIPT_VERSION = "1.0"
+
+#region Constants
+#Trace Level Costants
+$TRACE_NONE 	= 0
+$TRACE_ERROR 	= 1
+$TRACE_WARNING = 2
+$TRACE_INFO 	= 3
+$TRACE_VERBOSE = 4
+$TRACE_DEBUG = 5
+
+#Event Type Constants
+$EVENT_TYPE_SUCCESS      = 0
+$EVENT_TYPE_ERROR        = 1
+$EVENT_TYPE_WARNING      = 2
+$EVENT_TYPE_INFORMATION  = 4
+$EVENT_TYPE_AUDITSUCCESS = 8
+$EVENT_TYPE_AUDITFAILURE = 16
+
+#Standard Event IDs
+$FAILURE_EVENT_ID = 4000		#errore generico nello script
+$SUCCESS_EVENT_ID = 1101
+$START_EVENT_ID = 1102
+$STOP_EVENT_ID = 1103
+
+#TypedPropertyBag
+$AlertDataType = 0
+$EventDataType	= 2
+$PerformanceDataType = 2
+$StateDataType       = 3
+#endregion
+
+#region Helper Functions
+function Log-Params
+{
+	param($Invocation)
+	$line=''
+	foreach($key in $Invocation.BoundParameters.Keys) {$line += "$key=$($Invocation.BoundParameters[$key])  "}
+	Log-Event $START_EVENT_ID $EVENT_TYPE_INFORMATION  ("Starting script. Invocation Name:$($Invocation.InvocationName)`n Parameters`n $line") $TRACE_INFO
+}
+
+
+function Log-Event
+{
+	param($eventID, $eventType, $msg, $level)
+	
+	Write-Verbose ("Logging event. " + $SCRIPT_NAME + " EventID: " + $eventID + " eventType: " + $eventType + " Version:" + $SCRIPT_VERSION + " --> " + $msg)
+	if($level -le $P_TraceLevel)
+	{
+		Write-Host ("Logging event. " + $SCRIPT_NAME + " EventID: " + $eventID + " eventType: " + $eventType + " Version:" + $SCRIPT_VERSION + " --> " + $msg)
+		$g_API.LogScriptEvent($SCRIPT_NAME,$eventID,$eventType, ($msg + "`n" + "Version :" + $SCRIPT_VERSION))
+	}
+}
+
+Function Throw-EmptyDiscovery
+{
+	param($SourceId, $ManagedEntityId)
+
+	$oDiscoveryData = $g_API.CreateDiscoveryData(0, $SourceId, $ManagedEntityId)
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING "Exiting with empty discovery data" $TRACE_INFO
+	$oDiscoveryData
+	If($traceLevel -eq $TRACE_DEBUG)
+	{
+		#just for debug proposes when launched from command line does nothing when run inside OpsMgr Agent
+		$g_API.Return($oDiscoveryData)
+	}
+}
+
+Function Throw-KeepDiscoveryInfo
+{
+param($SourceId, $ManagedEntityId)
+	$oDiscoveryData = $g_API.CreateDiscoveryData(0,$SourceId,$ManagedEntityId)
+	#Instead of Snapshot discovery, submit Incremental discovery data
+	$oDiscoveryData.IsSnapshot = $false
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING "Exiting with null non snapshot discovery data" $TRACE_INFO
+	$oDiscoveryData    
+	If($traceLevel -eq $TRACE_DEBUG)
+	{
+		#just for debug proposes when launched from command line does nothing when run inside OpsMgr Agent	
+		$g_API.Return($oDiscoveryData)
+	}
+}
+#endregion
+
+
+#Start by setting up API object.
+	$P_TraceLevel = $TRACE_VERBOSE
+	$g_Api = New-Object -comObject 'MOM.ScriptAPI'
+	#$g_RegistryStatePath = "HKLM\" + $g_API.GetScriptStateKeyPath($SCRIPT_NAME)
+
+	$dtStart = Get-Date
+	$P_TraceLevel = $traceLevel
+	Log-Params $MyInvocation
+
+try
+{
+		if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
+
+	if (!(get-command -Module Hyper-V -Name Get-VM -ErrorAction SilentlyContinue)) {
+		Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("Get-VM Commandlet doesn't exist.") $TRACE_WARNING
+		Throw-EmptyDiscovery
+	}
+
+	$vms = Get-VM | where {$_.ReplicationMode.Value__ -ne 0}	#use the enum codes instead of labels 0 = 'None'
+	$discoveryData = $g_api.CreateDiscoveryData(0, $sourceId, $managedEntityId)
+	foreach($vm in $vms) {
+		$replica = Get-VMReplication -VM $vm
+	#I use labels and codes for discovery so they're UI friendly, if in the future I need to group objects I will add a code property. Labels are locale dependent
+	$oInstance = $discoveryData.CreateClassInstance("$MPElement[Name='QND.Hyperv2012R2.ReplicaVM']$")
+	$oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", $ComputerName)
+	$oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.ServerRole']/ServerId$", $HVServerId)
+	$oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$", $vm.VMId.ToString())
+	$oInstance.AddProperty("$MPElement[Name='QND.Hyperv2012R2.ReplicaVM']/PrimaryServerName$", $replica.PrimaryServerName)
+	$oInstance.AddProperty("$MPElement[Name='QND.Hyperv2012R2.ReplicaVM']/ReplicaServerName$", $replica.ReplicaServerName)
+	$oInstance.AddProperty("$MPElement[Name='QND.Hyperv2012R2.ReplicaVM']/ReplicationMode$", $vm.ReplicationMode.ToString())
+	$oInstance.AddProperty("$MPElement[Name='QND.Hyperv2012R2.ReplicaVM']/RelationshipType$", $replica.RelationshipType.ToString())
+	$oInstance.AddProperty("$MPElement[Name='QND.Hyperv2012R2.ReplicaVM']/FrequencySec$", $replica.FrequencySec)
+			$discoveryData.AddInstance($oInstance)
+	}
+	$discoveryData
+
+	Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("has completed successfully in " + ((Get-Date)- ($dtstart)).TotalSeconds + " seconds.") $TRACE_INFO
+}
+Catch [Exception] {
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING ("Main " + $Error) $TRACE_WARNING	
+	write-Verbose $("TRAPPED: " + $_.Exception.GetType().FullName); 
+	Write-Verbose $("TRAPPED: " + $_.Exception.Message); 
+}
+]]>
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>TraceLevel</Name>
+                    <Value>$Config/TraceLevel$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>ComputerName</Name>
+                    <Value>$Config/TargetComputer$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>HVServerId</Name>
+                    <Value>$Config/HVServerId$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>SourceId</Name>
+                    <Value>$MPElement$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>ManagedEntityId</Name>
+                    <Value>$Target/Id$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>false</StrictErrorHandling>
+                <!-- true only for Tasks -->
+              </DataSource>
+            </MemberModules>
+            <Composition>
+              <Node ID="DS" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.Discovery.Data</OutputType>
+      </DataSourceModuleType>
+      <DataSourceModuleType ID="QND.Hyperv2012R2.GetVMReplicaStatus.DS" Accessibility="Public" Batching="false">
+        <Configuration>
+          <xsd:element name="IntervalSeconds" type="xsd:int" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Scheduler" TypeID="System!System.SimpleScheduler">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+              </DataSource>
+              <ProbeAction ID="GetStatus" TypeID="QND.Hyperv2012R2.VMReplicaStatus.PT">
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <TraceLevel>$Config/TraceLevel$</TraceLevel>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="GetStatus">
+                <Node ID="Scheduler"></Node>
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+      <DataSourceModuleType ID="QND.Hyperv2012R2.GetVMSnapshotAge.DS" Accessibility="Public" Batching="false">
+        <Configuration>
+          <xsd:element name="IntervalSeconds" type="xsd:int" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Scheduler" TypeID="System!System.SimpleScheduler">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+              </DataSource>
+              <ProbeAction ID="GetStatus" TypeID="QND.Hyperv2012R2.VMSnapshotAge.PT">
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <TraceLevel>$Config/TraceLevel$</TraceLevel>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="GetStatus">
+                <Node ID="Scheduler"></Node>
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+      <DataSourceModuleType ID="QND.Hyperv2012R2.GetVMISStatus.DS" Accessibility="Public" Batching="false">
+        <Configuration>
+          <xsd:element name="IntervalSeconds" type="xsd:int" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Scheduler" TypeID="System!System.SimpleScheduler">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+              </DataSource>
+              <ProbeAction ID="GetStatus" TypeID="QND.Hyperv2012R2.VMISStatus.PT">
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <TraceLevel>$Config/TraceLevel$</TraceLevel>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="GetStatus">
+                <Node ID="Scheduler"></Node>
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+      <ProbeActionModuleType ID="QND.Hyperv2012R2.VMDiscovery.PT" Accessibility="Public" Batching="false">
+        <Configuration>
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="Discovery" TypeID="Windows!Microsoft.Windows.PowerShellDiscoveryProbe">
+                <ScriptName>Discover-VM.ps1</ScriptName>
+                <ScriptBody>
+                  <![CDATA[				  #Copyright (c) Microsoft Corporation. All rights reserved.
+				  param($SourceId, $ManagedEntityId, $ComputerIdentity)
+
+				  # Common Functions
+				  function ThrowScriptError
+				  {
+				  param($msg, $errorDetails)
+				  $errorMsg = $msg + $errorDetails;
+				  $oApi.LogScriptEvent("DiscoverHyperV2012R2VirtualMachine.ps1", 1000, 1, $errorMsg);
+				  }
+
+				  function ThrowScriptInfo
+				  {
+				  param($msg)
+				  $oApi.LogScriptEvent("DiscoverHyperV2012R2VirtualMachine.ps1", 1000, 4, $msg);
+				  }
+				  # End Common Functions
+
+				  function DiscoverVirtualNetworkAdapters()
+				  {
+				  param($vmId, $vmName)
+
+				  $query = "select InstanceID, HostResource from Msvm_EthernetPortAllocationSettingData where InstanceID LIKE 'Microsoft:" + $vmId + "%'";
+
+				  $nics = @(gwmi -Query $query -Namespace $namespace -ComputerName $ComputerIdentity)
+				  foreach ($nic in $nics)
+				  {
+				  $deviceName = "Network Adapter";
+				  $deviceID = "";
+				  $ConnectedNetworkId = "";
+				  $ConnectedNetworkName = "";
+				  if  ( $nic.InstanceID -ne $null)
+				  {
+				  $instanceIdArray = $nic.InstanceID.split("\");
+				  if ($instanceIdArray -ne $null -and $instanceIdArray.Count -gt 1)
+				  {
+				  $deviceID = $instanceIdArray[1];
+				  }
+				  }
+				  if ($nic.HostResource -ne $null)
+				  {
+				  $hostResourceArray = $nic.HostResource.split("`"");
+				  if ($hostResourceArray -ne $null -and $hostResourceArray.Count -gt 3)
+				  {
+				  $ConnectedNetworkId = $hostResourceArray[3];
+				  $switchQuery = "select ElementName from Msvm_VirtualEthernetSwitch where Name = '" + $ConnectedNetworkId + "'";
+				  $switches =  @(gwmi -Query $switchQuery -Namespace $namespace -ComputerName $ComputerIdentity)
+				  if ($switches -ne $null -and $switches.Count -gt 0)
+				  {
+				  $ConnectedNetworkName = $switches[0].ElementName;
+				  }
+				  }
+				  }
+				  $oInstance = $oDiscoveryData.CreateClassInstance("$MPElement[Name='Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.VirtualNetworkAdapter']$")
+				  $oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $deviceName)
+				  $oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", $ComputerIdentity)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.ServerRole']/ServerId$", $ComputerIdentity)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$", $vmId)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualHardwareComponent']/DeviceId$", $deviceID)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualHardwareComponent']/Name$", $deviceName)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualHardwareComponent']/VirtualMachineName$", $vmName)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualNetworkAdapter']/ConnectedNetworkId$", $ConnectedNetworkId)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualNetworkAdapter']/ConnectedNetworkName$", $ConnectedNetworkName)
+				  $oDiscoveryData.AddInstance($oInstance)
+
+
+				  }
+
+				  if ($error -eq $null -or $error.Count -eq 0)
+				  {
+				  $errormsg = "Successfully discovered Virtual Nic instances ";
+				  ThrowScriptInfo -msg $errormsg
+				  }
+				  else
+				  {
+				  $errormsg =  "Failed discovering Virtual Nic instances ";
+				  ThrowScriptError -msg $errormsg -errorDetails $error
+				  $error.Clear();
+				  }
+				  }
+
+
+				  function DiscoverVirtualDisks()
+				  {
+				  param($vmId, $vmName)
+				  $query = "select InstanceID, HostResource, ElementName from Msvm_StorageAllocationSettingData where InstanceID LIKE 'Microsoft:" + $vmId + "%'";
+				  $vhds = @(gwmi -Query $query -Namespace $namespace  -ComputerName $ComputerIdentity)
+
+				  $vhdsvc = gwmi -query "SELECT * FROM Msvm_ImageManagementService" -Namespace $namespace  -ComputerName $ComputerIdentity;
+
+
+				  foreach ($vhd in $vhds)
+				  {
+				  $deviceID = ""
+				  if ($vhd.InstanceID -ne $null)
+				  {
+				  $deviceID = $vhd.InstanceID;
+				  }
+
+				  $filePath = ""
+				  $driveType = ""
+				  $deviceName = "Hard Disk"
+				  $hostResourceArray = $vhd.HostResource;
+				  if ($hostResourceArray -ne $null -and $vhdsvc -ne $null)
+				  {
+				  $filePath = $hostResourceArray[0];
+				  $outParams = $vhdsvc.GetVirtualHardDiskSettingData($filePath);
+				  $xmlDoc = new-object -comObject 'Microsoft.XMLDOM';
+				  $xmlDoc.async = "false";
+				  $xmlDoc.loadXML($outParams.SettingData)
+				  $xPath = "/INSTANCE/PROPERTY[@NAME='Type']/VALUE/child:text()"
+				  $node = $xmlDoc.selectSingleNode($xPath)
+				  if ($node -ne $null)
+				  {
+				  if ($node.Text -ne "")
+				  {
+				  $driveType = $node.Text;
+				  }
+				  }
+				  }
+
+				  $oInstance = $oDiscoveryData.CreateClassInstance("$MPElement[Name='Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.VirtualDrive']$")
+				  $oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $deviceName)
+				  $oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", $ComputerIdentity)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.ServerRole']/ServerId$", $ComputerIdentity)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$", $vmId)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualHardwareComponent']/DeviceId$", $deviceID)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualHardwareComponent']/Name$", $deviceName)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualHardwareComponent']/VirtualMachineName$", $vmName)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualDrive']/ImageFile$", $filePath)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualDrive']/DriveType$", $driveType)
+				  $oDiscoveryData.AddInstance($oInstance)
+
+
+				  $filePathParts = $filePath.split("\");
+				  $driveLetter = "";
+				  if ($filePathParts -ne $null -and $filePathParts.Count -gt 0)
+				  {
+				  $driveLetter = $filePathParts[0].ToUpper();
+				  $oLogicalDisk = $oDiscoveryData.CreateClassInstance("$MPElement[Name='WSLib!Microsoft.Windows.Server.6.2.LogicalDisk']$")
+				  $oLogicalDisk.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", $ComputerIdentity)
+				  $oLogicalDisk.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.LogicalDevice']/DeviceID$", $driveLetter)
+
+				  # Create Relationship
+				  $oRelationship = $oDiscoveryData.CreateRelationshipInstance("$MPElement[Name='Hyperv2012R2!Microsoft.Windows.Server.2012.R2.LogicalDisk.Contains.HyperV.VirtualDrive']$")
+				  $oRelationship.Source = $oLogicalDisk;
+				  $oRelationship.Target = $oInstance;
+				  $oDiscoveryData.AddInstance($oRelationship);
+
+				  }
+				  }
+
+
+				  if ($error -eq $null -or $error.Count -eq 0)
+				  {
+				  $errormsg = "Successfully discovered Virtual HardDisk instances ";
+				  ThrowScriptInfo -msg $errormsg
+				  }
+				  else
+				  {
+				  $errormsg =  "Failed discovering Virtual HardDisk instances: " ;
+				  ThrowScriptError -msg $errormsg -errorDetails $error
+				  $error.Clear();
+				  }
+				  }
+
+
+				  $error.Clear();
+				  $oApi = new-object -comObject 'MOM.ScriptAPI'
+				  $oDiscoveryData = $oApi.CreateDiscoveryData(0, $SourceId, $ManagedEntityId);
+									$oApi.LogScriptEvent("DiscoverHyperV2012R2VirtualMachine.ps1", 1001, 2, 'Starting VM discovery');
+				  $namespace = "root/virtualization/v2";
+
+				  $virtualMachineList = @(gwmi -Query  "SELECT Name, ElementName FROM MSVM_ComputerSystem" -namespace $namespace -ComputerName $ComputerIdentity);
+				  $hostComputerName = @(gwmi Win32_ComputerSystem -ComputerName $ComputerIdentity);
+
+				  foreach ($oVirtualMachine in $virtualMachineList)
+				  {
+				  if ($oVirtualMachine.Name.ToLowerInvariant() -eq $hostComputerName.Name.ToLowerInvariant())
+				  {
+				  continue;
+				  }
+
+				  $query = "select GuestIntrinsicExchangeItems from MSVM_KvpExchangeComponent where SystemName='" + $oVirtualMachine.Name + "'";
+				  $associators = @(gwmi -Query $query -namespace $namespace -ComputerName $ComputerIdentity);
+				  $computerName = "";
+				  if ($associators -ne $null -and $associators.Count -gt 0)
+				  {
+				  $KVP = $associators[0];
+				  if ($KVP -ne $null)
+				  {
+				  $xmlDoc = new-object -comObject 'Microsoft.XMLDOM';
+				  $xmlDoc.async = "false";
+				  if ($KVP.GuestIntrinsicExchangeItems -ne $null)
+				  {
+				  foreach ( $dataItem in $KVP.GuestIntrinsicExchangeItems)
+				  {
+				  $xmlDoc.loadXML($dataItem); #dataItem is in xml
+				  $xPath = "/INSTANCE/PROPERTY[@NAME='Name']/VALUE/child:text()";
+				  $node = $xmlDoc.selectSingleNode($xPath)
+				  if ($node.Text -eq "FullyQualifiedDomainName")
+				  {
+				  $xPath = "/INSTANCE/PROPERTY[@NAME='Data']/VALUE/child:text()" ;
+				  $node = $xmlDoc.selectSingleNode($xPath);
+				  $computerName = $node.Text;
+				  break;
+				  }
+				  }
+				  }
+				  }
+				  }
+
+				  $oInstance = $oDiscoveryData.CreateClassInstance("$MPElement[Name='Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.VirtualMachine']$")
+				  $oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $oVirtualMachine.ElementName)
+				  $oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", $ComputerIdentity)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.ServerRole']/ServerId$", $ComputerIdentity)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$", $oVirtualMachine.Name)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineName$", $oVirtualMachine.ElementName)
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/ServerName$", $ComputerIdentity)
+				  if ($computerName -ne "")
+				  {
+				  $oInstance.AddProperty("$MPElement[Name='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/ComputerName$", $computerName)
+				  }
+
+
+
+				  $oDiscoveryData.AddInstance($oInstance);
+
+				  DiscoverVirtualNetworkAdapters -vmId $oVirtualMachine.Name -vmName $oVirtualMachine.ElementName;
+
+				  DiscoverVirtualDisks -vmId $oVirtualMachine.Name -vmName $oVirtualMachine.ElementName;
+
+
+				  }
+
+				  if ($error -eq $null -or $error.Count -eq 0)
+				  {
+				  $errormsg = "Successfully discovered Virtual Machine instances ";
+				  ThrowScriptInfo -msg $errormsg
+				  }
+				  else
+				  {
+				  $errormsg = "Failed discovering Virtual Machine instances "
+				  ThrowScriptError -msg $errormsg -errorDetails $error
+				  $error.Clear();
+				  }
+
+				  $oDiscoveryData
+
+				]]>
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>SourceID</Name>
+                    <Value>$MPElement$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>ManagedEntityID</Name>
+                    <Value>$Target/Id$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>ComputerIdentity</Name>
+                    <Value>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>false</StrictErrorHandling>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Discovery" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.Discovery.Data</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </ProbeActionModuleType>
+      <ProbeActionModuleType ID="QND.Hyperv2012R2.VMReplicaStatus.PT" Accessibility="Public" Batching="false">
+        <Configuration>
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="Stats" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagProbe">
+                <ScriptName>Get-VMReplicaStatus.ps1</ScriptName>
+                <ScriptBody>
+                  <![CDATA[#TO SHOW VERBOSE MESSAGES SET $VerbosePreference="continue"
+#SET ErrorLevel to 5 so show discovery info
+
+#*************************************************************************
+# Script Name - Discover-PrimaryReplicaVM.ps1
+# Author	  -  - Progel spa
+# Version  - 1.0 24.09.2007
+# Purpose     - 
+#               
+# Assumptions - 
+#				
+#               
+# Parameters  - TraceLevel
+#             - ComputerName
+#				- SourceId
+#				- ManagedEntityId
+# Command Line - .\test.ps1 4 "serverName" '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}' '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}'
+# If discovery must be added the followinf parameters
+#				SourceId ($ MPElement $ )
+#				ManagedEntityId ($ Target/Id $)
+#
+# Output properties
+#
+# Status
+#
+# Version History
+#	  1.0 21.02.2015 DG First Release
+#     
+#
+# (c) Copyright 2015, Progel spa, All Rights Reserved
+# Proprietary and confidential to Progel srl              
+#
+#*************************************************************************
+
+
+# Get the named parameters
+param([int]$traceLevel=$(throw 'must have a value'),
+	[string]$VMGuid)
+
+	[Threading.Thread]::CurrentThread.CurrentCulture = "en-US"        
+	[Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
+	
+#Constants used for event logging
+$SCRIPT_NAME			= "Get-VMReplicaStatus.ps1"
+$SCRIPT_ARGS = 1
+$SCRIPT_STARTED			= 831
+$PROPERTYBAG_CREATED	= 832
+$SCRIPT_ENDED			= 835
+$SCRIPT_VERSION = "1.0"
+
+#region Constants
+#Trace Level Costants
+$TRACE_NONE 	= 0
+$TRACE_ERROR 	= 1
+$TRACE_WARNING = 2
+$TRACE_INFO 	= 3
+$TRACE_VERBOSE = 4
+$TRACE_DEBUG = 5
+
+#Event Type Constants
+$EVENT_TYPE_SUCCESS      = 0
+$EVENT_TYPE_ERROR        = 1
+$EVENT_TYPE_WARNING      = 2
+$EVENT_TYPE_INFORMATION  = 4
+$EVENT_TYPE_AUDITSUCCESS = 8
+$EVENT_TYPE_AUDITFAILURE = 16
+
+#Standard Event IDs
+$FAILURE_EVENT_ID = 4000		#errore generico nello script
+$SUCCESS_EVENT_ID = 1101
+$START_EVENT_ID = 1102
+$STOP_EVENT_ID = 1103
+
+#TypedPropertyBag
+$AlertDataType = 0
+$EventDataType	= 2
+$PerformanceDataType = 2
+$StateDataType       = 3
+#endregion
+
+#region Helper Functions
+function Log-Params
+{
+	param($Invocation)
+	$line=''
+	foreach($key in $Invocation.BoundParameters.Keys) {$line += "$key=$($Invocation.BoundParameters[$key])  "}
+	Log-Event $START_EVENT_ID $EVENT_TYPE_INFORMATION  ("Starting script. Invocation Name:$($Invocation.InvocationName)`n Parameters`n $line") $TRACE_INFO
+}
+
+
+function Log-Event
+{
+	param($eventID, $eventType, $msg, $level)
+	
+	Write-Verbose ("Logging event. " + $SCRIPT_NAME + " EventID: " + $eventID + " eventType: " + $eventType + " Version:" + $SCRIPT_VERSION + " --> " + $msg)
+	if($level -le $P_TraceLevel)
+	{
+		Write-Host ("Logging event. " + $SCRIPT_NAME + " EventID: " + $eventID + " eventType: " + $eventType + " Version:" + $SCRIPT_VERSION + " --> " + $msg)
+		$g_API.LogScriptEvent($SCRIPT_NAME,$eventID,$eventType, ($msg + "`n" + "Version :" + $SCRIPT_VERSION))
+	}
+}
+
+Function Throw-EmptyDiscovery
+{
+	param($SourceId, $ManagedEntityId)
+
+	$oDiscoveryData = $g_API.CreateDiscoveryData(0, $SourceId, $ManagedEntityId)
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING "Exiting with empty discovery data" $TRACE_INFO
+	$oDiscoveryData
+	If($traceLevel -eq $TRACE_DEBUG)
+	{
+		#just for debug proposes when launched from command line does nothing when run inside OpsMgr Agent
+		$g_API.Return($oDiscoveryData)
+	}
+}
+
+Function Throw-KeepDiscoveryInfo
+{
+param($SourceId, $ManagedEntityId)
+	$oDiscoveryData = $g_API.CreateDiscoveryData(0,$SourceId,$ManagedEntityId)
+	#Instead of Snapshot discovery, submit Incremental discovery data
+	$oDiscoveryData.IsSnapshot = $false
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING "Exiting with null non snapshot discovery data" $TRACE_INFO
+	$oDiscoveryData    
+	If($traceLevel -eq $TRACE_DEBUG)
+	{
+		#just for debug proposes when launched from command line does nothing when run inside OpsMgr Agent	
+		$g_API.Return($oDiscoveryData)
+	}
+}
+#endregion
+
+
+#Start by setting up API object.
+	$P_TraceLevel = $TRACE_VERBOSE
+	$g_Api = New-Object -comObject 'MOM.ScriptAPI'
+	#$g_RegistryStatePath = "HKLM\" + $g_API.GetScriptStateKeyPath($SCRIPT_NAME)
+
+	$dtStart = Get-Date
+	$P_TraceLevel = $traceLevel
+	Log-Params $MyInvocation
+
+try
+{
+	if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
+
+
+	if (!(get-command -Module Hyper-V -Name Get-VM -ErrorAction SilentlyContinue)) {
+		Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("Get-VM Commandlet doesn't exist.") $TRACE_WARNING
+		Exit 1;
+	}
+
+	if ($VMGuid -ine 'ignore') {	#here we're in atask targeted at a specific VM
+		$vm = Get-VM | where {$_.VMId -ieq $VMGuid}
+		if ($vm) {
+			$replica = Get-VMReplication -VM $vm
+			Write-Host "$($vm.Name) Replication mode: $($vm.ReplicationMode.ToString())"
+			Write-Host "Replication Health: $($replica.ReplicationHealth.ToString()) State: $($replica.ReplicationState.ToString())"
+			Write-Host "Last replication: $($replica.LastReplicationTime)"
+			Write-Host "Replica state dump: "
+			$replica | fl *
+			Write-Host "Replica measure dump: "
+			Mesaure-VMReplica -VM $vm | fl *
+		}
+		else {
+			Write-Host "VM with Guid $VMGuid not found on host!"
+		}
+		exit;
+	}
+
+	$vms = @(gwmi Msvm_ComputerSystem -namespace "root\virtualization\v2" | where {$_.ReplicationMode -ne 0 -and $_.ReplicationMode -ne $null})
+	foreach($vm in $vms) {
+		$VMId = $vm.Name
+		$LastReplicationTime=[System.Management.ManagementDateTimeConverter]::ToDateTime($vm.LastReplicationTime) 
+		$VMReplicationMode=$vm.ReplicationMode
+		$VMReplicationHealthCode=$vm.ReplicationHealth
+		$VMReplicationStateCode=$vm.ReplicationState
+
+	#need to use Msvm_ReplicationRelationship
+	$VMReplicationState= switch ($VMReplicationStateCode)
+	{
+		0 {'Disabled'}
+		1 {'Ready for replication'}
+		2 {'Waiting to complete initial replication'}
+		3 {'Replicating'}
+		4 {'Synced replication complete'}
+		5 {'Recovered'}
+		6 {'Committed'}
+		7 {'Suspended'}
+		8 {'Critical'}
+		9 {'Waiting to start resynchronization'}
+		10 {'Resynchronizing'}
+		11 {'Resynchronization suspended'}
+		12 {'Failover in progress'}
+		13 {'Failback in progress'}
+		14 {'Failback complete'}
+		default {'Unknown'};
+	}
+		
+		$VMReplicationHealth= switch ($VMReplicationHealthCode) {
+			0 {'Disabled'}
+			1 {'OK'}	
+			2 {'Warning'}
+			3 {'Critical'}
+			default {'Unknown'}
+		}
+
+		$replicaAgeHours = ([DateTime]::Now - $LastReplicationTime).TotalHours
+		$bag = $g_api.CreatePropertyBag()
+		$bag.AddValue('VMId',$VMId)
+		$bag.AddValue('ReplicationMode', $VMReplicationMode) #to be used in filters, we just monitor primary replica side ==1
+		$bag.AddValue('ReplicationHealthCode',$VMReplicationHealthCode)
+		$bag.AddValue('ReplicationHealth',$VMReplicationHealth)
+		$bag.AddValue('ReplicationStateCode',$VMReplicationStateCode)
+		$bag.AddValue('ReplicationState',$VMReplicationState)
+		$bag.AddValue('ReplicaAgeHours',$replicaAgeHours)
+		$bag
+
+	$message="$($vm.Name) Replica State is: $($vmreplicationstatecode) Replica Health Is: $($vmreplicationhealthcode). Replica Age is: $replicaAgeHours"
+		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($vm.VMName) has been processed `n $message") $TRACE_DEBUG
+	}
+
+	#Debug the pèowershll module has issues in both caching (results doesn't change between iterations and values returned so we're not going to use POSH
+	$vms = Get-VM | where {$_.ReplicationMode.Value__ -ne 0}	#use the enum codes instead of labels 0 = 'None'
+	$vms=$null #debug not using POSH
+	foreach($vm in $vms) {
+		$replica = Get-VMReplication -VM $vm
+		$VMId = $vm.VMId.ToString()
+		$LastReplicationTime=$replica.LastReplicationTime
+		$VMReplicationMode=$vm.ReplicationMode.value__
+		$VMReplicationHealthCode=$replica.ReplicationHealth.Value__
+		$VMReplicationStateCode=$replica.ReplicationState.Value__
+		$VMReplicationState=$replica.ReplicationState.ToString()
+		$VMRepliactionHealth=$replica.ReplicationHealth.ToString()	
+		$message="$($vm.Name) Replica State is: $($vmreplicationstatecode) Replica Health Is: $($vmreplicationhealthcode). Replica Age is: $replicaAgeHours"
+		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($vm.VMName) has been processed `n $message") $TRACE_DEBUG
+
+	}
+
+	Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("has completed successfully in " + ((Get-Date)- ($dtstart)).TotalSeconds + " seconds.") $TRACE_INFO
+}
+Catch [Exception] {
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING ("Main " + $Error) $TRACE_WARNING	
+	write-Verbose $("TRAPPED: " + $_.Exception.GetType().FullName); 
+	Write-Verbose $("TRAPPED: " + $_.Exception.Message); 
+}
+]]>
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>TraceLevel</Name>
+                    <Value>$Config/TraceLevel$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>VMGuid</Name>
+                    <Value>ignore</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>false</StrictErrorHandling>
+                <!-- true only for Tasks -->
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Stats" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </ProbeActionModuleType>
+      <ProbeActionModuleType ID="QND.Hyperv2012R2.VMReplicaStatusTask.PT" Accessibility="Public" Batching="false">
+        <Configuration>
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="VMId" type="xsd:string" minOccurs="1" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="Stats" TypeID="Windows!Microsoft.Windows.PowerShellProbe">
+                <ScriptName>Get-VMReplicaStatus.ps1</ScriptName>
+                <ScriptBody>
+                  <![CDATA[#TO SHOW VERBOSE MESSAGES SET $VerbosePreference="continue"
+#SET ErrorLevel to 5 so show discovery info
+
+#*************************************************************************
+# Script Name - Discover-PrimaryReplicaVM.ps1
+# Author	  -  - Progel spa
+# Version  - 1.0 24.09.2007
+# Purpose     - 
+#               
+# Assumptions - 
+#				
+#               
+# Parameters  - TraceLevel
+#             - ComputerName
+#				- SourceId
+#				- ManagedEntityId
+# Command Line - .\test.ps1 4 "serverName" '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}' '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}'
+# If discovery must be added the followinf parameters
+#				SourceId ($ MPElement $ )
+#				ManagedEntityId ($ Target/Id $)
+#
+# Output properties
+#
+# Status
+#
+# Version History
+#	  1.0 21.02.2015 DG First Release
+#     
+#
+# (c) Copyright 2015, Progel spa, All Rights Reserved
+# Proprietary and confidential to Progel srl              
+#
+#*************************************************************************
+
+
+# Get the named parameters
+param([int]$traceLevel=$(throw 'must have a value'),
+	[string]$VMGuid)
+
+	[Threading.Thread]::CurrentThread.CurrentCulture = "en-US"        
+	[Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
+	
+#Constants used for event logging
+$SCRIPT_NAME			= "Get-VMReplicaStatus.ps1"
+$SCRIPT_ARGS = 1
+$SCRIPT_STARTED			= 831
+$PROPERTYBAG_CREATED	= 832
+$SCRIPT_ENDED			= 835
+$SCRIPT_VERSION = "1.0"
+
+#region Constants
+#Trace Level Costants
+$TRACE_NONE 	= 0
+$TRACE_ERROR 	= 1
+$TRACE_WARNING = 2
+$TRACE_INFO 	= 3
+$TRACE_VERBOSE = 4
+$TRACE_DEBUG = 5
+
+#Event Type Constants
+$EVENT_TYPE_SUCCESS      = 0
+$EVENT_TYPE_ERROR        = 1
+$EVENT_TYPE_WARNING      = 2
+$EVENT_TYPE_INFORMATION  = 4
+$EVENT_TYPE_AUDITSUCCESS = 8
+$EVENT_TYPE_AUDITFAILURE = 16
+
+#Standard Event IDs
+$FAILURE_EVENT_ID = 4000		#errore generico nello script
+$SUCCESS_EVENT_ID = 1101
+$START_EVENT_ID = 1102
+$STOP_EVENT_ID = 1103
+
+#TypedPropertyBag
+$AlertDataType = 0
+$EventDataType	= 2
+$PerformanceDataType = 2
+$StateDataType       = 3
+#endregion
+
+#region Helper Functions
+function Log-Params
+{
+	param($Invocation)
+	$line=''
+	foreach($key in $Invocation.BoundParameters.Keys) {$line += "$key=$($Invocation.BoundParameters[$key])  "}
+	Log-Event $START_EVENT_ID $EVENT_TYPE_INFORMATION  ("Starting script. Invocation Name:$($Invocation.InvocationName)`n Parameters`n $line") $TRACE_INFO
+}
+
+
+function Log-Event
+{
+	param($eventID, $eventType, $msg, $level)
+	
+	Write-Verbose ("Logging event. " + $SCRIPT_NAME + " EventID: " + $eventID + " eventType: " + $eventType + " Version:" + $SCRIPT_VERSION + " --> " + $msg)
+	if($level -le $P_TraceLevel)
+	{
+		Write-Host ("Logging event. " + $SCRIPT_NAME + " EventID: " + $eventID + " eventType: " + $eventType + " Version:" + $SCRIPT_VERSION + " --> " + $msg)
+		$g_API.LogScriptEvent($SCRIPT_NAME,$eventID,$eventType, ($msg + "`n" + "Version :" + $SCRIPT_VERSION))
+	}
+}
+
+Function Throw-EmptyDiscovery
+{
+	param($SourceId, $ManagedEntityId)
+
+	$oDiscoveryData = $g_API.CreateDiscoveryData(0, $SourceId, $ManagedEntityId)
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING "Exiting with empty discovery data" $TRACE_INFO
+	$oDiscoveryData
+	If($traceLevel -eq $TRACE_DEBUG)
+	{
+		#just for debug proposes when launched from command line does nothing when run inside OpsMgr Agent
+		$g_API.Return($oDiscoveryData)
+	}
+}
+
+Function Throw-KeepDiscoveryInfo
+{
+param($SourceId, $ManagedEntityId)
+	$oDiscoveryData = $g_API.CreateDiscoveryData(0,$SourceId,$ManagedEntityId)
+	#Instead of Snapshot discovery, submit Incremental discovery data
+	$oDiscoveryData.IsSnapshot = $false
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING "Exiting with null non snapshot discovery data" $TRACE_INFO
+	$oDiscoveryData    
+	If($traceLevel -eq $TRACE_DEBUG)
+	{
+		#just for debug proposes when launched from command line does nothing when run inside OpsMgr Agent	
+		$g_API.Return($oDiscoveryData)
+	}
+}
+#endregion
+
+
+#Start by setting up API object.
+	$P_TraceLevel = $TRACE_VERBOSE
+	$g_Api = New-Object -comObject 'MOM.ScriptAPI'
+	#$g_RegistryStatePath = "HKLM\" + $g_API.GetScriptStateKeyPath($SCRIPT_NAME)
+
+	$dtStart = Get-Date
+	$P_TraceLevel = $traceLevel
+	Log-Params $MyInvocation
+
+try
+{
+	if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
+
+
+	if (!(get-command -Module Hyper-V -Name Get-VM -ErrorAction SilentlyContinue)) {
+		Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("Get-VM Commandlet doesn't exist.") $TRACE_WARNING
+		Exit 1;
+	}
+
+	if ($VMGuid -ine 'ignore') {	#here we're in atask targeted at a specific VM
+		$vm = Get-VM | where {$_.VMId -ieq $VMGuid}
+		if ($vm) {
+			$replica = Get-VMReplication -VM $vm
+			Write-Host "$($vm.Name) Replication mode: $($vm.ReplicationMode.ToString())"
+			Write-Host "Replication Health: $($replica.ReplicationHealth.ToString()) State: $($replica.ReplicationState.ToString())"
+			Write-Host "Last replication: $($replica.LastReplicationTime)"
+			Write-Host "Replica state dump: "
+			$replica | fl *
+			Write-Host "Replica measure dump: "
+			Mesaure-VMReplica -VM $vm | fl *
+		}
+		else {
+			Write-Host "VM with Guid $VMGuid not found on host!"
+		}
+		exit;
+	}
+
+	$vms = @(gwmi Msvm_ComputerSystem -namespace "root\virtualization\v2" | where {$_.ReplicationMode -ne 0 -and $_.ReplicationMode -ne $null})
+	foreach($vm in $vms) {
+		$VMId = $vm.Name
+		$LastReplicationTime=[System.Management.ManagementDateTimeConverter]::ToDateTime($vm.LastReplicationTime) 
+		$VMReplicationMode=$vm.ReplicationMode
+		$VMReplicationHealthCode=$vm.ReplicationHealth
+		$VMReplicationStateCode=$vm.ReplicationState
+
+	#need to use Msvm_ReplicationRelationship
+	$VMReplicationState= switch ($VMReplicationStateCode)
+	{
+		0 {'Disabled'}
+		1 {'Ready for replication'}
+		2 {'Waiting to complete initial replication'}
+		3 {'Replicating'}
+		4 {'Synced replication complete'}
+		5 {'Recovered'}
+		6 {'Committed'}
+		7 {'Suspended'}
+		8 {'Critical'}
+		9 {'Waiting to start resynchronization'}
+		10 {'Resynchronizing'}
+		11 {'Resynchronization suspended'}
+		12 {'Failover in progress'}
+		13 {'Failback in progress'}
+		14 {'Failback complete'}
+		default {'Unknown'};
+	}
+		
+		$VMReplicationHealth= switch ($VMReplicationHealthCode) {
+			0 {'Disabled'}
+			1 {'OK'}	
+			2 {'Warning'}
+			3 {'Critical'}
+			default {'Unknown'}
+		}
+
+		$replicaAgeHours = ([DateTime]::Now - $LastReplicationTime).TotalHours
+		$bag = $g_api.CreatePropertyBag()
+		$bag.AddValue('VMId',$VMId)
+		$bag.AddValue('ReplicationMode', $VMReplicationMode) #to be used in filters, we just monitor primary replica side ==1
+		$bag.AddValue('ReplicationHealthCode',$VMReplicationHealthCode)
+		$bag.AddValue('ReplicationHealth',$VMReplicationHealth)
+		$bag.AddValue('ReplicationStateCode',$VMReplicationStateCode)
+		$bag.AddValue('ReplicationState',$VMReplicationState)
+		$bag.AddValue('ReplicaAgeHours',$replicaAgeHours)
+		$bag
+
+	$message="$($vm.Name) Replica State is: $($vmreplicationstatecode) Replica Health Is: $($vmreplicationhealthcode). Replica Age is: $replicaAgeHours"
+		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($vm.VMName) has been processed `n $message") $TRACE_DEBUG
+	}
+
+	#Debug the pèowershll module has issues in both caching (results doesn't change between iterations and values returned so we're not going to use POSH
+	$vms = Get-VM | where {$_.ReplicationMode.Value__ -ne 0}	#use the enum codes instead of labels 0 = 'None'
+	$vms=$null #debug not using POSH
+	foreach($vm in $vms) {
+		$replica = Get-VMReplication -VM $vm
+		$VMId = $vm.VMId.ToString()
+		$LastReplicationTime=$replica.LastReplicationTime
+		$VMReplicationMode=$vm.ReplicationMode.value__
+		$VMReplicationHealthCode=$replica.ReplicationHealth.Value__
+		$VMReplicationStateCode=$replica.ReplicationState.Value__
+		$VMReplicationState=$replica.ReplicationState.ToString()
+		$VMRepliactionHealth=$replica.ReplicationHealth.ToString()	
+		$message="$($vm.Name) Replica State is: $($vmreplicationstatecode) Replica Health Is: $($vmreplicationhealthcode). Replica Age is: $replicaAgeHours"
+		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($vm.VMName) has been processed `n $message") $TRACE_DEBUG
+
+	}
+
+	Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("has completed successfully in " + ((Get-Date)- ($dtstart)).TotalSeconds + " seconds.") $TRACE_INFO
+}
+Catch [Exception] {
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING ("Main " + $Error) $TRACE_WARNING	
+	write-Verbose $("TRAPPED: " + $_.Exception.GetType().FullName); 
+	Write-Verbose $("TRAPPED: " + $_.Exception.Message); 
+}
+]]>
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>TraceLevel</Name>
+                    <Value>$Config/TraceLevel$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>VMGuid</Name>
+                    <Value>$Config/VMId$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>true</StrictErrorHandling>
+                <!-- true only for Tasks -->
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Stats" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>Windows!Microsoft.Windows.SerializedObjectData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </ProbeActionModuleType>
+      <ProbeActionModuleType ID="QND.Hyperv2012R2.VMSnapshotAge.PT" Accessibility="Public" Batching="false">
+        <Configuration>
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="Stats" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagProbe">
+                <ScriptName>Get-VMSnapshotAge.ps1</ScriptName>
+                <ScriptBody>
+                  <![CDATA[#TO SHOW VERBOSE MESSAGES SET $VerbosePreference="continue"
+#SET ErrorLevel to 5 so show discovery info
+
+#*************************************************************************
+# Script Name - Get-VMSnapShotAge.ps1
+# Author	  - Daniele Grandini - Progel spa
+# Version  - 1.0 27/02/2015
+# Purpose     - 
+#               
+# Assumptions - 
+#				
+#               
+# Parameters  - TraceLevel
+#             - ComputerName
+#				- SourceId
+#				- ManagedEntityId
+# Command Line - .\test.ps1 4 "serverName" '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}' '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}'
+# If discovery must be added the followinf parameters
+#				SourceId ($ MPElement $ )
+#				ManagedEntityId ($ Target/Id $)
+#
+# Output properties
+#
+# Status
+#
+# Version History
+#	  1.0 21.02.2015 DG First Release
+#     
+#
+# (c) Copyright 2015, Progel spa, All Rights Reserved
+# Proprietary and confidential to Progel srl              
+#
+#*************************************************************************
+
+
+# Get the named parameters
+param([int]$traceLevel=$(throw 'must have a value'))
+
+	[Threading.Thread]::CurrentThread.CurrentCulture = "en-US"        
+	[Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
+	
+#Constants used for event logging
+$SCRIPT_NAME			= "Get-VMSnapshotAge.ps1"
+$SCRIPT_ARGS = 1
+$SCRIPT_STARTED			= 831
+$PROPERTYBAG_CREATED	= 832
+$SCRIPT_ENDED			= 835
+$SCRIPT_VERSION = "1.01"
+
+#region Constants
+#Trace Level Costants
+$TRACE_NONE 	= 0
+$TRACE_ERROR 	= 1
+$TRACE_WARNING = 2
+$TRACE_INFO 	= 3
+$TRACE_VERBOSE = 4
+$TRACE_DEBUG = 5
+
+#Event Type Constants
+$EVENT_TYPE_SUCCESS      = 0
+$EVENT_TYPE_ERROR        = 1
+$EVENT_TYPE_WARNING      = 2
+$EVENT_TYPE_INFORMATION  = 4
+$EVENT_TYPE_AUDITSUCCESS = 8
+$EVENT_TYPE_AUDITFAILURE = 16
+
+#Standard Event IDs
+$FAILURE_EVENT_ID = 4000		#errore generico nello script
+$SUCCESS_EVENT_ID = 1101
+$START_EVENT_ID = 1102
+$STOP_EVENT_ID = 1103
+
+#TypedPropertyBag
+$AlertDataType = 0
+$EventDataType	= 2
+$PerformanceDataType = 2
+$StateDataType       = 3
+#endregion
+
+#region Helper Functions
+function Log-Params
+{
+	param($Invocation)
+	$line=''
+	foreach($key in $Invocation.BoundParameters.Keys) {$line += "$key=$($Invocation.BoundParameters[$key])  "}
+	Log-Event $START_EVENT_ID $EVENT_TYPE_INFORMATION  ("Starting script. Invocation Name:$($Invocation.InvocationName)`n Parameters`n $line") $TRACE_INFO
+}
+
+
+function Log-Event
+{
+	param($eventID, $eventType, $msg, $level)
+	
+	Write-Verbose ("Logging event. " + $SCRIPT_NAME + " EventID: " + $eventID + " eventType: " + $eventType + " Version:" + $SCRIPT_VERSION + " --> " + $msg)
+	if($level -le $P_TraceLevel)
+	{
+		Write-Host ("Logging event. " + $SCRIPT_NAME + " EventID: " + $eventID + " eventType: " + $eventType + " Version:" + $SCRIPT_VERSION + " --> " + $msg)
+		$g_API.LogScriptEvent($SCRIPT_NAME,$eventID,$eventType, ($msg + "`n" + "Version :" + $SCRIPT_VERSION))
+	}
+}
+
+Function Throw-EmptyDiscovery
+{
+	param($SourceId, $ManagedEntityId)
+
+	$oDiscoveryData = $g_API.CreateDiscoveryData(0, $SourceId, $ManagedEntityId)
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING "Exiting with empty discovery data" $TRACE_INFO
+	$oDiscoveryData
+	If($traceLevel -eq $TRACE_DEBUG)
+	{
+		#just for debug proposes when launched from command line does nothing when run inside OpsMgr Agent
+		$g_API.Return($oDiscoveryData)
+	}
+}
+
+Function Throw-KeepDiscoveryInfo
+{
+param($SourceId, $ManagedEntityId)
+	$oDiscoveryData = $g_API.CreateDiscoveryData(0,$SourceId,$ManagedEntityId)
+	#Instead of Snapshot discovery, submit Incremental discovery data
+	$oDiscoveryData.IsSnapshot = $false
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING "Exiting with null non snapshot discovery data" $TRACE_INFO
+	$oDiscoveryData    
+	If($traceLevel -eq $TRACE_DEBUG)
+	{
+		#just for debug proposes when launched from command line does nothing when run inside OpsMgr Agent	
+		$g_API.Return($oDiscoveryData)
+	}
+}
+#endregion
+
+Function Get-SnapshotTree()
+{
+	param($vm,[hashtable] $tree=@{})
+	if ($vm.ParentSnapshotId -ne $null) {
+		#$tree += $vm.ParentSnapShotId
+		$parent = Get-VMSnapshot -Id $vm.ParentSnapShotId
+		$tree.Add($vm.ParentSnapshotId, @($parent.CreationTime,$parent.Name))
+		Get-SnapshotTree -vm $parent -tree $tree | Out-Null
+		#$parentTree = Get-SnapshotTree -vm $parent -tree @{}
+		#$tree += $parentTree
+		# or 
+		# Get-SnapshotTree -vm $parent -tree $tree
+		#
+		#
+	}
+	return $tree
+}
+
+#Start by setting up API object.
+	$P_TraceLevel = $TRACE_VERBOSE
+	$g_Api = New-Object -comObject 'MOM.ScriptAPI'
+	#$g_RegistryStatePath = "HKLM\" + $g_API.GetScriptStateKeyPath($SCRIPT_NAME)
+
+	$dtStart = Get-Date
+	$P_TraceLevel = $traceLevel
+	Log-Params $MyInvocation
+
+try
+{
+		if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
+
+	if (!(get-command -Module Hyper-V -Name Get-VM -ErrorAction SilentlyContinue)) {
+		Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("Get-VM Commandlet doesn't exist.") $TRACE_WARNING
+		Exit 1;
+	}
+
+	$vms = get-vm # | where {$_.ParentSnapshotId -ne $null}
+
+
+	foreach($vm in $vms) {
+		$snapshotAgeHours = 0
+		$message=''
+		if ($vm.ParentSnapshotID -ne $null) {
+			$snapshots = Get-SnapshotTree -VM $vm
+			foreach($snapKey in $snapshots.Keys) {
+				if ($snapshots[$snapKey][0] -le [DateTime]'1900-01-01') {
+					$snapConfig = Get-Item -Path "$($vm.ConfigurationLocation)\Snapshots\$($snapKey).xml"
+					$snapshots[$snapKey][0] = $snapCOnfig.CreationTime
+				}
+				$message+="$($snapshots[$snapKey][1]) - $($snapshots[$snapKey][0]) `n"
+				if ( $snapshotAgeHours -lt ([DateTime]::Now - $snapshots[$snapKey][0]).TotalHours) {$snapshotAgeHours=([DateTime]::Now - $snapshots[$snapKey][0]).TotalHours }
+			}
+		}
+		$bag = $g_api.CreatePropertyBag()
+		$bag.AddValue('VMId',$vm.VMId.ToString())
+		$bag.AddValue('OldestSnapshotAgeHours',$snapshotAgeHours ) 
+		$bag.AddValue('SnapshotHistory',$message)
+		$bag
+		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($vm.VMName) has been processed `n $message") $TRACE_DEBUG
+	}
+	Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("has completed successfully in " + ((Get-Date)- ($dtstart)).TotalSeconds + " seconds.") $TRACE_INFO
+}
+Catch [Exception] {
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING ("Main " + $Error) $TRACE_WARNING	
+	write-Verbose $("TRAPPED: " + $_.Exception.GetType().FullName); 
+	Write-Verbose $("TRAPPED: " + $_.Exception.Message); 
+}
+
+
+
+
+
+
+
+
+#$snapshotFile=$vm.SnapshotFileLocation
+#$configFileLocartion="$($vm.ConfigurationsFileLocation)\Snapshots"
+
+
+foreach($v in $vms) {
+	$snapshots = Get-SnapshotTree -VM $v
+	$snapConfig = Get-Item -Path "$($vm.ConfigurationLocation)\Snapshots\$($snap.Id).xml"
+	$snapCOnfig.CreationTime
+}
+
+]]>
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>TraceLevel</Name>
+                    <Value>$Config/TraceLevel$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>false</StrictErrorHandling>
+                <!-- true only for Tasks -->
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Stats" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </ProbeActionModuleType>
+      <ProbeActionModuleType ID="QND.Hyperv2012R2.VMISStatus.PT" Accessibility="Public" Batching="false">
+        <Configuration>
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="Stats" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagProbe">
+                <ScriptName>Get-VMISStatus.ps1</ScriptName>
+                <ScriptBody>
+                  <![CDATA[#TO SHOW VERBOSE MESSAGES SET $VerbosePreference="continue"
+#SET ErrorLevel to 5 so show discovery info
+
+#*************************************************************************
+# Script Name - Get-VMISStaus.ps1
+# Author	  -  Daniele Grandini - Progel spa
+# Version  - 1.0 01.03.2015
+# Purpose     - 
+#               
+# Assumptions - 
+#				
+#               
+# Parameters  - TraceLevel
+#             - ComputerName
+#				- SourceId
+#				- ManagedEntityId
+# Command Line - .\test.ps1 4 "serverName" '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}' '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}'
+# If discovery must be added the followinf parameters
+#				SourceId ($ MPElement $ )
+#				ManagedEntityId ($ Target/Id $)
+#
+# Output properties
+#
+# Status
+#
+# Version History
+#	  1.0 01.03.2015 DG First Release
+#     
+#
+# (c) Copyright 2015, Progel spa, All Rights Reserved
+# Proprietary and confidential to Progel srl              
+#
+#*************************************************************************
+
+
+# Get the named parameters
+param([int]$traceLevel=$(throw 'must have a value'))
+
+	[Threading.Thread]::CurrentThread.CurrentCulture = "en-US"        
+	[Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
+	
+#Constants used for event logging
+$SCRIPT_NAME			= "Get-VMISStatus.ps1"
+$SCRIPT_ARGS = 1
+$SCRIPT_STARTED			= 831
+$PROPERTYBAG_CREATED	= 832
+$SCRIPT_ENDED			= 835
+$SCRIPT_VERSION = "1.0"
+
+#region Constants
+#Trace Level Costants
+$TRACE_NONE 	= 0
+$TRACE_ERROR 	= 1
+$TRACE_WARNING = 2
+$TRACE_INFO 	= 3
+$TRACE_VERBOSE = 4
+$TRACE_DEBUG = 5
+
+#Event Type Constants
+$EVENT_TYPE_SUCCESS      = 0
+$EVENT_TYPE_ERROR        = 1
+$EVENT_TYPE_WARNING      = 2
+$EVENT_TYPE_INFORMATION  = 4
+$EVENT_TYPE_AUDITSUCCESS = 8
+$EVENT_TYPE_AUDITFAILURE = 16
+
+#Standard Event IDs
+$FAILURE_EVENT_ID = 4000		#errore generico nello script
+$SUCCESS_EVENT_ID = 1101
+$START_EVENT_ID = 1102
+$STOP_EVENT_ID = 1103
+
+#TypedPropertyBag
+$AlertDataType = 0
+$EventDataType	= 2
+$PerformanceDataType = 2
+$StateDataType       = 3
+#endregion
+
+#region Helper Functions
+function Log-Params
+{
+	param($Invocation)
+	$line=''
+	foreach($key in $Invocation.BoundParameters.Keys) {$line += "$key=$($Invocation.BoundParameters[$key])  "}
+	Log-Event $START_EVENT_ID $EVENT_TYPE_INFORMATION  ("Starting script. Invocation Name:$($Invocation.InvocationName)`n Parameters`n $line") $TRACE_INFO
+}
+
+
+function Log-Event
+{
+	param($eventID, $eventType, $msg, $level)
+	
+	Write-Verbose ("Logging event. " + $SCRIPT_NAME + " EventID: " + $eventID + " eventType: " + $eventType + " Version:" + $SCRIPT_VERSION + " --> " + $msg)
+	if($level -le $P_TraceLevel)
+	{
+		Write-Host ("Logging event. " + $SCRIPT_NAME + " EventID: " + $eventID + " eventType: " + $eventType + " Version:" + $SCRIPT_VERSION + " --> " + $msg)
+		$g_API.LogScriptEvent($SCRIPT_NAME,$eventID,$eventType, ($msg + "`n" + "Version :" + $SCRIPT_VERSION))
+	}
+}
+
+Function Throw-EmptyDiscovery
+{
+	param($SourceId, $ManagedEntityId)
+
+	$oDiscoveryData = $g_API.CreateDiscoveryData(0, $SourceId, $ManagedEntityId)
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING "Exiting with empty discovery data" $TRACE_INFO
+	$oDiscoveryData
+	If($traceLevel -eq $TRACE_DEBUG)
+	{
+		#just for debug proposes when launched from command line does nothing when run inside OpsMgr Agent
+		$g_API.Return($oDiscoveryData)
+	}
+}
+
+Function Throw-KeepDiscoveryInfo
+{
+param($SourceId, $ManagedEntityId)
+	$oDiscoveryData = $g_API.CreateDiscoveryData(0,$SourceId,$ManagedEntityId)
+	#Instead of Snapshot discovery, submit Incremental discovery data
+	$oDiscoveryData.IsSnapshot = $false
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING "Exiting with null non snapshot discovery data" $TRACE_INFO
+	$oDiscoveryData    
+	If($traceLevel -eq $TRACE_DEBUG)
+	{
+		#just for debug proposes when launched from command line does nothing when run inside OpsMgr Agent	
+		$g_API.Return($oDiscoveryData)
+	}
+}
+#endregion
+
+
+#Start by setting up API object.
+	$P_TraceLevel = $TRACE_VERBOSE
+	$g_Api = New-Object -comObject 'MOM.ScriptAPI'
+	$g_RegistryStatePath = "HKLM\" + $g_API.GetScriptStateKeyPath($SCRIPT_NAME)
+
+	$dtStart = Get-Date
+	$P_TraceLevel = $traceLevel
+	Log-Params $MyInvocation
+
+try
+{
+	if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
+
+
+	if (!(get-command -Module Hyper-V -Name Get-VM -ErrorAction SilentlyContinue)) {
+		Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("Get-VM Commandlet doesn't exist.") $TRACE_WARNING
+		Exit 1;
+	}
+	$store = Get-Item -Path Registry::$g_RegistryStatePath
+	$ISPersisted = @{}
+	foreach($value in $store.GetValueNames()) {
+		$ISPersisted.Add($value,$store.GetValue($value))
+		Remove-ItemProperty -Path Registry::$g_RegistryStatePath -Name $value
+	}
+	$vms = Get-VM
+	foreach($vm in $vms) {
+		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("Processing $($vm.VMName)") $TRACE_DEBUG
+
+		$ISVersion = $vm.IntegrationServicesVersion
+		$ISState= $vm.IntegrationServicesState
+		$ISStateCode = switch($ISState) {
+			'Up to date' {1}
+			'Update required' {2}
+			default: {0}
+		}
+
+		if ([String]::IsNullOrEmpty($ISVersion) -or $ISState -eq $null) {
+			if($ISPersisted.ContainsKey($vm.VMId)) {
+				$ISVersion = [String]::Split(',',$ISPersisted[$vm.VMId])[0]
+				$ISStateCode = [String]::Split(',',$ISPersisted[$vm.VMId])[1]
+			}
+		}
+		if ([String]::IsNullOrEmpty($ISVersion) -or $ISState -eq $null) {
+			Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("Integration Services Info MIssing for $($vm.VMName)") $TRACE_INFO
+			continue
+		}
+		New-ItemProperty -Path Registry::$g_RegistryStatePath -Name $vm.VMId -PropertyType String -Value ([String]::Join(',',$ISVersion,$ISStateCode))
+
+		$bag = $g_api.CreatePropertyBag()
+		$bag.AddValue('VMId',$vm.VMId.ToString())
+		$bag.AddValue('ISVersion', $ISVersion) #to be used in filters, we just monitor primary replica side ==1
+		$bag.AddValue('ISStateCode',$ISStateCode)
+		$bag.AddValue('ISState',$ISState)
+		$bag
+
+		$message="$($vm.VMName) IS State is: $ISStateCode Version is: $ISVersion"
+		Log-Event $START_EVENT_ID $EVENT_TYPE_INFO ("$($vm.VMName) has been processed `n $message") $TRACE_DEBUG
+
+	}
+
+	Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("has completed successfully in " + ((Get-Date)- ($dtstart)).TotalSeconds + " seconds.") $TRACE_INFO
+}
+Catch [Exception] {
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING ("Main " + $Error) $TRACE_WARNING	
+	write-Verbose $("TRAPPED: " + $_.Exception.GetType().FullName); 
+	Write-Verbose $("TRAPPED: " + $_.Exception.Message); 
+}
+]]>
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>TraceLevel</Name>
+                    <Value>$Config/TraceLevel$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>false</StrictErrorHandling>
+                <!-- true only for Tasks -->
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Stats" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </ProbeActionModuleType>
+      <WriteActionModuleType ID="QND.Hyperv2012R2.WriteTriggerEvent.WAT" Accessibility="Internal">
+        <Configuration>
+          <xsd:element name="Source" type="xsd:string" minOccurs="1" maxOccurs="1" default="Schedule" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <WriteAction ID="WA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
+                <ScriptName>Write-TriggerEvent.ps1</ScriptName>
+                <ScriptBody>
+                  <![CDATA[
+#quick and dirty
+param([string] $source)
+
+New-EventLog –LogName 'Operations Manager' –Source 'Hyper-V Dynamic Discovery' -ErrorAction SilentlyContinue
+
+Write-EventLog -LogName 'Operations Manager' -Source 'Hyper-V Dynamic Discovery' -EntryType Information -EventId 62001 -Message $source]]>
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>Source</Name>
+                    <Value>$Config/Source$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>60</TimeoutSeconds>
+                <StrictErrorHandling>false</StrictErrorHandling>
+                <!-- true only for Tasks -->
+              </WriteAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="WA" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>Windows!Microsoft.Windows.SerializedObjectData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </WriteActionModuleType>
+      <WriteActionModuleType ID="QND.Hyperv2012R2.ResumeReplica.WAT" Accessibility="Public">
+        <Configuration>
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="VMId" type="xsd:string" minOccurs="1" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+        </OverrideableParameters>
+        <ModuleImplementation>
+          <Composite>
+            <MemberModules>
+              <WriteAction ID="Stats" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
+                <ScriptName>Get-VMReplicaStatus.ps1</ScriptName>
+                <ScriptBody>
+                  <![CDATA[#TO SHOW VERBOSE MESSAGES SET $VerbosePreference="continue"
+#SET ErrorLevel to 5 so show discovery info
+
+#*************************************************************************
+# Script Name - Resume-VMReplicaWA.ps1
+# Author	  -  - Progel spa
+# Version  - 1.0 24.09.2007
+# Purpose     - 
+#               
+# Assumptions - 
+#				
+#               
+# Parameters  - TraceLevel
+#             - ComputerName
+#				- SourceId
+#				- ManagedEntityId
+# Command Line - .\test.ps1 4 "serverName" '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}' '{1860E0EB-8C21-41DA-9F35-2FE9343CCF36}'
+# If discovery must be added the followinf parameters
+#				SourceId ($ MPElement $ )
+#				ManagedEntityId ($ Target/Id $)
+#
+# Output properties
+#
+# Status
+#
+# Version History
+#	  1.0 21.02.2015 DG First Release
+#     
+#
+# (c) Copyright 2015, Progel spa, All Rights Reserved
+# Proprietary and confidential to Progel srl              
+#
+#*************************************************************************
+
+
+# Get the named parameters
+param([int]$traceLevel=$(throw 'must have a value'),
+	[string]$VMGuid)
+
+	[Threading.Thread]::CurrentThread.CurrentCulture = "en-US"        
+	[Threading.Thread]::CurrentThread.CurrentUICulture = "en-US"
+	
+#Constants used for event logging
+$SCRIPT_NAME			= "Get-VMReplicaStatus.ps1"
+$SCRIPT_ARGS = 1
+$SCRIPT_STARTED			= 831
+$PROPERTYBAG_CREATED	= 832
+$SCRIPT_ENDED			= 835
+$SCRIPT_VERSION = "1.0"
+
+#region Constants
+#Trace Level Costants
+$TRACE_NONE 	= 0
+$TRACE_ERROR 	= 1
+$TRACE_WARNING = 2
+$TRACE_INFO 	= 3
+$TRACE_VERBOSE = 4
+$TRACE_DEBUG = 5
+
+#Event Type Constants
+$EVENT_TYPE_SUCCESS      = 0
+$EVENT_TYPE_ERROR        = 1
+$EVENT_TYPE_WARNING      = 2
+$EVENT_TYPE_INFORMATION  = 4
+$EVENT_TYPE_AUDITSUCCESS = 8
+$EVENT_TYPE_AUDITFAILURE = 16
+
+#Standard Event IDs
+$FAILURE_EVENT_ID = 4000		#errore generico nello script
+$SUCCESS_EVENT_ID = 1101
+$START_EVENT_ID = 1102
+$STOP_EVENT_ID = 1103
+
+#TypedPropertyBag
+$AlertDataType = 0
+$EventDataType	= 2
+$PerformanceDataType = 2
+$StateDataType       = 3
+#endregion
+
+#region Helper Functions
+function Log-Params
+{
+	param($Invocation)
+	$line=''
+	foreach($key in $Invocation.BoundParameters.Keys) {$line += "$key=$($Invocation.BoundParameters[$key])  "}
+	Log-Event $START_EVENT_ID $EVENT_TYPE_INFORMATION  ("Starting script. Invocation Name:$($Invocation.InvocationName)`n Parameters`n $line") $TRACE_INFO
+}
+
+
+function Log-Event
+{
+	param($eventID, $eventType, $msg, $level)
+	
+	Write-Verbose ("Logging event. " + $SCRIPT_NAME + " EventID: " + $eventID + " eventType: " + $eventType + " Version:" + $SCRIPT_VERSION + " --> " + $msg)
+	if($level -le $P_TraceLevel)
+	{
+		Write-Host ("Logging event. " + $SCRIPT_NAME + " EventID: " + $eventID + " eventType: " + $eventType + " Version:" + $SCRIPT_VERSION + " --> " + $msg)
+		$g_API.LogScriptEvent($SCRIPT_NAME,$eventID,$eventType, ($msg + "`n" + "Version :" + $SCRIPT_VERSION))
+	}
+}
+
+Function Throw-EmptyDiscovery
+{
+	param($SourceId, $ManagedEntityId)
+
+	$oDiscoveryData = $g_API.CreateDiscoveryData(0, $SourceId, $ManagedEntityId)
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING "Exiting with empty discovery data" $TRACE_INFO
+	$oDiscoveryData
+	If($traceLevel -eq $TRACE_DEBUG)
+	{
+		#just for debug proposes when launched from command line does nothing when run inside OpsMgr Agent
+		$g_API.Return($oDiscoveryData)
+	}
+}
+
+Function Throw-KeepDiscoveryInfo
+{
+param($SourceId, $ManagedEntityId)
+	$oDiscoveryData = $g_API.CreateDiscoveryData(0,$SourceId,$ManagedEntityId)
+	#Instead of Snapshot discovery, submit Incremental discovery data
+	$oDiscoveryData.IsSnapshot = $false
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING "Exiting with null non snapshot discovery data" $TRACE_INFO
+	$oDiscoveryData    
+	If($traceLevel -eq $TRACE_DEBUG)
+	{
+		#just for debug proposes when launched from command line does nothing when run inside OpsMgr Agent	
+		$g_API.Return($oDiscoveryData)
+	}
+}
+#endregion
+
+
+#Start by setting up API object.
+	$P_TraceLevel = $TRACE_VERBOSE
+	$g_Api = New-Object -comObject 'MOM.ScriptAPI'
+	#$g_RegistryStatePath = "HKLM\" + $g_API.GetScriptStateKeyPath($SCRIPT_NAME)
+
+	$dtStart = Get-Date
+	$P_TraceLevel = $traceLevel
+	Log-Params $MyInvocation
+
+try
+{
+	if (!(get-Module -Name Hyper-v)) {Import-Module Hyper-v}
+
+
+	if (!(get-command -Module Hyper-V -Name Get-VM -ErrorAction SilentlyContinue)) {
+		Log-Event $START_EVENT_ID $EVENT_TYPE_WARNING ("Get-VM Commandlet doesn't exist.") $TRACE_WARNING
+		Exit 1;
+	}
+		$vm = Get-VM | where {$_.VMId -ieq $VMGuid}
+		if ($vm) {
+			Reset-VMReplicationStatistics -VM $vm
+			Resume-VMReplication -VM $vm
+			Start-Sleep -Seconds 60
+			$replica = Get-VMReplication -VM $vm
+			Write-Host "$($vm.Name) Replication mode: $($vm.ReplicationMode.ToString())"
+			Write-Host "Replication Health: $($replica.ReplicationHealth.ToString()) State: $($replica.ReplicationState.ToString())"
+			Write-Host "Last replication: $($replica.LastReplicationTime)"
+			Write-Host "Replica state dump: "
+			$replica | fl *
+			Write-Host "Replica measure dump: "
+			Measure-VMReplica -VM $vm | fl *
+		}
+		else {
+			Write-Host "VM with Guid $VMGuid not found on host!"
+		}
+
+	Log-Event $STOP_EVENT_ID $EVENT_TYPE_SUCCESS ("has completed successfully in " + ((Get-Date)- ($dtstart)).TotalSeconds + " seconds.") $TRACE_INFO
+}
+Catch [Exception] {
+	Log-Event $FAILURE_EVENT_ID $EVENT_TYPE_WARNING ("Main " + $Error) $TRACE_WARNING	
+	write-Verbose $("TRAPPED: " + $_.Exception.GetType().FullName); 
+	Write-Verbose $("TRAPPED: " + $_.Exception.Message); 
+}
+]]>
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>TraceLevel</Name>
+                    <Value>$Config/TraceLevel$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>VMGuid</Name>
+                    <Value>$Config/VMId$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+                <StrictErrorHandling>true</StrictErrorHandling>
+                <!-- true only for Tasks -->
+              </WriteAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Stats" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>Windows!Microsoft.Windows.SerializedObjectData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </WriteActionModuleType>
+    </ModuleTypes>
+    <MonitorTypes>
+      <UnitMonitorType ID="QND.Hyperv2012R2.VMReplica.MT" Accessibility="Public">
+        <MonitorTypeStates>
+          <MonitorTypeState ID="Healthy" />
+          <MonitorTypeState ID="Warning" />
+          <MonitorTypeState ID="Error" />
+        </MonitorTypeStates>
+        <!-- See  https://msdn.microsoft.com/en-us/library/hh850116(v=vs.85).aspx -->
+        <Configuration>
+          <xsd:element name="IntervalSeconds" type="xsd:int" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="VMId" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="ReplicaAgeHoursWarningThreshold" type="xsd:int" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="ReplicaAgeHoursErrorThreshold" type="xsd:int" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="StateHealthyCodes" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="StateWarningCodes" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="StateErrorCodes" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="HealthyCodes" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="WarningCodes" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="ErrorCodes" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+          <OverrideableParameter ID="ReplicaAgeHoursWarningThreshold" Selector="$Config/ReplicaAgeHoursWarningThreshold$" ParameterType="int" />
+          <OverrideableParameter ID="ReplicaAgeHoursErrorThreshold" Selector="$Config/ReplicaAgeHoursErrorThreshold$" ParameterType="int" />
+          <OverrideableParameter ID="StateHealthyCodes" Selector="$Config/StateHealthyCodes$" ParameterType="string" />
+          <OverrideableParameter ID="StateWarningCodes" Selector="$Config/StateWarningCodes$" ParameterType="string" />
+          <OverrideableParameter ID="StateErrorCodes" Selector="$Config/StateErrorCodes$" ParameterType="string" />
+          <OverrideableParameter ID="HealthyCodes" Selector="$Config/HealthyCodes$" ParameterType="string" />
+          <OverrideableParameter ID="WarningCodes" Selector="$Config/WarningCodes$" ParameterType="string" />
+          <OverrideableParameter ID="ErrorCodes" Selector="$Config/ErrorCodes$" ParameterType="string" />
+        </OverrideableParameters>
+        <MonitorImplementation>
+          <MemberModules>
+            <DataSource ID="DS" TypeID="QND.Hyperv2012R2.GetVMReplicaStatus.DS">
+              <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+              <SyncTime>$Config/SyncTime$</SyncTime>
+              <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              <TraceLevel>$Config/TraceLevel$</TraceLevel>
+            </DataSource>
+            <ConditionDetection ID="FilterVM" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <And>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="String">Property[@Name='VMId']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>Equal</Operator>
+                      <ValueExpression>
+                        <Value Type="String">$Config/VMId$</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Integer">Property[@Name='ReplicationMode']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>Equal</Operator>
+                      <ValueExpression>
+                        <Value Type="Integer">1</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                </And>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="HealthyCD" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <And>
+                  <Expression>
+                    <RegExExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="String">Property[@Name='ReplicationHealthCode']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>MatchesRegularExpression</Operator>
+                      <Pattern>$Config/HealthyCodes$</Pattern>
+                    </RegExExpression>
+                  </Expression>
+                  <Expression>
+                    <RegExExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="String">Property[@Name='ReplicationStateCode']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>MatchesRegularExpression</Operator>
+                      <Pattern>$Config/StateHealthyCodes$</Pattern>
+                    </RegExExpression>
+                  </Expression>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Double">Property[@Name='ReplicaAgeHours']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>LessEqual</Operator>
+                      <ValueExpression>
+                        <Value Type="Integer">$Config/ReplicaAgeHoursWarningThreshold$</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                </And>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="WarningCD" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <And>
+                  <Expression>
+                    <Or>
+                      <Expression>
+                        <RegExExpression>
+                          <ValueExpression>
+                            <XPathQuery Type="String">Property[@Name='ReplicationHealthCode']</XPathQuery>
+                          </ValueExpression>
+                          <Operator>MatchesRegularExpression</Operator>
+                          <Pattern>$Config/WarningCodes$</Pattern>
+                        </RegExExpression>
+                      </Expression>
+                      <Expression>
+                        <RegExExpression>
+                          <ValueExpression>
+                            <XPathQuery Type="String">Property[@Name='ReplicationStateCode']</XPathQuery>
+                          </ValueExpression>
+                          <Operator>MatchesRegularExpression</Operator>
+                          <Pattern>$Config/StateWarningCodes$</Pattern>
+                        </RegExExpression>
+                      </Expression>
+                      <Expression>
+                        <And>
+                          <Expression>
+                            <SimpleExpression>
+                              <ValueExpression>
+                                <XPathQuery Type="Double">Property[@Name='ReplicaAgeHours']</XPathQuery>
+                              </ValueExpression>
+                              <Operator>Greater</Operator>
+                              <ValueExpression>
+                                <Value Type="Integer">$Config/ReplicaAgeHoursWarningThreshold$</Value>
+                              </ValueExpression>
+                            </SimpleExpression>
+                          </Expression>
+                          <Expression>
+                            <SimpleExpression>
+                              <ValueExpression>
+                                <XPathQuery Type="Double">Property[@Name='ReplicaAgeHours']</XPathQuery>
+                              </ValueExpression>
+                              <Operator>LessEqual</Operator>
+                              <ValueExpression>
+                                <Value Type="Integer">$Config/ReplicaAgeHoursErrorThreshold$</Value>
+                              </ValueExpression>
+                            </SimpleExpression>
+                          </Expression>
+                        </And>
+                      </Expression>
+                    </Or>
+                  </Expression>
+                  <Expression>
+                    <Not>
+                      <Expression>
+                        <Or>
+                          <Expression>
+                            <RegExExpression>
+                              <ValueExpression>
+                                <XPathQuery Type="String">Property[@Name='ReplicationHealthCode']</XPathQuery>
+                              </ValueExpression>
+                              <Operator>MatchesRegularExpression</Operator>
+                              <Pattern>$Config/ErrorCodes$</Pattern>
+                            </RegExExpression>
+                          </Expression>
+                          <Expression>
+                            <RegExExpression>
+                              <ValueExpression>
+                                <XPathQuery Type="String">Property[@Name='ReplicationStateCode']</XPathQuery>
+                              </ValueExpression>
+                              <Operator>MatchesRegularExpression</Operator>
+                              <Pattern>$Config/StateErrorCodes$</Pattern>
+                            </RegExExpression>
+                          </Expression>
+                        </Or>
+                      </Expression>
+                    </Not>
+                  </Expression>
+                </And>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="ErrorCD" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <Or>
+                  <Expression>
+                    <RegExExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="String">Property[@Name='ReplicationHealthCode']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>MatchesRegularExpression</Operator>
+                      <Pattern>$Config/ErrorCodes$</Pattern>
+                    </RegExExpression>
+                  </Expression>
+                  <Expression>
+                    <RegExExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="String">Property[@Name='ReplicationStateCode']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>MatchesRegularExpression</Operator>
+                      <Pattern>$Config/StateErrorCodes$</Pattern>
+                    </RegExExpression>
+                  </Expression>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Double">Property[@Name='ReplicaAgeHours']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>Greater</Operator>
+                      <ValueExpression>
+                        <Value Type="Integer">$Config/ReplicaAgeHoursErrorThreshold$</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                </Or>
+              </Expression>
+            </ConditionDetection>
+          </MemberModules>
+          <RegularDetections>
+            <RegularDetection MonitorTypeStateID="Healthy">
+              <Node ID="HealthyCD">
+                <Node ID="FilterVM">
+                  <Node ID="DS" />
+                </Node>
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="Warning">
+              <Node ID="WarningCD">
+                <Node ID="FilterVM">
+                  <Node ID="DS" />
+                </Node>
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="Error">
+              <Node ID="ErrorCD">
+                <Node ID="FilterVM">
+                  <Node ID="DS" />
+                </Node>
+              </Node>
+            </RegularDetection>
+          </RegularDetections>
+        </MonitorImplementation>
+      </UnitMonitorType>
+      <UnitMonitorType ID="QND.Hyperv2012R2.VMSnapshot.MT" Accessibility="Public">
+        <MonitorTypeStates>
+          <MonitorTypeState ID="Healthy" />
+          <MonitorTypeState ID="Warning" />
+          <MonitorTypeState ID="Error" />
+        </MonitorTypeStates>
+        <Configuration>
+          <xsd:element name="IntervalSeconds" type="xsd:int" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="VMId" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="SnapshotAgeHoursWarningThreshold" type="xsd:int" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="SnapshotAgeHoursErrorThreshold" type="xsd:int" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+          <OverrideableParameter ID="SnapshotAgeHoursWarningThreshold" Selector="$Config/SnapshotAgeHoursWarningThreshold$" ParameterType="int" />
+          <OverrideableParameter ID="SnapshotAgeHoursErrorThreshold" Selector="$Config/SnapshotAgeHoursErrorThreshold$" ParameterType="int" />
+        </OverrideableParameters>
+        <MonitorImplementation>
+          <MemberModules>
+            <DataSource ID="DS" TypeID="QND.Hyperv2012R2.GetVMSnapshotAge.DS">
+              <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+              <SyncTime>$Config/SyncTime$</SyncTime>
+              <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              <TraceLevel>$Config/TraceLevel$</TraceLevel>
+            </DataSource>
+            <ConditionDetection ID="FilterVM" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="String">Property[@Name='VMId']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Equal</Operator>
+                  <ValueExpression>
+                    <Value Type="String">$Config/VMId$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="HealthyCD" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Property[@Name='OldestSnapshotAgeHours']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>LessEqual</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">$Config/SnapshotAgeHoursWarningThreshold$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="WarningCD" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <And>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Double">Property[@Name='OldestSnapshotAgeHours']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>Greater</Operator>
+                      <ValueExpression>
+                        <Value Type="Integer">$Config/SnapshotAgeHoursWarningThreshold$</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Double">Property[@Name='OldestSnapshotAgeHours']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>LessEqual</Operator>
+                      <ValueExpression>
+                        <Value Type="Integer">$Config/SnapshotAgeHoursErrorThreshold$</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                </And>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="ErrorCD" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Property[@Name='OldestSnapshotAgeHours']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Greater</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">$Config/SnapshotAgeHoursErrorThreshold$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+          </MemberModules>
+          <RegularDetections>
+            <RegularDetection MonitorTypeStateID="Healthy">
+              <Node ID="HealthyCD">
+                <Node ID="FilterVM">
+                  <Node ID="DS" />
+                </Node>
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="Warning">
+              <Node ID="WarningCD">
+                <Node ID="FilterVM">
+                  <Node ID="DS" />
+                </Node>
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="Error">
+              <Node ID="ErrorCD">
+                <Node ID="FilterVM">
+                  <Node ID="DS" />
+                </Node>
+              </Node>
+            </RegularDetection>
+          </RegularDetections>
+        </MonitorImplementation>
+      </UnitMonitorType>
+      <UnitMonitorType ID="QND.Hyperv2012R2.VMISStatus.MT" Accessibility="Public">
+        <MonitorTypeStates>
+          <MonitorTypeState ID="UpToDate" />
+          <MonitorTypeState ID="NeedsUpdate" />
+        </MonitorTypeStates>
+        <Configuration>
+          <xsd:element name="IntervalSeconds" type="xsd:int" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="VMId" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$" />
+        </OverrideableParameters>
+        <MonitorImplementation>
+          <MemberModules>
+            <DataSource ID="DS" TypeID="QND.Hyperv2012R2.GetVMISStatus.DS">
+              <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+              <SyncTime>$Config/SyncTime$</SyncTime>
+              <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              <TraceLevel>$Config/TraceLevel$</TraceLevel>
+            </DataSource>
+            <ConditionDetection ID="FilterVM" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="String">Property[@Name='VMId']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Equal</Operator>
+                  <ValueExpression>
+                    <Value Type="String">$Config/VMId$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="HealthyCD" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="String">Property[@Name='ISStateCode']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Equal</Operator>
+                  <ValueExpression>
+                    <Value Type="String">1</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="WarningCD" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="String">Property[@Name='ISStateCode']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>NotEqual</Operator>
+                  <ValueExpression>
+                    <Value Type="String">1</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+          </MemberModules>
+          <RegularDetections>
+            <RegularDetection MonitorTypeStateID="UpToDate">
+              <Node ID="HealthyCD">
+                <Node ID="FilterVM">
+                  <Node ID="DS" />
+                </Node>
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="NeedsUpdate">
+              <Node ID="WarningCD">
+                <Node ID="FilterVM">
+                  <Node ID="DS" />
+                </Node>
+              </Node>
+            </RegularDetection>
+          </RegularDetections>
+        </MonitorImplementation>
+      </UnitMonitorType>
+    </MonitorTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Discoveries>
+      <Discovery ID="QND.HyperV2012R2.VirtualMachineDiscovery" Enabled="onEssentialMonitoring" Target="Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.ServerRole" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.VirtualMachine">
+            <Property TypeID="Windows!Microsoft.Windows.Computer" PropertyID="PrincipalName" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.ServerRole" PropertyID="ServerId" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualMachine" PropertyID="VirtualMachineId" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualMachine" PropertyID="VirtualMachineName" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualMachine" PropertyID="ServerName" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualMachine" PropertyID="ComputerName" />
+          </DiscoveryClass>
+          <DiscoveryClass TypeID="Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.VirtualDrive">
+            <Property TypeID="Windows!Microsoft.Windows.Computer" PropertyID="PrincipalName" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.ServerRole" PropertyID="ServerId" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualMachine" PropertyID="VirtualMachineId" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualHardwareComponent" PropertyID="DeviceId" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualHardwareComponent" PropertyID="Name" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualHardwareComponent" PropertyID="VirtualMachineName" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualDrive" PropertyID="ConnectedControllerName" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualDrive" PropertyID="ImageFile" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualDrive" PropertyID="DriveType" />
+          </DiscoveryClass>
+          <DiscoveryClass TypeID="Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.VirtualNetworkAdapter">
+            <Property TypeID="Windows!Microsoft.Windows.Computer" PropertyID="PrincipalName" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.ServerRole" PropertyID="ServerId" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualMachine" PropertyID="VirtualMachineId" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualHardwareComponent" PropertyID="DeviceId" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualHardwareComponent" PropertyID="Name" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualHardwareComponent" PropertyID="VirtualMachineName" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualNetworkAdapter" PropertyID="ConnectedNetworkId" />
+            <Property TypeID="HypervLib!Microsoft.Windows.HyperV.VirtualNetworkAdapter" PropertyID="ConnectedNetworkName" />
+          </DiscoveryClass>
+          <!-- bogus entry to fool VSAE and force the inclusion of WSLib -->
+          <DiscoveryClass TypeID="WSLib!Microsoft.Windows.Server.6.2.Computer" />
+          <DiscoveryRelationship TypeID="Hyperv2012R2!Microsoft.Windows.Server.2012.R2.LogicalDisk.Contains.HyperV.VirtualDrive" />
+        </DiscoveryTypes>
+        <DataSource ID="DiscoveryDataSource" TypeID="QND.Hyperv2012R2.VM.DynamicDiscovery.DSType">
+          <TraceLevel>2</TraceLevel>
+          <TimeoutSeconds>300</TimeoutSeconds>
+          <TargetComputer>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</TargetComputer>
+        </DataSource>
+      </Discovery>
+      <Discovery ID="QND.Hyperv2012R2.ReplicaVM.Discovery" ConfirmDelivery="false" Enabled="true" Priority="Normal" Remotable="false" Target="Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.ServerRole">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="QND.Hyperv2012R2.ReplicaVM"></DiscoveryClass>
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="QND.Hyperv2012R2.ReplicaVM.Discovery.DSType">
+          <TraceLevel>2</TraceLevel>
+          <IntervalSeconds>43200</IntervalSeconds>
+          <SyncTime></SyncTime>
+          <TimeoutSeconds>300</TimeoutSeconds>
+          <TargetComputer>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</TargetComputer>
+          <HVServerId>$Target/Property[Type="HypervLib!Microsoft.Windows.HyperV.ServerRole']/ServerId$</HVServerId>
+        </DataSource>
+      </Discovery>
+    </Discoveries>
+    <Rules>
+      <Rule ID="QND.Hyperv2012R2.TranslateNewPartitionEvent.Rule" ConfirmDelivery="false" DiscardLevel="100" Enabled="true" Priority="Normal" Remotable="false" Target="Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.ServerRole">
+        <Category>Operations</Category>
+        <DataSources>
+          <DataSource ID="DS1" TypeID="Windows!Microsoft.Windows.EventProvider">
+            <ComputerName>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</ComputerName>
+            <LogName>Microsoft-Windows-Hyper-V-Hypervisor-Operational</LogName>
+            <AllowProxying>false</AllowProxying>
+            <Expression>
+              <And>
+                <Expression>
+                  <RegExExpression>
+                    <ValueExpression>
+                      <XPathQuery Type="UnsignedInteger">EventDisplayNumber</XPathQuery>
+                    </ValueExpression>
+                    <Operator>MatchesRegularExpression</Operator>
+                    <Pattern>^(16641|16642)$</Pattern>
+                  </RegExExpression>
+                </Expression>
+                <Expression>
+                  <SimpleExpression>
+                    <ValueExpression>
+                      <XPathQuery Type="Integer">EventLevel</XPathQuery>
+                    </ValueExpression>
+                    <Operator>Equal</Operator>
+                    <ValueExpression>
+                      <Value Type="Integer">4</Value>
+                    </ValueExpression>
+                  </SimpleExpression>
+                </Expression>
+              </And>
+            </Expression>
+          </DataSource>
+        </DataSources>
+        <ConditionDetection ID="Consolidate" TypeID="System!System.ConsolidatorCondition">
+          <Consolidator>
+            <ConsolidationProperties />
+            <TimeControl>
+              <Latency>60</Latency>
+              <WithinTimeSchedule>
+                <Interval>600</Interval>
+              </WithinTimeSchedule>
+            </TimeControl>
+            <CountingCondition>
+              <!-- <Count/> -->
+              <CountMode>OnNewItemNOP_OnTimerOutputRestart</CountMode>
+            </CountingCondition>
+          </Consolidator>
+        </ConditionDetection>
+        <WriteActions>
+          <WriteAction ID="WriteEvent" TypeID="QND.Hyperv2012R2.WriteTriggerEvent.WAT">
+            <Source>ClusterLog</Source>
+          </WriteAction>
+        </WriteActions>
+      </Rule>
+      <Rule ID="QND.Hyperv2012R2.VMDynamicDiscoveryTrigger.Rule" ConfirmDelivery="false" DiscardLevel="100" Enabled="true" Priority="Normal" Remotable="false" Target="Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.ServerRole">
+        <Category>Operations</Category>
+        <DataSources>
+          <DataSource ID="DS1" TypeID="System!System.Discovery.Scheduler">
+            <Scheduler>
+              <SimpleReccuringSchedule>
+                <Interval Unit="Seconds">43200</Interval>
+                <SyncTime />
+              </SimpleReccuringSchedule>
+              <ExcludeDates />
+            </Scheduler>
+          </DataSource>
+        </DataSources>
+        <WriteActions>
+          <WriteAction ID="WriteEvent" TypeID="QND.Hyperv2012R2.WriteTriggerEvent.WAT">
+            <Source>Scheduled</Source>
+          </WriteAction>
+        </WriteActions>
+      </Rule>
+    </Rules>
+    <Tasks>
+      <Task ID="QND.Hyperv2012R2.Addendum.GetVMReplicaStatus.Task" Accessibility="Internal" Target="QND.Hyperv2012R2.ReplicaVM" Enabled="true" Timeout="300" Remotable="true">
+        <Category>Maintenance</Category>
+        <ProbeAction ID="PA" TypeID="QND.Hyperv2012R2.VMReplicaStatusTask.PT">
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <TraceLevel>2</TraceLevel>
+          <VMId>$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$</VMId>
+        </ProbeAction>
+      </Task>
+      <Task ID="QND.Hyperv2012R2.Addendum.ResumeVMReplica.Task" Accessibility="Internal" Target="QND.Hyperv2012R2.ReplicaVM" Enabled="true" Timeout="300" Remotable="true">
+        <Category>Maintenance</Category>
+        <WriteAction ID="WA" TypeID="QND.Hyperv2012R2.ResumeReplica.WAT">
+          <TimeoutSeconds>300</TimeoutSeconds>
+          <TraceLevel>2</TraceLevel>
+          <VMId>$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$</VMId>
+        </WriteAction>
+      </Task>
+    </Tasks>
+    <Monitors>
+      <UnitMonitor ID="QND.Hyperv2012R2.VMReplica.Status" Accessibility="Public" Enabled="true" Target="QND.Hyperv2012R2.ReplicaVM" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="false" Priority="Normal" TypeID="QND.Hyperv2012R2.VMReplica.MT" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="QND.Hyperv2012R2.VMReplica.Status.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Data/Context/Property[@Name='ReplicationHealth']$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='ReplicationState']$</AlertParameter2>
+            <AlertParameter3>$Data/Context/Property[@Name='ReplicaAgeHours']$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="Healthy" MonitorTypeStateID="Healthy" HealthState="Success" />
+          <OperationalState ID="Warning" MonitorTypeStateID="Warning" HealthState="Warning" />
+          <OperationalState ID="Error" MonitorTypeStateID="Error" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>1800</IntervalSeconds>
+          <SyncTime></SyncTime>
+          <TimeoutSeconds>120</TimeoutSeconds>
+          <TraceLevel>2</TraceLevel>
+          <VMId>$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$</VMId>
+          <ReplicaAgeHoursWarningThreshold>1</ReplicaAgeHoursWarningThreshold>
+          <ReplicaAgeHoursErrorThreshold>4</ReplicaAgeHoursErrorThreshold>
+          <StateHealthyCodes>^(0|1|3|4|5|6|14)$</StateHealthyCodes>
+          <StateWarningCodes>^(2|7|9|10|11|13)$</StateWarningCodes>
+          <StateErrorCodes>^(8)$</StateErrorCodes>
+          <HealthyCodes>^(0|1)$</HealthyCodes>
+          <WarningCodes>^(2)$</WarningCodes>
+          <ErrorCodes>^(3)$</ErrorCodes>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="QND.Hyperv2012R2.VMSnapshotAge.Status" Accessibility="Public" Enabled="true" Target="Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.VirtualMachine" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="false" Priority="Normal" TypeID="QND.Hyperv2012R2.VMSnapshot.MT" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="QND.Hyperv2012R2.VMSnapshotAge.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Data/Context/Property[@Name='OldestSnapshotAgeHours']$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='SnapshotHistory']$</AlertParameter2>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="Healthy" MonitorTypeStateID="Healthy" HealthState="Success" />
+          <OperationalState ID="Warning" MonitorTypeStateID="Warning" HealthState="Warning" />
+          <OperationalState ID="Error" MonitorTypeStateID="Error" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>7200</IntervalSeconds>
+          <SyncTime></SyncTime>
+          <TimeoutSeconds>120</TimeoutSeconds>
+          <TraceLevel>2</TraceLevel>
+          <VMId>$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$</VMId>
+          <SnapshotAgeHoursWarningThreshold>8</SnapshotAgeHoursWarningThreshold>
+          <SnapshotAgeHoursErrorThreshold>24</SnapshotAgeHoursErrorThreshold>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="QND.Hyperv2012R2.VMISStatus" Accessibility="Public" Enabled="true" Target="Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.VirtualMachine" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="false" Priority="Normal" TypeID="QND.Hyperv2012R2.VMISStatus.MT" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="QND.Hyperv2012R2.VMISStatus.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Data/Context/Property[@Name='ISVersion']$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='ISState']$</AlertParameter2>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="Healthy" MonitorTypeStateID="UpToDate" HealthState="Success" />
+          <OperationalState ID="Warning" MonitorTypeStateID="NeedsUpdate" HealthState="Warning" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>43200</IntervalSeconds>
+          <SyncTime></SyncTime>
+          <TimeoutSeconds>120</TimeoutSeconds>
+          <TraceLevel>2</TraceLevel>
+          <VMId>$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$</VMId>
+        </Configuration>
+      </UnitMonitor>
+    </Monitors>
+    <Diagnostics>
+      <Diagnostic ID="QND.Hyperv2012R2.GetReplicaStatus.Diagnostic" Comment="Get Replica Status" Accessibility="Public" Enabled="true" Target="QND.Hyperv2012R2.ReplicaVM" Monitor="QND.Hyperv2012R2.VMReplica.Status" ExecuteOnState="Warning" Remotable="false" Timeout="300">
+        <Category>Maintenance</Category>
+        <ProbeAction ID="PA" TypeID="QND.Hyperv2012R2.VMReplicaStatusTask.PT">
+          <TimeoutSeconds>120</TimeoutSeconds>
+          <TraceLevel>2</TraceLevel>
+          <VMId>$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$</VMId>
+        </ProbeAction>
+      </Diagnostic>
+      <Diagnostic ID="QND.Hyperv2012R2.GetReplicaStatusError.Diagnostic" Comment="Get Replica Status" Accessibility="Public" Enabled="true" Target="QND.Hyperv2012R2.ReplicaVM" Monitor="QND.Hyperv2012R2.VMReplica.Status" ExecuteOnState="Error" Remotable="false" Timeout="300">
+        <Category>Maintenance</Category>
+        <ProbeAction ID="PA" TypeID="QND.Hyperv2012R2.VMReplicaStatusTask.PT">
+          <TimeoutSeconds>120</TimeoutSeconds>
+          <TraceLevel>2</TraceLevel>
+          <VMId>$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$</VMId>
+        </ProbeAction>
+      </Diagnostic>
+    </Diagnostics>
+    <Recoveries>
+      <Recovery ID="QND.Hyperv2012R2.ResumeReplica" Target="QND.Hyperv2012R2.ReplicaVM" Monitor="QND.Hyperv2012R2.VMReplica.Status" Accessibility="Public" Enabled="false" ExecuteOnState="Warning" Remotable="false" ResetMonitor="false" Timeout="300">
+        <Category>Maintenance</Category>
+        <!-- Please fill in the type of the condition detection module 
+             or remove the ConditionDetection section. This can be used to
+             inspect the Monitor State, Data Item that caused the State Change,
+             or the Diagnostic ProbeAction Output (if the ExecuteOnDiagnostic
+             attribute is present). If this Condition Detection does not "pass"
+             the WriteAction will not be executed. -->
+        <ConditionDetection ID="Filter" TypeID="System!System.ExpressionFilter">
+          <Expression>
+            <RegExExpression>
+              <ValueExpression>
+                <XPathQuery>StateChange/DataItem/Context/Property[@Name='ReplicationStateCode']</XPathQuery>
+              </ValueExpression>
+              <Operator>MatchesRegularExpression</Operator>
+              <Pattern>^(7,8,9,11)$</Pattern>
+            </RegExExpression>
+          </Expression>
+        </ConditionDetection>
+        <!-- Please fill in the type of the write action module.
+             Without a ConditionDetection, the WriteAction always executes.
+             The output of the write action will be shown in the 
+             Health Explorer detail pane. -->
+        <WriteAction ID="WA" TypeID="QND.Hyperv2012R2.ResumeReplica.WAT">
+          <TimeoutSeconds>300</TimeoutSeconds>
+          <TraceLevel>2</TraceLevel>
+          <VMId>$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$</VMId>
+        </WriteAction>
+      </Recovery>
+      <Recovery ID="QND.Hyperv2012R2.Error.ResumeReplica" Target="QND.Hyperv2012R2.ReplicaVM" Monitor="QND.Hyperv2012R2.VMReplica.Status" Accessibility="Public" Enabled="false" ExecuteOnState="Error" Remotable="false" ResetMonitor="false" Timeout="300">
+        <Category>Maintenance</Category>
+        <!-- Please fill in the type of the condition detection module 
+             or remove the ConditionDetection section. This can be used to
+             inspect the Monitor State, Data Item that caused the State Change,
+             or the Diagnostic ProbeAction Output (if the ExecuteOnDiagnostic
+             attribute is present). If this Condition Detection does not "pass"
+             the WriteAction will not be executed. -->
+        <ConditionDetection ID="Filter" TypeID="System!System.ExpressionFilter">
+          <Expression>
+            <RegExExpression>
+              <ValueExpression>
+                <XPathQuery>StateChange/DataItem/Context/Property[@Name='ReplicationStateCode']</XPathQuery>
+              </ValueExpression>
+              <Operator>MatchesRegularExpression</Operator>
+              <Pattern>^(7,8,9,11)$</Pattern>
+            </RegExExpression>
+          </Expression>
+        </ConditionDetection>
+        <!-- Please fill in the type of the write action module.
+             Without a ConditionDetection, the WriteAction always executes.
+             The output of the write action will be shown in the 
+             Health Explorer detail pane. -->
+        <WriteAction ID="WA" TypeID="QND.Hyperv2012R2.ResumeReplica.WAT">
+          <TimeoutSeconds>300</TimeoutSeconds>
+          <TraceLevel>2</TraceLevel>
+          <VMId>$Target/Property[Type='HypervLib!Microsoft.Windows.HyperV.VirtualMachine']/VirtualMachineId$</VMId>
+        </WriteAction>
+      </Recovery>
+    </Recoveries>
+    <Overrides>
+      <DiscoveryPropertyOverride ID="QND.Hyperv2012R2.DisableStdVMDiscovery.Override" Context="Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.ServerRole" Enforced="false" Discovery="Hyperv2012R2!Microsoft.Windows.HyperV.2012.R2.VirtualMachineDiscovery" Property="Enabled">
+        <Value>false</Value>
+      </DiscoveryPropertyOverride>
+    </Overrides>
+  </Monitoring>
+  <Presentation>
+    <StringResources>
+      <StringResource ID="QND.Hyperv2012R2.VMReplica.Status.AlertMessage" />
+      <StringResource ID="QND.Hyperv2012R2.VMSnapshotAge.AlertMessage" />
+      <StringResource ID="QND.Hyperv2012R2.VMISStatus.AlertMessage" />
+    </StringResources>
+  </Presentation>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="QND.HyperV2012R2.VirtualMachineDiscovery">
+          <Name>Hyper-V - Dynamic VM Discovery</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.TranslateNewPartitionEvent.Rule">
+          <Name>Hyper-V - Dynamic VM Discovery New Partition Hook</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.VMDynamicDiscoveryTrigger.Rule">
+          <Name>Hyper-V - Dynamic VM Discovery Time hook</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.DisableStdVMDiscovery.Override">
+          <Name>Hyper-V - Dynamic VM Discovery Disable Standard Discovery</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.Addendum">
+          <Name>QND Hyper-v 2012 R2 Addendum Monitoring</Name>
+          <Description>Integrates the standard monitoring devlivered by Microsoft Hyper-v Management Pack</Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.VMReplica.Status">
+          <Name>Replica Status</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.VMReplica.Status.AlertMessage">
+          <Name>Hyper-V - Replica has issues</Name>
+          <Description>Replica State is:{0}. Replica Health is:{1}. Last replica age in hours is:{2}</Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.VMSnapshotAge.Status">
+          <Name>Snapshots age</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.VMSnapshotAge.AlertMessage">
+          <Name>Hyper-V - Old snapshot is present</Name>
+          <Description>Oldest snapshot age in hours is:{0}. 
+          History:
+          {1}</Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.VMISStatus">
+          <Name>Integration Services Version</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.VMISStatus.AlertMessage">
+          <Name>Hyper-V - Integration Services are out dated</Name>
+          <Description>
+            Integration Services Version is: {0}.
+            Integration Services reported status is: {1}.
+          </Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.GetReplicaStatus.Diagnostic">
+          <Name>Get VM Replica Status</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.ResumeReplica">
+          <Name>Hyper-v - Resume VM Replica</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.ReplicaVM">
+          <Name>Hyper-V 2012 R2 - Replica Virtual Machine</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.ReplicaVM" SubElementID="PrimaryServerName">
+          <Name>Primary Server Name</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.ReplicaVM" SubElementID="ReplicaServerName">
+          <Name>Replica Server Name</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.ReplicaVM" SubElementID="RelationshipType">
+          <Name>Relationship</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.ReplicaVM" SubElementID="FrequencySec">
+          <Name>Replica Frequency sec</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.ReplicaVM" SubElementID="ReplicationMode">
+          <Name>Replication mode</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.ReplicaVM.Discovery">
+          <Name>Hyper-V 2012 R2 - Discovers VM Primary Replica</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.Addendum.GetVMReplicaStatus.Task">
+          <Name>Hyper-V - get VM replica Status</Name>
+          <Description>Get VM replica Status</Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.Hyperv2012R2.Addendum.ResumeVMReplica.Task">
+          <Name>Hyper-V - Resume VM Replica</Name>
+          <Description>Resume VM Rewplica without Resync</Description>
+        </DisplayString>
+      </DisplayStrings>
+      <KnowledgeArticles></KnowledgeArticles>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPack>
