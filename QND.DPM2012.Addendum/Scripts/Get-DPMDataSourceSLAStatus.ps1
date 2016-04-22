@@ -154,6 +154,8 @@ try
 				
 				#Put the gathered statistics into the property bag.  
 				#Includes a value for the folder name so that we can tell which folder the data is from.
+				#the latest recovery point property is lazy so let's force it
+                $lastRP = $ds.GetRecoveryPoint() | Sort $_.BackupTime -Descending | select -First 1
 				$age = (Get-Date) - $ds.LatestRecoveryPoint
 				$dsinSLA = ($age.TotalHours -le $pgSLA)
 				#$dsinShortSLA = ($age.TotalHours -le $pgSLA/2) -and $ds.CurrentlyProtected
