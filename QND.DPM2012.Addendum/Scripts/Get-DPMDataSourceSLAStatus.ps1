@@ -157,10 +157,12 @@ try
 				#the latest recovery point property is lazy so let's force it, since this can become taxing let's try some optimization
 				if ($ds.LatestRecoveryPoint -lt ([DateTime]'2010-01-01')) {
 					#this forces the field to get the correct value
-					$ds.GetRecoveryPoint() | out-null
-					#$lastRP = $ds.GetRecoveryPoint() # | Sort $_.BackupTime -Descending | select -First 1
+					#$ds.GetRecoveryPoint() | out-null
+					$lastRP = $ds.GetRecoveryPoint() | Sort $_.BackupTime -Descending | select -First 1
+					$latestRPTime = $lastRP.BackupTime
 				}
-				$age = (Get-Date) - $ds.LatestRecoveryPoint
+				else {$latestRPTime=$ds.LatestRecoveryPoint}
+				$age = (Get-Date) - $latestRPTime
 				$dsinSLA = ($age.TotalHours -le $pgSLA)
 				#$dsinShortSLA = ($age.TotalHours -le $pgSLA/2) -and $ds.CurrentlyProtected
 				#CurrentlyProtected
@@ -169,7 +171,7 @@ try
 				$bag.AddValue('Type','DS')
 				$bag.AddValue('Id',$ds.DataSourceId.ToString())
 				$bag.AddValue('SLA',$pgSLA)
-				$bag.AddValue('LatestRP',$ds.LatestRecoveryPoint)
+				$bag.AddValue('LatestRP',$latestRPTime)
 				$bag.AddValue('RPAgeHours',$age.TotalHours)
 				$bag.AddValue('DSInSLA',$dsinSLA)
 				$bag.AddValue('DSIsProtected',$ds.CurrentlyProtected)
