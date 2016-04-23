@@ -138,12 +138,18 @@
           <xsd:element name="SyncTime" type="xsd:string" />
           <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" />
           <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="StartTime" type="xsd:string" minOccurs="0" maxOccurs="1" default="00:00"/>
+          <xsd:element name="EndTime" type="xsd:string" minOccurs="0" maxOccurs="1" default="23:59"/>
+          <xsd:element name="DaysOfWeekMask" type="xsd:int" minOccurs="0" maxOccurs="1" default="127"/>
         </Configuration>
         <OverrideableParameters>
           <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
           <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
           <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
           <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$"/>
+          <OverrideableParameter ID="StartTime" ParameterType="string" Selector="$Config/StartTime$"/>
+          <OverrideableParameter ID="EndTime" ParameterType="string" Selector="$Config/EndTime$"/>
+          <OverrideableParameter ID="DaysOfWeekMask" ParameterType="int" Selector="$Config/DaysOfWeekMask$"/>
         </OverrideableParameters>
         <ModuleImplementation>
           <Composite>
@@ -152,10 +158,31 @@
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
               </DataSource>
+              
               <ProbeAction ID="GetStatus" TypeID="QND.DPM2012.GetDSSLAStatus.PT">
                 <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
                 <TraceLevel>$Config/TraceLevel$</TraceLevel>
               </ProbeAction>
+
+              <ConditionDetection ID="OperatingHours" TypeID="System!System.SchedulerFilter">
+                <SchedulerFilter>
+                  <ProcessDataMode>OnSchedule</ProcessDataMode>
+                  <Schedule>
+                    <WeeklySchedule>
+                      <Windows>
+                        <Daily>
+                          <Start>$Config/StartTime$</Start>
+                          <End>$Config/EndTime$</End>
+                          <DaysOfWeekMask>$Config/DaysOfWeekMask$</DaysOfWeekMask>
+                        </Daily>
+                      </Windows>
+                    </WeeklySchedule>
+                    <ExcludeDates />
+                  </Schedule>
+                  <UseCurrentTime>true</UseCurrentTime>
+                </SchedulerFilter>
+              </ConditionDetection>
+              
             </MemberModules>
             <Composition>
               <Node ID ="GetStatus">

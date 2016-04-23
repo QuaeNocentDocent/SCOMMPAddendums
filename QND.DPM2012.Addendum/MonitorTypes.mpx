@@ -167,15 +167,21 @@
       <Configuration>
         <xsd:element name="IntervalSeconds" type="xsd:int" />
         <xsd:element name="SyncTime" type="xsd:string" />
-        <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" />
+        <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="600" />
         <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
         <xsd:element name="DataSourceId" type="xsd:string" />
+        <xsd:element name="StartTime" type="xsd:string" minOccurs="0" maxOccurs="1" default="00:00"/>
+        <xsd:element name="EndTime" type="xsd:string" minOccurs="0" maxOccurs="1" default="23:59"/>
+        <xsd:element name="DaysOfWeekMask" type="xsd:int" minOccurs="0" maxOccurs="1" default="127"/>
       </Configuration>
       <OverrideableParameters>
         <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
         <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
         <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
         <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$"/>
+        <OverrideableParameter ID="StartTime" ParameterType="string" Selector="$Config/StartTime$"/>
+        <OverrideableParameter ID="EndTime" ParameterType="string" Selector="$Config/EndTime$"/>
+        <OverrideableParameter ID="DaysOfWeekMask" ParameterType="int" Selector="$Config/DaysOfWeekMask$"/>
       </OverrideableParameters>
       <MonitorImplementation>
         <MemberModules>
@@ -184,6 +190,9 @@
             <SyncTime>$Config/SyncTime$</SyncTime>
             <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
             <TraceLevel>$Config/TraceLevel$</TraceLevel>
+            <StartTime>$Config/StartTime$</StartTime>
+            <EndTime>$Config/EndTime$</EndTime>
+            <DaysOfWeekMask>$Config/DaysOfWeekMask$</DaysOfWeekMask>
           </DataSource>
           <ConditionDetection ID="DSFilter" TypeID="System!System.ExpressionFilter">
             <Expression>
@@ -266,17 +275,23 @@
       <Configuration>
         <xsd:element name="IntervalSeconds" type="xsd:int" />
         <xsd:element name="SyncTime" type="xsd:string" />
-        <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" />
+        <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="600" />
         <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
         <xsd:element name="PGId" type="xsd:string" />
         <xsd:element name="Threshold" type="xsd:int" minOccurs="1"/>
+        <xsd:element name="StartTime" type="xsd:string" minOccurs="0" maxOccurs="1" default="00:00"/>
+        <xsd:element name="EndTime" type="xsd:string" minOccurs="0" maxOccurs="1" default="23:59"/>
+        <xsd:element name="DaysOfWeekMask" type="xsd:int" minOccurs="0" maxOccurs="1" default="127"/>        
       </Configuration>
       <OverrideableParameters>
         <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
         <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
         <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
         <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$"/>
-        <OverrideableParameter ID="Threshold" ParameterType="int" Selector="$Config/Threshold$"/>        
+        <OverrideableParameter ID="Threshold" ParameterType="int" Selector="$Config/Threshold$"/>
+        <OverrideableParameter ID="StartTime" ParameterType="string" Selector="$Config/StartTime$"/>
+        <OverrideableParameter ID="EndTime" ParameterType="string" Selector="$Config/EndTime$"/>
+        <OverrideableParameter ID="DaysOfWeekMask" ParameterType="int" Selector="$Config/DaysOfWeekMask$"/>        
       </OverrideableParameters>
       <MonitorImplementation>
         <MemberModules>
@@ -285,6 +300,9 @@
             <SyncTime>$Config/SyncTime$</SyncTime>
             <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
             <TraceLevel>$Config/TraceLevel$</TraceLevel>
+            <StartTime>$Config/StartTime$</StartTime>
+            <EndTime>$Config/EndTime$</EndTime>
+            <DaysOfWeekMask>$Config/DaysOfWeekMask$</DaysOfWeekMask>
           </DataSource>
           <ConditionDetection ID="Filter" TypeID="System!System.ExpressionFilter">
             <Expression>
