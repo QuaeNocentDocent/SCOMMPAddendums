@@ -186,7 +186,9 @@
             </MemberModules>
             <Composition>
               <Node ID ="GetStatus">
+                <Node ID="OperatingHours">
                 <Node ID="Scheduler"></Node>
+                  </Node>
               </Node>
             </Composition>
           </Composite>
