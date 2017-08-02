@@ -1,0 +1,382 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<TypeDefinitions>
+  <MonitorTypes>
+    <UnitMonitorType ID="QND.DPM2016.SPFreeSpace.MT" Accessibility="Public">
+      <MonitorTypeStates>
+        <MonitorTypeState ID="Healthy"/>
+        <MonitorTypeState ID="OverThreshold1"/>
+        <MonitorTypeState ID="OverThreshold2"/>
+      </MonitorTypeStates>
+      <Configuration>
+        <xsd:element name="IntervalSeconds" type="xsd:int" />
+        <xsd:element name="SyncTime" type="xsd:string" />
+        <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="60" />
+        <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
+        <xsd:element name="Threshold1Perc" type="xsd:int" />
+        <xsd:element name="Threshold2Perc" type="xsd:int" />
+        <xsd:element name="Threshold2Abs" type="xsd:int" />     
+      </Configuration>
+      <OverrideableParameters>
+        <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+        <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+        <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$"/>
+        <OverrideableParameter ID="Threshold1Perc" Selector="$Config/Threshold1Perc$" ParameterType="int" />
+        <OverrideableParameter ID="Threshold2Perc" Selector="$Config/Threshold2Perc$" ParameterType="int" />
+        <OverrideableParameter ID="Threshold2Abs" Selector="$Config/Threshold2Abs$" ParameterType="int" />
+      </OverrideableParameters>
+      <MonitorImplementation>
+        <MemberModules>
+          <DataSource ID="GetStats" TypeID="QND.DPM2016.GetSPStats.DS">
+            <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+            <SyncTime>$Config/SyncTime$</SyncTime>
+            <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+            <TraceLevel>$Config/TraceLevel$</TraceLevel>
+          </DataSource>
+          <ConditionDetection ID="OverThreshold1CD" TypeID="System!System.ExpressionFilter">
+            <Expression>
+              <And>
+                <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Property[@Name='FreePoolPerc']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>LessEqual</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">$Config/Threshold1Perc$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+                </Expression>
+                <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Property[@Name='FreePoolPerc']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Greater</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">$Config/Threshold2Perc$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+                </Expression>
+                <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Property[@Name='FreePoolGB']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Greater</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">$Config/Threshold2Abs$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+                </Expression>
+              </And>
+            </Expression>
+          </ConditionDetection>
+          <ConditionDetection ID="OverThreshold2CD" TypeID="System!System.ExpressionFilter">
+            <Expression>
+              <Or>
+                <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Property[@Name='FreePoolPerc']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>LessEqual</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">$Config/Threshold2Perc$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+                </Expression>
+                <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Property[@Name='FreePoolGB']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>LessEqual</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">$Config/Threshold2Abs$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+                </Expression>
+              </Or>
+            </Expression>
+          </ConditionDetection>
+          <ConditionDetection ID="UnderThresholdCD" TypeID="System!System.ExpressionFilter">
+            <Expression>
+              <And>
+                <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Property[@Name='FreePoolPerc']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Greater</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">$Config/Threshold1Perc$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+                </Expression>
+                <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Property[@Name='FreePoolPerc']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Greater</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">$Config/Threshold2Perc$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+                </Expression>
+                <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Property[@Name='FreePoolGB']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Greater</Operator>
+                  <ValueExpression>
+                    <Value Type="Integer">$Config/Threshold2Abs$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+                </Expression>
+              </And>
+            </Expression>
+          </ConditionDetection>          
+        </MemberModules>
+        <RegularDetections>
+          <RegularDetection MonitorTypeStateID="Healthy">
+            <Node ID="UnderThresholdCD">
+              <Node ID="GetStats" />
+            </Node>
+          </RegularDetection>
+          <RegularDetection MonitorTypeStateID="OverThreshold1">
+            <Node ID="OverThreshold1CD">
+              <Node ID="GetStats" />
+            </Node>
+          </RegularDetection>
+          <RegularDetection MonitorTypeStateID="OverThreshold2">
+            <Node ID="OverThreshold2CD">
+              <Node ID="GetStats" />
+            </Node>
+          </RegularDetection>
+        </RegularDetections>
+      </MonitorImplementation>
+    </UnitMonitorType>
+    <UnitMonitorType ID="QND.DPM2016.DSSLAStatus.MT" Accessibility="Public">
+      <MonitorTypeStates>
+        <MonitorTypeState ID="InSLA"/>
+        <MonitorTypeState ID="OutSLA"/>
+      </MonitorTypeStates>
+      <Configuration>
+        <xsd:element name="IntervalSeconds" type="xsd:int" />
+        <xsd:element name="SyncTime" type="xsd:string" />
+        <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="600" />
+        <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
+        <xsd:element name="DataSourceId" type="xsd:string" />
+        <xsd:element name="StartTime" type="xsd:string" minOccurs="0" maxOccurs="1" default="00:00"/>
+        <xsd:element name="EndTime" type="xsd:string" minOccurs="0" maxOccurs="1" default="23:59"/>
+        <xsd:element name="DaysOfWeekMask" type="xsd:int" minOccurs="0" maxOccurs="1" default="127"/>
+      </Configuration>
+      <OverrideableParameters>
+        <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+        <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+        <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$"/>
+        <OverrideableParameter ID="StartTime" ParameterType="string" Selector="$Config/StartTime$"/>
+        <OverrideableParameter ID="EndTime" ParameterType="string" Selector="$Config/EndTime$"/>
+        <OverrideableParameter ID="DaysOfWeekMask" ParameterType="int" Selector="$Config/DaysOfWeekMask$"/>
+      </OverrideableParameters>
+      <MonitorImplementation>
+        <MemberModules>
+          <DataSource ID="GetStatus" TypeID="QND.DPM2016.GetDSSLAStatus.DS">
+            <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+            <SyncTime>$Config/SyncTime$</SyncTime>
+            <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+            <TraceLevel>$Config/TraceLevel$</TraceLevel>
+            <StartTime>$Config/StartTime$</StartTime>
+            <EndTime>$Config/EndTime$</EndTime>
+            <DaysOfWeekMask>$Config/DaysOfWeekMask$</DaysOfWeekMask>
+          </DataSource>
+          <ConditionDetection ID="DSFilter" TypeID="System!System.ExpressionFilter">
+            <Expression>
+              <And>
+                <Expression>
+                  <SimpleExpression>
+                    <ValueExpression>
+                      <XPathQuery Type="String">Property[@Name='Type']</XPathQuery>
+                    </ValueExpression>
+                    <Operator>Equal</Operator>
+                    <ValueExpression>
+                      <Value Type="String">DS</Value>
+                    </ValueExpression>
+                  </SimpleExpression>
+                </Expression>
+                <Expression>
+                  <SimpleExpression>
+                    <ValueExpression>
+                      <XPathQuery Type="String">Property[@Name='Id']</XPathQuery>
+                    </ValueExpression>
+                    <Operator>Equal</Operator>
+                    <ValueExpression>
+                      <Value Type="String">$Config/DataSourceId$</Value>
+                    </ValueExpression>
+                  </SimpleExpression>
+                </Expression>
+              </And>
+            </Expression>
+          </ConditionDetection>          
+          <ConditionDetection ID="InSLACD" TypeID="System!System.ExpressionFilter">
+            <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Boolean">Property[@Name='DSInSLA']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Equal</Operator>
+                  <ValueExpression>
+                    <Value Type="Boolean">true</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+            </Expression>
+          </ConditionDetection>
+          <ConditionDetection ID="OutSLACD" TypeID="System!System.ExpressionFilter">
+            <Expression>
+              <SimpleExpression>
+                <ValueExpression>
+                  <XPathQuery Type="Boolean">Property[@Name='DSInSLA']</XPathQuery>
+                </ValueExpression>
+                <Operator>NotEqual</Operator>
+                <ValueExpression>
+                  <Value Type="Boolean">true</Value>
+                </ValueExpression>
+              </SimpleExpression>
+            </Expression>
+          </ConditionDetection>
+        </MemberModules>
+        <RegularDetections>
+          <RegularDetection MonitorTypeStateID="InSLA">
+            <Node ID="InSLACD">
+              <Node ID="DSFilter">
+                <Node ID="GetStatus" />
+              </Node>
+            </Node>
+          </RegularDetection>
+          <RegularDetection MonitorTypeStateID="OutSLA">
+            <Node ID="OutSLACD">
+              <Node ID="DSFilter">
+                <Node ID="GetStatus" />
+              </Node>
+            </Node>
+          </RegularDetection>
+        </RegularDetections>
+      </MonitorImplementation>
+    </UnitMonitorType>
+    <UnitMonitorType ID="QND.DPM2016.PGSLAStatus.MT" Accessibility="Public">
+      <MonitorTypeStates>
+        <MonitorTypeState ID="InSLA"/>
+        <MonitorTypeState ID="OutSLA"/>
+      </MonitorTypeStates>
+      <Configuration>
+        <xsd:element name="IntervalSeconds" type="xsd:int" />
+        <xsd:element name="SyncTime" type="xsd:string" />
+        <xsd:element name="TimeoutSeconds" type="xsd:int" minOccurs="0" maxOccurs="1" default="600" />
+        <xsd:element name="TraceLevel" type="xsd:int" minOccurs="0" maxOccurs="1" />
+        <xsd:element name="PGId" type="xsd:string" />
+        <xsd:element name="Threshold" type="xsd:int" minOccurs="1"/>
+        <xsd:element name="StartTime" type="xsd:string" minOccurs="0" maxOccurs="1" default="00:00"/>
+        <xsd:element name="EndTime" type="xsd:string" minOccurs="0" maxOccurs="1" default="23:59"/>
+        <xsd:element name="DaysOfWeekMask" type="xsd:int" minOccurs="0" maxOccurs="1" default="127"/>        
+      </Configuration>
+      <OverrideableParameters>
+        <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+        <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+        <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        <OverrideableParameter ID="TraceLevel" ParameterType="int" Selector="$Config/TraceLevel$"/>
+        <OverrideableParameter ID="Threshold" ParameterType="int" Selector="$Config/Threshold$"/>
+        <OverrideableParameter ID="StartTime" ParameterType="string" Selector="$Config/StartTime$"/>
+        <OverrideableParameter ID="EndTime" ParameterType="string" Selector="$Config/EndTime$"/>
+        <OverrideableParameter ID="DaysOfWeekMask" ParameterType="int" Selector="$Config/DaysOfWeekMask$"/>        
+      </OverrideableParameters>
+      <MonitorImplementation>
+        <MemberModules>
+          <DataSource ID="GetStatus" TypeID="QND.DPM2016.GetDSSLAStatus.DS">
+            <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+            <SyncTime>$Config/SyncTime$</SyncTime>
+            <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+            <TraceLevel>$Config/TraceLevel$</TraceLevel>
+            <StartTime>$Config/StartTime$</StartTime>
+            <EndTime>$Config/EndTime$</EndTime>
+            <DaysOfWeekMask>$Config/DaysOfWeekMask$</DaysOfWeekMask>
+          </DataSource>
+          <ConditionDetection ID="Filter" TypeID="System!System.ExpressionFilter">
+            <Expression>
+              <And>
+                <Expression>
+                  <SimpleExpression>
+                    <ValueExpression>
+                      <XPathQuery Type="String">Property[@Name='Type']</XPathQuery>
+                    </ValueExpression>
+                    <Operator>Equal</Operator>
+                    <ValueExpression>
+                      <Value Type="String">PG</Value>
+                    </ValueExpression>
+                  </SimpleExpression>
+                </Expression>
+                <Expression>
+                  <SimpleExpression>
+                    <ValueExpression>
+                      <XPathQuery Type="String">Property[@Name='Id']</XPathQuery>
+                    </ValueExpression>
+                    <Operator>Equal</Operator>
+                    <ValueExpression>
+                      <Value Type="String">$Config/PGId$</Value>
+                    </ValueExpression>
+                  </SimpleExpression>
+                </Expression>
+              </And>
+            </Expression>
+          </ConditionDetection>
+          <ConditionDetection ID="InSLACD" TypeID="System!System.ExpressionFilter">
+            <Expression>
+              <SimpleExpression>
+                <ValueExpression>
+                  <XPathQuery Type="Integer">Property[@Name='NumberOfMissingDS']</XPathQuery>
+                </ValueExpression>
+                <Operator>LessEqual</Operator>
+                <ValueExpression>
+                  <Value Type="Integer">$Config/Threshold$</Value>
+                </ValueExpression>
+              </SimpleExpression>
+            </Expression>
+          </ConditionDetection>
+          <ConditionDetection ID="OutSLACD" TypeID="System!System.ExpressionFilter">
+            <Expression>
+              <SimpleExpression>
+                <ValueExpression>
+                  <XPathQuery Type="Integer">Property[@Name='NumberOfMissingDS']</XPathQuery>
+                </ValueExpression>
+                <Operator>Greater</Operator>
+                <ValueExpression>
+                  <Value Type="Integer">$Config/Threshold$</Value>
+                </ValueExpression>
+              </SimpleExpression>
+            </Expression>
+          </ConditionDetection>
+        </MemberModules>
+        <RegularDetections>
+          <RegularDetection MonitorTypeStateID="InSLA">
+            <Node ID="InSLACD">
+              <Node ID="Filter">
+                <Node ID="GetStatus" />
+              </Node>
+            </Node>
+          </RegularDetection>
+          <RegularDetection MonitorTypeStateID="OutSLA">
+            <Node ID="OutSLACD">
+              <Node ID="Filter">
+                <Node ID="GetStatus" />
+              </Node>
+            </Node>
+          </RegularDetection>
+        </RegularDetections>
+      </MonitorImplementation>
+    </UnitMonitorType>
+  </MonitorTypes>
+</TypeDefinitions>  
+</ManagementPackFragment>

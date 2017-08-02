@@ -1,0 +1,108 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+        
+        <!-- In this section, modify the attributes based on your needs. Ensure the
+             Base attribute matches the application you are modeling.
+             More information can be found in the Management Pack Development Kit: 
+             http://msdn.microsoft.com/en-us/library/ee533867.aspx -->
+        <ClassType ID="QND.DPM2016.SLAProtectionGroup" Base="DPM!Microsoft.SystemCenter.DataProtectionManager.2011.Library.ProtectionGroup" Accessibility="Internal" Abstract="false" Hosted="true" Singleton="false">
+          <Property ID="SLA" Key="false" Type="int"/>          
+        </ClassType>
+        <ClassType ID="QND.DPM2016.DataSourceswithSLA.Group" Base="MSIL!Microsoft.SystemCenter.InstanceGroup" Abstract="false" Accessibility="Public" Hosted="false" Singleton="true"></ClassType>
+        <ClassType ID="QND.DPM2016.DataSourceswithoutSLA.Group" Base="MSIL!Microsoft.SystemCenter.InstanceGroup" Abstract="false" Accessibility="Public" Hosted="false" Singleton="true"></ClassType>        
+      </ClassTypes>
+    </EntityTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Discoveries>
+      <Discovery ID="QND.DPM2016.SLAProtectionGroup.Discovery" ConfirmDelivery="false" Enabled="true" Priority="Normal" Remotable="false" Target="DPM!Microsoft.SystemCenter.DataProtectionManager.2011.Library.DPMServer">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="QND.DPM2016.SLAProtectionGroup">
+            <Property PropertyID="SLA"/>
+          </DiscoveryClass>
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="QND.DPM2016.PGSLA.Discovery.DS">
+          <TraceLevel>2</TraceLevel>
+          <IntervalSeconds>19200</IntervalSeconds>
+          <SyncTime></SyncTime>
+          <TimeoutSeconds>300</TimeoutSeconds>
+          <TargetComputer>$Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</TargetComputer>
+          <DPMServerName>$Target/Property[Type="DPM!Microsoft.SystemCenter.DataProtectionManager.2011.Library.DPMServer"]/DPMServerName$</DPMServerName>
+        </DataSource>
+      </Discovery>
+      <Discovery ID="QND.DPM2016.DataSourceswSLA.Discovery" Enabled="true" Target="QND.DPM2016.DataSourceswithSLA.Group" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryRelationship TypeID="MSIL!Microsoft.SystemCenter.InstanceGroupContainsEntities" />
+        </DiscoveryTypes>
+        <DataSource ID="GroupPopulationDataSource" TypeID="SC!Microsoft.SystemCenter.GroupPopulator">
+          <RuleId>$MPElement$</RuleId>
+          <GroupInstanceId>$MPElement[Name="QND.DPM2016.DataSourceswithSLA.Group"]$</GroupInstanceId>
+          <MembershipRules>
+            <MembershipRule>
+              <MonitoringClass>$MPElement[Name="DPM!Microsoft.SystemCenter.DataProtectionManager.2011.Library.DataSource"]$</MonitoringClass>
+              <RelationshipClass>$MPElement[Name="MSIL!Microsoft.SystemCenter.InstanceGroupContainsEntities"]$</RelationshipClass>
+              <Expression>
+                <Contained>
+                  <MonitoringClass>$MPElement[Name="QND.DPM2016.SLAProtectionGroup"]$</MonitoringClass>
+                </Contained>
+              </Expression>
+            </MembershipRule>
+          </MembershipRules>
+        </DataSource>
+      </Discovery>
+      <Discovery ID="QND.DPM2016.DataSourceswithoutSLA.Discovery" Enabled="true" Target="QND.DPM2016.DataSourceswithoutSLA.Group" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryRelationship TypeID="MSIL!Microsoft.SystemCenter.InstanceGroupContainsEntities" />
+        </DiscoveryTypes>
+        <DataSource ID="GroupPopulationDataSource" TypeID="SC!Microsoft.SystemCenter.GroupPopulator">
+          <RuleId>$MPElement$</RuleId>
+          <GroupInstanceId>$MPElement[Name="QND.DPM2016.DataSourceswithoutSLA.Group"]$</GroupInstanceId>
+          <MembershipRules>
+            <MembershipRule>
+              <MonitoringClass>$MPElement[Name="DPM!Microsoft.SystemCenter.DataProtectionManager.2011.Library.DataSource"]$</MonitoringClass>
+              <RelationshipClass>$MPElement[Name="MSIL!Microsoft.SystemCenter.InstanceGroupContainsEntities"]$</RelationshipClass>
+              <Expression>
+                <NotContained>
+                  <MonitoringClass>$MPElement[Name="QND.DPM2016.SLAProtectionGroup"]$</MonitoringClass>
+                </NotContained>
+              </Expression>
+            </MembershipRule>
+          </MembershipRules>
+        </DataSource>
+      </Discovery>
+    </Discoveries>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        
+        <!-- This is the string users of the Operations Console and Web Console will see. 
+             Descriptions are also helpful when the user is doing a search in the Console. -->
+        <DisplayString ElementID="QND.DPM2016.SLAProtectionGroup">
+          <Name>QND - DPM Protection Group with SLA</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="QND.DPM2016.SLAProtectionGroup" SubElementID="SLA">
+          <Name>SLA in hours</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.DPM2016.DataSourceswithSLA.Group">
+          <Name>QND - DPM Data Sources with SLA</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.DPM2016.DataSourceswSLA.Discovery">
+          <Name>DPM Data Sources with SLA Discovery</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.DPM2016.DataSourceswithoutSLA.Group">
+          <Name>QND - DPM Data Sources without SLA</Name>
+        </DisplayString>
+        <DisplayString ElementID="QND.DPM2016.DataSourceswithoutSLA.Discovery">
+          <Name>DPM Data Sources without SLA Discovery</Name>
+        </DisplayString>        
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

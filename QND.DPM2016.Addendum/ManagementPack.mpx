@@ -1,0 +1,45 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="QND.DPM2016.Addendum">
+          <Name>QND Data Protection Manager (DPM) 2016 Addendum</Name>
+          <Description>QND Data Protection Manager (DPM) 2016 Addendum</Description>
+        </DisplayString>
+      </DisplayStrings>
+      <KnowledgeArticles>
+
+        <KnowledgeArticle ElementID="QND.DPM2016.Addendum">
+          <MamlContent>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Summary</maml:title>
+              <maml:para>This Management Pack Extends the Microsoft provided for System center Data Protection Manager 2016.</maml:para>
+              <maml:para>The following scenario are currently implemented:</maml:para>
+              <maml:list>
+                <maml:listItem>
+                  <maml:para>Check for any data source out side the defined SLA for RPO and if so raise an alert</maml:para>
+                </maml:listItem>
+                <maml:listItem>
+                  <maml:para>Check for any Protection group with data sources outside the defined SLA for RPO without raising an alert</maml:para>
+                </maml:listItem>
+                <maml:listItem>
+                  <maml:para>Check for any disk/storage pool approaching the maximum capacity and raise an alert</maml:para>
+                </maml:listItem>
+              </maml:list>
+            </maml:section>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Configuration</maml:title>
+              <maml:para>The SLA monitoring requires Update Rollup 4 for System Center 2012 R2. To set a SLA for a given Protection Group the following POSH command can be used:</maml:para>
+              <maml:para>Get-DPMProtectionGroup | where {$_.Name –ieq ‘MyProtectionGroup’} | Set-DPMProtectionGroupSLA –SLAInHours 24</maml:para>
+              <maml:para>No action is taken if the Protection Group doesn't have a SLA defined or if the DPM server is not at UR4 yet</maml:para>
+            </maml:section>
+            <maml:section xmlns:maml="http://schemas.microsoft.com/maml/2004/10">
+              <maml:title>Causes</maml:title>
+              <maml:para>This monitor enters an error state when the processor utilization level on the network device is greater than the configured threshold. The utilization is expressed as a percentage of the overall capacity of the processor. The default is 90%.</maml:para>
+            </maml:section>
+          </MamlContent>
+        </KnowledgeArticle>
+      </KnowledgeArticles>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

@@ -1,0 +1,26 @@
+<TemplateGroup>
+  <Instances>
+    <Instance ID="Instance6e6966ef64584dabab974d07aee03c69" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.PerformanceCollectionRule" Version="1.0.0.0">
+      <PerformanceCollectionRuleConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Id>SPFreeSpace.Rule</Id>
+        <DisplayName>DPM: Storage Pool Free Space %</DisplayName>
+        <Description>Collect DPM Storage Pool Free Space %</Description>
+        <Category>PerformanceCollection</Category>
+        <ConfirmDelivery>false</ConfirmDelivery>
+        <Target>DPM!Microsoft.SystemCenter.DataProtectionManager.2011.Library.DPMServer</Target>
+        <Enabled>true</Enabled>
+        <Remotable>false</Remotable>
+        <Priority>Normal</Priority>
+        <DiscardLevel>100</DiscardLevel>
+        <ConditionDetectionConfig>&lt;Tolerance&gt;2&lt;/Tolerance&gt;&lt;ToleranceType&gt;Absolute&lt;/ToleranceType&gt;&lt;MaximumSampleSeparation&gt;4&lt;/MaximumSampleSeparation&gt;&lt;SamplingPeriodInSeconds&gt;1800&lt;/SamplingPeriodInSeconds&gt;</ConditionDetectionConfig>
+        <ConditionDetectionId>CD</ConditionDetectionId>
+        <ConditionDetectionType>Perf!System.Performance.OptimizedCollectionFilter</ConditionDetectionType>
+        <DataSourceId>DS</DataSourceId>
+        <DataSourceConfig>&lt;IntervalSeconds&gt;1800&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;&lt;/SyncTime&gt;&lt;TimeoutSeconds&gt;120&lt;/TimeoutSeconds&gt;&lt;TraceLevel&gt;1&lt;/TraceLevel&gt;</DataSourceConfig>
+        <DataSourceType>QND.DPM2016.GetSPStats.Perf.DS</DataSourceType>
+        <CollectToDB>true</CollectToDB>
+        <CollectToDW>true</CollectToDW>
+      </PerformanceCollectionRuleConfig>
+    </Instance>
+  </Instances>
+</TemplateGroup>
